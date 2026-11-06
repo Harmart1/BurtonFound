@@ -1,0 +1,20 @@
+# Local credentials and secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Tooling and generated previews
+node_modules/
+.wrangler/
+dist/
+coverage/
+.DS_Store
+__pycache__/
+*.pyc
+Burton_And_Found_Review_Preview.html
+Burton_And_Found_*_Preview.html
