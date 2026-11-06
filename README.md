@@ -1,3 +1,21 @@
+# Current Cloudflare Workers deployment (November 6, 2026)
+
+The supplied live hostname is **https://burtonfound.timharmar.workers.dev** (Cloudflare Workers, not Cloudflare Pages). A read-only GitHub runner probe confirmed the storefront HTTP 200 but `/api/health` HTTP 404: the currently deployed Worker has static assets but not the expected API.
+
+The repository now supports **both** Cloudflare Pages Functions (`functions/`) and Cloudflare Workers with static assets (`src/worker.js` + `wrangler.jsonc`). The Worker entry point reuses the same API handlers; changes in GitHub do **not** publish themselves to the current Worker.
+
+## Deploy the Worker safely
+
+1. In GitHub repository **Settings → Secrets and variables → Actions**, create repository secrets `CLOUDFLARE_API_TOKEN` (limited to editing Workers) and `CLOUDFLARE_ACCOUNT_ID`. Do not paste these credentials into source code or a chat.
+2. Run the **Deploy Burton & Found Worker (manual, test-safe)** workflow from the **Actions** tab. It validates the repository and deploys `wrangler.jsonc` to the existing `burtonfound` Worker. Automatic deployments are intentionally **not enabled** until the live deployment is verified.
+3. The Worker configuration ships with `LIVE_CHECKOUT_ENABLED=false`, `LIVE_PAYMENTS_APPROVED=false`, `TAX_CONFIGURATION_APPROVED=false`, and `CARRIER_QUOTES_ENABLED=false`. These values keep payment collection and carrier quotes disabled even after deployment.
+4. Verify `https://burtonfound.timharmar.workers.dev/api/health` returns `{"service":"Burton & Found","checkout":"preview_only",...}` and `/api/public-account-config` returns `{"configured":false}` before enabling accounts.
+5. Configure the **correct Burton & Found Supabase project** and a **Stripe sandbox for the correct merchant** first. Use Cloudflare Worker **Variables and Secrets** for `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (nonsecret), `SUPABASE_SECRET_KEY` (secret), `STRIPE_SECRET_KEY` (`sk_test_...`, secret), and `STRIPE_WEBHOOK_SECRET` (test webhook `whsec_...`, secret). Do not enable payment collection until test orders and owner tax/shipping checks pass. Never use an `sk_live_` key during this phase.
+
+The existing Cloudflare Pages instructions below remain valid if you choose to migrate to a separate Pages project later, but they **do not** deploy the `.workers.dev` hostname.
+
+---
+
 # IMPORTANT — production hosting
 
 **GitHub stores the repository; Cloudflare Pages hosts the ecommerce site.** Do not use GitHub Pages as the payment storefront. In Cloudflare connect this repository through **Git integration**, use repository root `/`, no framework, **no build command**, output directory **`public`**. The server-side `functions/` directory must be retained at repository root and Cloudflare encryption must hold Stripe/Supabase/carrier private credentials.
