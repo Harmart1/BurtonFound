@@ -1,10 +1,19 @@
-name: Deploy Burton & Found Worker (manual, test-safe)
+name: Deploy Burton & Found Worker (test-safe)
 
 on:
   workflow_dispatch:
+  # Intentional deployment trigger; unrelated code pushes never publish the Worker.
+  push:
+    branches: [main]
+    paths:
+      - .github/deploy-worker-trigger.txt
 
 permissions:
   contents: read
+
+concurrency:
+  group: burtonfound-worker-deployment
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -21,6 +30,15 @@ jobs:
         run: |
           npm run check:deploy
           npm test
+      - name: Assert live checkout stays disabled
+        run: |
+          node --input-type=module -e '
+          import {readFileSync} from "node:fs";
+          const vars=JSON.parse(readFileSync("wrangler.jsonc","utf8")).vars;
+          for(const key of ["LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED","TAX_CONFIGURATION_APPROVED","CARRIER_QUOTES_ENABLED"]){
+            if(vars[key]!=="false")throw Error(key+" must be false for this test-safe deployment");
+          }
+          '
       - name: Verify Cloudflare deploy credentials exist
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -36,3 +54,28 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
+      - name: Verify public backend and disabled checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://burtonfound.timharmar.workers.dev"
+          for attempt in 1 2 3 4 5 6; do
+            if curl --fail --silent --show-error --max-time 15 "$base/api/health" -o /tmp/burton-health.json; then
+              if python3 - <<'PY'
+          import json
+          data=json.load(open("/tmp/burton-health.json"))
+          assert data.get("service")=="Burton & Found", data
+          assert data.get("checkout")=="preview_only", "Checkout must remain disabled"
+          print("Verified Burton & Found health:",data.get("checkout"))
+          PY
+              then
+                break
+              fi
+            fi
+            if [[ "$attempt" -eq 6 ]]; then
+              echo "::error::Deployed API is not healthy in disabled-checkout mode."
+              exit 1
+            fi
+            sleep 5
+          done
+          curl --fail --silent --show-error --max-time 15 "$base/api/public-account-config" | python3 -c 'import json,sys; data=json.load(sys.stdin); assert isinstance(data.get("configured"),bool); print("Public account endpoint responsive")'
