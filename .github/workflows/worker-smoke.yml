@@ -1,0 +1,48 @@
+name: Verify Burton & Found public deployment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/worker-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify public storefront and API without credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://burtonfound.timharmar.workers.dev"
+          for path in "/" "/api/health" "/api/public-account-config"; do
+            out="$(mktemp)"
+            echo "Checking ${base}${path}"
+            code="$(curl -L -sS --max-time 20 --retry 1 -o "$out" -w '%{http_code}' "${base}${path}")" || {
+              echo "::error::Could not connect to ${base}${path}"
+              exit 1
+            }
+            echo "HTTP ${code}"
+            if [[ "$code" != "200" ]]; then
+              echo "::error::Unexpected status ${code} for ${path}"
+              exit 1
+            fi
+            if [[ "$path" == "/api/health" ]]; then
+              python3 - "$out" <<'PY'
+          import json, sys
+          with open(sys.argv[1]) as f:
+              data=json.load(f)
+          print('Service:',data.get('service'), '| Checkout:',data.get('checkout'))
+          if data.get('service') != 'Burton & Found':
+              raise SystemExit('Unexpected API: not the Burton & Found backend')
+          if data.get('checkout') not in ('preview_only','test_mode'):
+              raise SystemExit('UNSAFE: public API is not in preview/test payment mode')
+          PY
+            fi
+            rm -f "$out"
+          done
+          echo "Public smoke check passed; no payments attempted."
