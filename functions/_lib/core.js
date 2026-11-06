@@ -7,7 +7,10 @@ export function hasVerifiedPackages(env){
     return Object.values(profiles).some(p=>p&&p.verified===true&&[p.weightKg,p.lengthCm,p.widthCm,p.heightCm].every(v=>Number.isFinite(Number(v))&&Number(v)>0));
   }catch{return false}
 }
-export function secure(env){return !!(env.SUPABASE_URL&&env.SUPABASE_SECRET_KEY&&/^sk_(test|live)_/.test(env.STRIPE_SECRET_KEY||'')&&/^whsec_/.test(env.STRIPE_WEBHOOK_SECRET||'')&&(env.SHIPPING_MODE==='live_carrier'?(env.CARRIER_QUOTES_ENABLED==='true'&&String(env.SHIPPING_QUOTE_SECRET||'').length>=32&&hasVerifiedPackages(env)&&(env.CANADA_POST_USERNAME&&env.CANADA_POST_PASSWORD||env.FEDEX_CLIENT_ID&&env.FEDEX_CLIENT_SECRET&&env.FEDEX_ACCOUNT_NUMBER)&&!(String(env.STRIPE_SECRET_KEY).startsWith('sk_live_')&&(env.CANADA_POST_SANDBOX==='true'||env.FEDEX_SANDBOX==='true'))):env.SHIPPING_STANDARD_CA_CENTS)&&env.TAX_CONFIGURATION_APPROVED==='true'&&env.LIVE_CHECKOUT_ENABLED==='true');}
+export function secure(env){
+  // A separate explicit approval is required before any sk_live_* key can enable checkout.
+  if(String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_')&&env.LIVE_PAYMENTS_APPROVED!=='true')return false;
+  return !!(env.SUPABASE_URL&&env.SUPABASE_SECRET_KEY&&/^sk_(test|live)_/.test(env.STRIPE_SECRET_KEY||'')&&/^whsec_/.test(env.STRIPE_WEBHOOK_SECRET||'')&&(env.SHIPPING_MODE==='live_carrier'?(env.CARRIER_QUOTES_ENABLED==='true'&&String(env.SHIPPING_QUOTE_SECRET||'').length>=32&&hasVerifiedPackages(env)&&(env.CANADA_POST_USERNAME&&env.CANADA_POST_PASSWORD||env.FEDEX_CLIENT_ID&&env.FEDEX_CLIENT_SECRET&&env.FEDEX_ACCOUNT_NUMBER)&&!(String(env.STRIPE_SECRET_KEY).startsWith('sk_live_')&&(env.CANADA_POST_SANDBOX==='true'||env.FEDEX_SANDBOX==='true'))):env.SHIPPING_STANDARD_CA_CENTS)&&env.TAX_CONFIGURATION_APPROVED==='true'&&env.LIVE_CHECKOUT_ENABLED==='true');}
 export function requireDb(env){if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(env.SUPABASE_URL||'')||!(env.SUPABASE_SECRET_KEY||'').trim())throw Error('Database is not configured');}
 export async function db(env,table,{method='GET',query='',body,prefer='return=representation'}={}){
   requireDb(env);
