@@ -13,7 +13,8 @@ const req=(payload,headers={})=>new Request(base+'/api/admin/fulfill',{method:'P
 const valid={id:orderId,status:'shipped',carrier:'Canada Post',tracking_number:'1234567890123456'};
 test('Stripe test checkout mode is distinguished from live or disabled checkout',async()=>{
  assert.equal((await (await health({env})).json()).checkout,'test_mode');
- assert.equal((await (await health({env:{...env,STRIPE_SECRET_KEY:'sk_live_testing'}})).json()).checkout,'live_mode');
+ assert.equal((await (await health({env:{...env,STRIPE_SECRET_KEY:'sk_live_testing'}})).json()).checkout,'preview_only');
+ assert.equal((await (await health({env:{...env,STRIPE_SECRET_KEY:'sk_live_testing',LIVE_PAYMENTS_APPROVED:'true'}})).json()).checkout,'live_mode');
  assert.equal((await (await health({env:{...env,TAX_CONFIGURATION_APPROVED:'false'}})).json()).checkout,'preview_only');
 });
 test('shipping updates reject unauthenticated users before database access',async()=>{
