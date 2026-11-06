@@ -48,6 +48,15 @@ jobs:
             echo "::error::Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository Actions secrets before deploying."
             exit 1
           fi
+          # Validate only the format; never print the values.
+          if [[ ! "$CF_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID should be exactly 32 hexadecimal characters, not a URL or account name."
+            exit 1
+          fi
+          if [[ ! "$CF_API_TOKEN" =~ ^[a-zA-Z0-9_.-]{30,120}$ || "$CF_API_TOKEN" == cfk_* || "$CF_API_TOKEN" == cfoat_* ]]; then
+            echo "::error::CLOUDFLARE_API_TOKEN must be the raw scoped Cloudflare API token, without 'Bearer', whitespace, quotes or a Global API Key."
+            exit 1
+          fi
       - name: Deploy to existing burtonfound Worker
         uses: cloudflare/wrangler-action@v4
         with:
