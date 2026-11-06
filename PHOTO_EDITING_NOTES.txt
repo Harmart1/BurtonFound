@@ -1,0 +1,21 @@
+BURTON & FOUND · PHOTO POLISH NOTES
+
+What changed
+- Removed sentence-ending periods from website headings (not body copy, street names or historical print text).
+- Removed website-added drop shadows from product photographs, product cards and featured-image displays.
+- Applied moderate local lighting balance and contrast adjustments to 40 individually photographed catalog items.
+- Preserved 100% of the original .webp photograph files in assets/images-original/.
+- Added a "View original unedited photo" toggle in the product detail gallery. The enlarged-view button shows the selected mode.
+
+Important limitations
+Some supplied photographs have strong reflections from sleeves or glossy surfaces and shadows obscuring printed detail. Fully restoring the obscured information would require inventing it. These areas have not been filled using generative AI, because that could misrepresent historical condition. The processed images correct uneven exposure where the underlying print is visible, but some glare remains.
+
+Photographing the inventory for best sales results
+1. Remove removable reflective plastic sleeves if safe for the item.
+2. Lay the sheet flat on matte cream/grey paper using non-adhesive weights outside the print.
+3. Place two inexpensive diffused daylight lamps at 45 degrees to the item, avoiding frontal light or flash.
+4. Photograph with the camera lens parallel to the print, no zoom distortion and no shadows across the artwork.
+5. Include entire margins; also capture the reverse and close-ups of relevant condition issues.
+6. Replace the matching files in assets/images/ after reviewing exact colors and details; preserve originals.
+
+No prices, stock or account logic changed. Test the full site and verify item condition before enabling public checkout.

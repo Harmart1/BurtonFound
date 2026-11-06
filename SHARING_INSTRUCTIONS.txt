@@ -1,0 +1,9 @@
+BURTON & FOUND — SHOP-FIRST NETLIFY REVIEW BUILD
+
+1. Visit https://app.netlify.com/drop and upload Burton_And_Found_Shop_First_Netlify.zip.
+2. The free Netlify site address opens DIRECTLY into the actual storefront: product grid, prices, collection filters, cart, watchlist, and shop information.
+3. Share the HTTPS URL in Facebook Messenger or email. No extra click is required to enter the shop.
+4. A reviewer who wants a guided tour or feedback form can use https://YOUR-NETLIFY-DOMAIN/preview.html.
+5. Registration / secure payments are intentionally NOT live in this review build. The demo account is clearly labelled and should not be used for real personal data. Seller contact is not configured.
+
+The homepage lists 22 vintage paper sale listings. Books and collectibles are upcoming departments, not advertised as stocked. The guided feedback tour is secondary.

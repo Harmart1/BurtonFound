@@ -1,0 +1,7 @@
+Could you take a look at Burton & Found? The preview now opens directly to the shop so you can browse actual vintage ads and Old Hollywood finds with photos and prices.
+
+SHOP: [PASTE YOUR NETLIFY HTTPS URL]
+
+To leave comments, the optional guided review is at [YOUR URL]/preview.html.
+
+Please tell me what you think about the browsing, product photos, prices, mobile design and how easy it is to find what you want. (This is a preview; payment and real customer accounts are not yet enabled.)

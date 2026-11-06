@@ -1,0 +1,18 @@
+BURTON & FOUND — GITHUB / CLOUDFLARE UPLOAD
+
+1. Extract THIS ZIP to a folder on your computer.
+2. Create a GitHub repository called Burton-And-Found.
+3. Upload the CONTENTS of the extracted folder directly into the repository root.
+   Do not upload this ZIP as the only file.
+   Make sure public/, functions/, supabase/, and .github/ are at repo root.
+4. In Cloudflare Pages: connect that GitHub repository.
+   Framework: None
+   Root directory: repository root
+   Build command: leave blank
+   Output directory: public
+5. See DEPLOY_GITHUB_CLOUDFLARE_STRIPE.md and ACCOUNT_AND_MENU_SETUP.md
+   for Supabase, Stripe, Auth and shipping configuration.
+
+SECURITY: Never commit .dev.vars, .env, live keys, or passwords.
+This archive includes a .dev.vars.example TEMPLATE (not actual secrets).
+Real payment processing is NOT active until setup and tests are completed.
