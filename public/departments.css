@@ -1,0 +1,21 @@
+
+/* Burton & Found new department pages */
+.bf-dept-page{background:#f5f0e7;color:#243b32;font-family:Georgia,serif;min-height:100vh}
+.bf-dept-bar{font:700 .69rem/1.5 system-ui, sans-serif;letter-spacing:.15em;background:#18352d;color:#f2e8d7;padding:12px clamp(20px,5vw,70px);text-transform:uppercase;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.bf-dept-nav{max-width:1280px;margin:auto;padding:22px clamp(18px,4vw,48px);display:flex;align-items:center;justify-content:space-between;gap:24px}
+.bf-dept-nav a{color:inherit;text-decoration:none}.bf-dept-logo{font-size:clamp(1.5rem,2.3vw,2rem);letter-spacing:-.055em;font-weight:600}.bf-dept-logo em{color:#a34d3c;font-weight:400}
+.bf-dept-links{display:flex;gap:22px;flex-wrap:wrap;font:600 .79rem system-ui,sans-serif}.bf-dept-links a:hover{text-decoration:underline}
+.bf-dept-main{max-width:1280px;margin:auto;padding:12px clamp(18px,4vw,48px) 90px}
+.bf-dept-hero{border-top:1px solid #a9b5aa;padding-top:60px;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(280px,.88fr);align-items:center;gap:clamp(28px,5vw,90px)}
+.bf-dept-kicker{font:700 .72rem system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9c503d}
+.bf-dept-hero h1{font-size:clamp(3.1rem,6vw,6.7rem);line-height:.99;letter-spacing:-.065em;max-width:13ch;margin:20px 0}.bf-dept-hero h1 em{font-weight:400;color:#9d4d3b}
+.bf-dept-lede{font:1.14rem/1.75 system-ui,sans-serif;color:#4e5c55;max-width:56ch}
+.bf-dept-note{display:inline-block;padding:9px 13px;border:1px solid #a98c71;font:700 .73rem system-ui,sans-serif;color:#765d43;letter-spacing:.04em}
+.bf-dept-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.bf-dept-actions a{display:inline-flex;align-items:center;justify-content:center;background:#18352d;border:1px solid #18352d;padding:15px 19px;color:white;text-decoration:none;font:600 .82rem system-ui,sans-serif;border-radius:4px;min-height:48px}.bf-dept-actions a.bf-outline{background:transparent;color:#18352d}
+.bf-dept-visual{background:#d7c7ae;min-height:530px;display:grid;place-items:center;position:relative;overflow:hidden;border-radius:8px}
+.bf-dept-visual:before{content:'';position:absolute;inset:18px;border:1px solid #b59e81}
+.bf-book-motif{position:relative;transform:rotate(-8deg);width:54%;height:66%;background:linear-gradient(115deg,#3a5b4d,#14362e);box-shadow:18px 12px 0 #a3543c,29px 24px 0 #e6d9bd,32px 25px 34px #6d604b66;border-left:12px solid #ba9d74;border-radius:3px 9px 9px 3px;color:#e9d8b9;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:22px;padding:15px}
+.bf-book-motif span{font:600 1.9rem/1.3 Georgia,serif;letter-spacing:.08em}.bf-book-motif small{font:600 .67rem system-ui,sans-serif;letter-spacing:.23em}.bf-object-motif{width:52%;aspect-ratio:1/1;background:radial-gradient(ellipse at 40% 35%,#b88455,#634936 70%);box-shadow:18px 23px 30px #3e302766;clip-path:polygon(50% 0,62% 16%,82% 12%,85% 32%,100% 50%,85% 70%,76% 90%,50% 100%,24% 89%,13% 70%,0 50%,14% 29%,22% 13%,39% 16%);display:grid;place-items:center;color:#f6e7cc;font:4rem Georgia,serif}
+.bf-dept-grid{margin-top:70px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.bf-dept-card{background:#fffaf1;border:1px solid #ddd0bf;padding:28px;min-height:210px}.bf-dept-card h2{font-size:1.45rem;letter-spacing:-.03em}.bf-dept-card p{font:1rem/1.65 system-ui,sans-serif;color:#53665b}.bf-dept-footer{background:#18352d;color:#f7ebd8;text-align:center;padding:34px 20px;font:0.9rem system-ui,sans-serif}.bf-dept-footer a{color:inherit}
+@media(max-width:800px){.bf-dept-hero{grid-template-columns:1fr}.bf-dept-visual{min-height:400px;order:-1}.bf-dept-grid{grid-template-columns:1fr}.bf-dept-hero{padding-top:25px}.bf-dept-main{padding-bottom:50px}.bf-dept-links{gap:12px;font-size:.72rem}}
+@media(max-width:420px){.bf-dept-visual{min-height:290px}.bf-book-motif span{font-size:1.25rem}.bf-dept-hero h1{font-size:3rem}.bf-dept-nav{align-items:flex-start;flex-direction:column}}

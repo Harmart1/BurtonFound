@@ -1,0 +1,22 @@
+*{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0;background:#f7f3eb;color:#263a35;line-height:1.5}header{background:#243b38;color:white;display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:1.2rem max(1rem,calc((100vw - 1200px)/2))}header a{color:white;text-decoration:none;font-weight:700}header span{color:#c5a86b}nav{display:flex;gap:1rem}main{max-width:1150px;margin:3rem auto;padding:0 1rem}.eyebrow{letter-spacing:.16em;font-weight:700;font-size:.75rem;color:#8c5553}h1{font:normal clamp(2.2rem,5vw,3.4rem) Georgia,serif;margin:.4rem 0}button{background:#243b38;color:white;border:0;border-radius:6px;padding:.8rem 1.1rem;cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b28042;outline-offset:2px}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:2rem 0}.order{border:1px solid #d7cfbe;background:white;padding:1.4rem;border-radius:10px;margin:1rem 0;box-shadow:0 2px 12px #1526200b}.top{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.order h2{font:normal 1.5rem Georgia,serif;margin:0}.order dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem}dt{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:#596c62}dd{margin:.3rem 0;white-space:pre-line;overflow-wrap:anywhere}.items{padding:1rem;background:#f7f3eb}.form{display:flex;flex-wrap:wrap;gap:.8rem;align-items:end;margin-top:1rem}.form label{display:grid;gap:.3rem;min-width:155px;flex:1}.form input,.form select{padding:.7rem;border:1px solid #abb4a9;border-radius:5px;font:inherit;width:100%}.help{padding:1.25rem;border:1px solid #d4c9aa;background:#fffaf0;margin:2rem 0}.error{color:#a52e2e}.ok{color:#1a6039}footer{padding:2rem;text-align:center;font-size:.85rem;color:#56665f}
+/* Manual packing and shipping workspace */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.85rem;margin:1.8rem 0}
+.stats article{padding:1.15rem;background:#fff;border:1px solid #ded4c5;border-radius:8px}
+.stats small{display:block;color:#596c62;font-weight:600}.stats strong{font:normal 2rem Georgia,serif;display:block;margin-top:.15rem}
+.filters,.toolbar-buttons,.order-actions{display:flex;gap:.65rem;flex-wrap:wrap;align-items:center}
+.filters label{display:flex;flex-direction:column;gap:.3rem;font-size:.85rem;font-weight:600}
+.filters input,.filters select{border:1px solid #abb4a9;background:#fff;padding:.65rem;border-radius:6px;font:inherit;min-width:170px}
+button.secondary{background:#fff;color:#243b38;border:1px solid #7a8c86}
+.order-actions{margin-top:1rem;padding-top:1rem;border-top:1px solid #e1dcd2}.order-actions button{font-size:.85rem;padding:.65rem .75rem}
+.history{margin-top:1rem;padding:.9rem;background:#f7f2e9;border:1px solid #ddd5c4}.history p{margin:.3rem 0}
+.help a{color:#713330}
+@media(max-width:800px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{flex-direction:column;align-items:stretch}.filters>*{flex:1}.toolbar-buttons{justify-content:flex-start}}
+@media(max-width:460px){.order{padding:1rem}.order-actions>*{flex:1}.filters{flex-direction:column;align-items:stretch}.filters input,.filters select{width:100%}}
+
+.holds{margin-top:2.5rem;border-top:2px solid #c8b78d;padding-top:1.2rem}.holds h2{font:normal 1.5rem Georgia,serif;margin:0}.holds p{margin:.35rem 0 1rem}.hold-line{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;border:1px solid #d7cfbe;padding:1rem;margin:.7rem 0;background:#fff}.hold-line small{display:block;color:#63736e}.hold-line button{white-space:normal}
+
+.shipping-review-alert{padding:16px;background:#fff3e7;border:2px solid #9c3f31;border-radius:7px;color:#5c261d;margin:16px 0}
+.shipping-review-alert p{font-size:13px;line-height:1.5}
+.shipping-review-alert label{display:flex;flex-direction:column;font-weight:700;font-size:13px;gap:7px}
+.shipping-review-alert textarea{padding:11px;border:1px solid #9c6549;max-width:100%;font:14px/1.5 system-ui,sans-serif;border-radius:4px}
+.shipping-review-alert button{margin-top:10px;background:#723c33}

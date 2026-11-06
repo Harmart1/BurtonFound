@@ -1,0 +1,249 @@
+/* Burton & Found — accessible reading system, light and dark modes
+   System fonts, strong hierarchy, bounded line lengths, no images recolored.
+   Settings prioritize cognitive clarity, but are not a substitute for user testing. */
+:root,
+html[data-theme="light"] {
+ color-scheme:light;
+ --ui-bg:#f8f6f0;
+ --ui-surface:#fffdfa;
+ --ui-soft:#eeeae1;
+ --ui-ink:#25372f;
+ --ui-muted:#4c5b52;
+ --ui-subtle:#637268;
+ --ui-line:#c6c7bc;
+ --ui-accent:#933f34;
+ --ui-link:#7b332c;
+ --ui-ring:#ac503b;
+ --ui-button:#26483a;
+ --ui-button-text:#fffaf0;
+ --ui-chip:#e5e9e0;
+ --ui-shadow:0 2px 10px rgb(24 31 27 / .06);
+ --ink:var(--ui-ink);--ink-soft:var(--ui-muted);--paper:var(--ui-bg);--paper-2:var(--ui-soft);--cream:var(--ui-surface);--muted:var(--ui-muted);--line:var(--ui-line);--rust:var(--ui-accent);
+ --ac-ink:var(--ui-ink);--ac-dark:var(--ui-button);--ac-sage:var(--ui-muted);--ac-copper:var(--ui-accent);--ac-ivory:var(--ui-bg);--ac-paper:var(--ui-surface);--ac-line:var(--ui-line);--ac-text:var(--ui-ink);
+ --pt:var(--ui-ink);
+ --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+ --serif:Georgia,serif;
+}
+html[data-theme="dark"]{
+ color-scheme:dark;
+ --ui-bg:#15201b;
+ --ui-surface:#233029;
+ --ui-soft:#2c3b32;
+ --ui-ink:#f1f4ed;
+ --ui-muted:#d0d9cf;
+ --ui-subtle:#b8cbbf;
+ --ui-line:#708174;
+ --ui-accent:#f0aa93;
+ --ui-link:#ffbd9d;
+ --ui-ring:#ffd18c;
+ --ui-button:#d6e4d6;
+ --ui-button-text:#14251d;
+ --ui-chip:#33473b;
+ --ui-shadow:none;
+ --ink:var(--ui-ink);--ink-soft:var(--ui-muted);--paper:var(--ui-bg);--paper-2:var(--ui-soft);--cream:var(--ui-surface);--muted:var(--ui-muted);--line:var(--ui-line);--rust:var(--ui-accent);
+ --ac-ink:var(--ui-ink);--ac-dark:var(--ui-surface);--ac-sage:var(--ui-muted);--ac-copper:var(--ui-accent);--ac-ivory:var(--ui-bg);--ac-paper:var(--ui-surface);--ac-line:var(--ui-line);--ac-text:var(--ui-ink);
+ --pt:var(--ui-ink);
+}
+/* Inclusive default: 16px root, readable paragraphs, familiar controls and no reliance on decorative lettering */
+html{font-size:100%;scroll-padding-top:92px}
+body, .bf-dept-page, .papertrail-page, .collector-account-page, input,select,textarea,button{
+ font-family:var(--sans)!important;color:var(--ui-ink); }
+body{font-size:1rem;line-height:1.62;background:var(--ui-bg);background-image:none;}
+body p, .detail-copy p, .papertrail-page p, .bf-dept-page p, .account-panel p{
+ line-height:1.65;letter-spacing:.005em;
+}
+:is(.shop,.archive,.about,.notes,.footer,.closing,.papertrail-page,.bf-dept-page,.collector-account-page) p{max-width:76ch}
+:is(.shop,.archive,.about,.notes,.closing,.account-panel,.bf-dept-main,.pt-width) :is(h1,h2,h3,h4){letter-spacing:-.02em;line-height:1.16;}
+/* A restrained serif is retained only for prominent editorial headings and names */
+:is(.collection-lead,.shop,.about,.archive,.closing,.feature-wrap) :is(h1,h2), .logo-words strong,.bf-dept-logo,.pr-logo{font-family:Georgia,serif!important}
+button,select,input,textarea{font-size:1rem}
+button,a,select,input,textarea{transition-duration:.12s}
+:where(button,a,select,input,textarea):focus-visible{
+ outline:3px solid var(--ui-ring)!important;outline-offset:3px!important;
+}
+a:not([class]):hover{text-decoration:underline}
+:where(.tab,.market-dept,.add-small,.btn,.account-header-link,.product-watch,.bag-btn,.theme-toggle){min-height:44px}
+/* Do not force tiny upper-case lettering for functional controls */
+:where(.main-nav a,.market-dept,.market-dept small,.tab,.product-price,.add-small,.bag-btn,.header-actions a,
+ .toolbar label,.search-controls select,.product-title,.product-desc,.shipping-box, .shipping-box *,
+ .pt-controls, .pt-controls *, .account-page, .bf-dept-links){font-family:var(--sans)!important}
+:where(.main-nav a,.market-dept,.market-dept small,.product-desc,.account-return,.account-header-link,.pt-back){letter-spacing:.005em!important}
+:where(.product-desc,.product-meta,.product-card .product-year,.media-kicker,.catalog-count,.market-shop-subtitle,
+ .market-rail small,.spotlight-info p,.detail-note,.detail-grid dt,.archive-item,
+ .account-page p,.pt-controls label){font-size:max(.85rem, 13px)!important;line-height:1.5!important}
+:is(.tabs .tab,.search-controls select,.search-controls input,.market-dept,.btn,.add-small){font-weight:650!important}
+:where(.product-card,.order,.card,.pr-card,.bf-dept-card){box-shadow:var(--ui-shadow)!important}
+/* One clear, predictable permanent location for the appearance control on each page */
+.theme-toggle{border:1.5px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-ink);
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;
+ padding:9px 14px;line-height:1.25;font-size:.88rem;font-weight:700;white-space:nowrap;
+ box-shadow:none;cursor:pointer;flex:0 0 auto;}
+.theme-toggle:hover{background:var(--ui-soft)}
+.theme-toggle .theme-icon{font-size:1.1em;display:inline-flex;align-items:center;justify-content:center;width:1.25em}
+.theme-toggle:focus-visible{outline:3px solid var(--ui-ring)!important;outline-offset:2px!important}
+.theme-toggle:active{transform:none}
+.header .theme-toggle{margin-left:3px}
+.pt-header .theme-toggle{margin-left:auto}
+.bf-dept-nav .theme-toggle{order:2}
+.pr-top-row .theme-toggle{margin-left:auto}
+.admin-theme-wrap{display:flex;align-items:center;gap:9px}
+@media(max-width:800px){.theme-toggle{min-height:44px;min-width:44px;padding:8px 10px}.theme-toggle .theme-label{display:none}.header .theme-toggle{margin-inline:0}.header .main-nav{gap:8px}.bf-dept-nav .theme-toggle{order:0}.pr-top-row .theme-toggle{margin-inline:4px}}
+@media(max-width:370px){.theme-toggle{padding:8px}.header-actions{gap:5px!important}.header .logo{min-width:0}.logo-words strong{font-size:clamp(18px,5vw,24px)}}
+/* Simplify shopping interactions and information density */
+.market-hero.collection-lead{padding-top:22px;padding-bottom:18px;background:var(--ui-bg)!important}
+.collection-lead .lead-intro{gap:clamp(14px,2.6vw,42px)}
+.collection-lead .lead-intro>p{font:400 1rem/1.58 var(--sans)!important;color:var(--ui-muted);max-width:60ch}
+.collection-lead .lead-kicker{font-size:.8rem;letter-spacing:.07em}
+.spotlight-info p{font-size:.87rem!important;max-width:48ch}
+.spotlight{box-shadow:none!important}
+.market-rail{background:var(--ui-soft);border:1px solid var(--ui-line)}
+.market-dept{color:var(--ui-ink);border-color:var(--ui-line)}
+.market-dept small{font-size:.78rem!important;color:var(--ui-muted)}
+.market-dept.active{background:var(--ui-button)!important;color:var(--ui-button-text)!important}
+.market-dept.active small{color:inherit!important;opacity:.9}
+.shop.shop-first .shop-heading{margin-bottom:20px}
+.shop.shop-first .toolbar{gap:16px;margin-bottom:20px}
+.shop.shop-first .product-grid{gap:clamp(18px,2.5vw,30px)}
+.product-info{padding-block:16px!important}
+.product-title{font-family:Georgia,serif!important;line-height:1.28!important}
+.product-desc{color:var(--ui-muted)!important;min-height:auto}
+.product-meta,.product-price small,.catalog-count{color:var(--ui-muted)!important}
+:where(.market-dept,.tab,.btn,.add-small,button){cursor:pointer}
+/* Stable visual focus; turn off distracting motion when requested */
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+/* DARK MODE — do not modify product photographs, only the surrounding interface */
+html[data-theme="dark"] body,html[data-theme="dark"] .bf-dept-page,html[data-theme="dark"] .papertrail-page{background:var(--ui-bg)!important;background-image:none!important;color:var(--ui-ink)!important;}
+html[data-theme="dark"] :is(.header,.pt-header,.bf-dept-nav,.pr-top,.account-site-header){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important;}
+html[data-theme="dark"] :is(.header a,.pt-header a,.bf-dept-nav a,.pr-top a,.pr-logo,.logo-words strong,.account-return,.account-header-link,.bf-dept-logo){color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.topline,.bf-dept-bar,.pr-live-badge){background:#2c3d32!important;color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.mobile-nav,.mobile-nav a,.pt-mobile-nav){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.shop,.section-wrap,.archive,.about,.notes,.closing,.footer,.feature-wrap,.hero,.hero-content,.categories,.account-page,.account-main,.account-hero,.pr-main,.pr-section,.pr-feedback,.pt-main,.pt-section,.pt-block,.pt-controls,.bf-dept-main,.bf-dept-hero,.bf-dept-section){background-color:var(--ui-bg)!important;color:var(--ui-ink)!important;background-image:none!important;}
+html[data-theme="dark"] :is(.market-rail,.shop-footnote,.toolbar,.category-grid,.catalog-help,.pt-method,.pt-tip,.bf-dept-bottom,.bf-dept-note){background:var(--ui-soft)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.product-card,.product-info,.product-content,.archive-item,.category-card,.category-book,.category-collectibles,.category-grid>a,.pr-card,.pr-feedback-card,.account-panel,.account-card,.account-info-card,.saved-bag-card,.watch-card,.pt-card,.pt-result,.pt-tip,.pt-archive-item,.bf-dept-card,.bf-dept-suggestion,.bf-dept-hero,.order,.card,.help){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important;box-shadow:none!important}
+html[data-theme="dark"] :is(.product-media,.detail-media,.detail-hero-img,.archive-item img,.spotlight-photo,.pt-product-image){background:#e6e0d4!important}
+html[data-theme="dark"] :is(.product-price,.product-title,.product-meta,.product-desc,.product-year,.product-type,.shop-heading h2,.section-top h2,.archive-top h2,.about h2,.notes h2,.closing h2,.detail-copy h2,.archive-item h3,.account-panel h2,.account-panel h3,.pt-section h2,.pt-result h3,.bf-dept-main h1,.bf-dept-main h2,.pr-main h1,.pr-main h2,.account-hero h1,.account-hero h2){color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.eyebrow,.media-kicker,.catalog-count,.market-shop-subtitle,.product-price small,.product-card .product-desc,.about p,.notes p,.closing p,.account-panel p,.pt-section p,.bf-dept-main p,.pr-main p,.detail-copy p,.detail-grid dd,.detail-grid dt,.pt-intro,.pt-caption,.bf-dept-card p,.pr-card p){color:var(--ui-muted)!important}
+html[data-theme="dark"] :is(.tab,.market-dept,.search-controls input,.search-controls select,.toolbar input,.toolbar select,.account-panel input,.account-panel select,.account-panel textarea,.pr-feedback input,.pr-feedback textarea,.pr-feedback select,.pt-controls input,.pt-controls select,.pt-controls textarea,.bf-dept-page input,.bf-dept-page select){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border:1px solid var(--ui-line)!important}
+html[data-theme="dark"] :is(input,select,textarea)::placeholder{color:#c2d0c4!important;opacity:1}
+html[data-theme="dark"] :is(.tab.active,.market-dept.active,.btn-dark,.add-small,.account-primary,.pt-primary){background:var(--ui-button)!important;color:var(--ui-button-text)!important;border-color:var(--ui-button)!important}
+html[data-theme="dark"] :is(.tab.active span,.market-dept.active small){color:var(--ui-button-text)!important}
+html[data-theme="dark"] :is(.product-dialog,.info-dialog,.search-overlay,.cart-drawer,.cart-panel,.account-dialog,.pr-popover,.pt-modal,.pt-dialog,dialog){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.cart-header,.cart-footer,.cart-item,.cart-line,.cart-total,.detail-copy,.detail-grid,.detail-note,.shipping-box,.shipping-options,.shipping-form,.shipping-option,.shipping-choice,.shipping-quote,.shipping-summary,.shipping-row,.shipping-help,.shipping-footer){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.shipping-box input,.shipping-box select,.cart-drawer input,.cart-drawer select){background:var(--ui-soft)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.shipping-option.selected,.shipping-quote.selected){background:var(--ui-soft)!important;border-color:#e9c992!important}
+html[data-theme="dark"] :is(.detail-copy p,.cart-footer small,.shipping-help,.shipping-option small,.shipping-quote small,.cart-note,.shipping-summary small){color:var(--ui-muted)!important}
+html[data-theme="dark"] :is(.dialog-close,.cart-close,.icon-btn,.mobile-nav-btn,.product-watch,.account-header-link,.bag-btn,.pr-top-action){background:var(--ui-soft)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.footer,.footer-top,.footer-bottom,.footer a,.footer p,.pr-footer,.pt-footer,.bf-dept-footer){background:var(--ui-bg)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.spotlight-coke,.spotlight-hollywood){color:#fffaef!important;border-color:#8e9f8c!important}
+html[data-theme="dark"] .spotlight-coke{background:#71332d!important}
+html[data-theme="dark"] .spotlight-hollywood{background:#304839!important}
+html[data-theme="dark"] :is(.spotlight-info h2,.spotlight-info p,.spotlight-count,.spotlight-action){color:#fff9f0!important}
+html[data-theme="dark"] .collection-lead h1{color:var(--ui-ink)!important}
+html[data-theme="dark"] a:hover{color:var(--ui-link)}
+/* Product artwork, vintage photographs and merchandise images stay colour-accurate */
+html[data-theme="dark"] :is(.product-media img,.spotlight-photo img,.archive-item img,.product-detail img,.bf-dept-page img,.pt-product-image img){filter:none!important;opacity:1!important;mix-blend-mode:normal!important}
+/* Default light-mode also resets hard-coded microscopically small text and ambiguous controls */
+:where(.pr-card p,.bf-dept-card p,.account-panel label,.papertrail-page label,.detail-copy p){font-family:var(--sans)!important;font-size:1rem;line-height:1.6}
+@media (min-width:1100px){.main-nav a{font-size:clamp(.84rem,.87vw,.95rem)!important}}
+@media (max-width:700px){.lead-intro>p{font-size:.91rem!important}.spotlight h2{line-height:1.16!important}.shop.shop-first .product-grid{gap:20px 13px}.theme-toggle{font-size:14px}}
+/* Very narrow devices: account link lives in mobile navigation; avoid cramped header */
+@media (max-width:560px){
+ .header .account-header-link{display:none!important}
+ .header .header-actions{gap:4px!important;flex:0 0 auto}
+ .header .bag-btn{padding:8px 7px!important;min-width:0;min-height:44px}
+ .header .logo{gap:5px;min-width:0;flex:0 1 auto}
+ .header .logo img{width:34px;height:34px}
+ .header .logo-words strong{font-size:clamp(17px,4.6vw,22px)!important}
+ .header .logo-words small{font-size:6px!important;letter-spacing:0!important}
+ .header{padding-inline:clamp(9px,3.5vw,16px)!important;gap:5px!important}
+ .header .mobile-nav-btn{width:36px!important;min-width:36px!important}
+}
+/* Keep primary collection links visible on mid-sized desktops; remaining links stay in the menu */
+@media(min-width:1281px) and (max-width:1650px){
+ .header .main-nav{display:flex!important;gap:clamp(12px,1.2vw,20px)!important}
+ .header .main-nav a:nth-child(n+4){display:none!important}
+ .header .mobile-nav-btn{display:block!important;min-width:40px!important}
+ .header{padding-inline:clamp(20px,2vw,36px)!important;gap:10px!important}
+ .header .header-actions{gap:8px!important}
+ .header .logo{min-width:218px!important}
+}
+/* Restore explicit contrast for important dark-mode labels and controls */
+html[data-theme="dark"] .header .main-nav a,
+html[data-theme="dark"] .account-header-link,
+html[data-theme="dark"] .pt-header .main-nav a,
+html[data-theme="dark"] .bf-dept-nav a{color:var(--ui-ink)!important}
+html[data-theme="dark"] .header .main-nav a:hover{color:var(--ui-accent)!important}
+html[data-theme="dark"] .lead-kicker,
+html[data-theme="dark"] :is(.eyebrow,.market-rail-title,.shop-heading .eyebrow){color:#f1c2ab!important}
+html[data-theme="dark"] :is(.collection-lead h1 em,.shop-heading h2 em,.about h2 em,.closing h2 em){color:var(--ui-accent)!important}
+html[data-theme="dark"] .media-kicker{color:#263b32!important;background:#f5efe6!important}
+html[data-theme="dark"] :is(.theme-toggle,.theme-toggle:hover){background:#35483b!important;color:#fffefa!important;border:2px solid #97b4a3!important;box-shadow:none!important}
+html[data-theme="dark"] .theme-toggle :is(.theme-icon,.theme-label){color:#fffefa!important}
+html[data-theme="dark"] :is(.market-rail-title,.market-dept small){color:#d9e6d8!important}
+html[data-theme="dark"] .market-dept.active small{color:#14251d!important}
+html[data-theme="dark"] .search-controls select,
+html[data-theme="dark"] .search-controls input,
+html[data-theme="dark"] .search-controls select option,
+html[data-theme="dark"] .toolbar .tab:not(.active){background:#2c3b32!important;color:#eff8ec!important;border-color:#708174!important}
+html[data-theme="dark"] .search-field svg{stroke:#e1ebdc!important}
+html[data-theme="dark"] .product-watch{color:#fffefa!important;background:#2c3b32!important;border:1px solid #708174!important}
+html[data-theme="dark"] .market-dept:not(.active):hover{background:#40584a!important;color:#fff!important}
+/* Archived editorial cards and research results have consistent foreground/background */
+html[data-theme="dark"] :is(.category-title,.cat-meta,.category-book .cat-meta,.category-collectibles .cat-meta,.category-book .category-title,.category-collectibles .category-title){color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.pr-form,.pr-feedback,.pr-summary,.pt-panel,.pt-tool,.pt-surface,.pt-quiz,.pt-archive,.ac-card,.account-sidebar,.account-panel-inner){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] .pr-top-action{color:var(--ui-ink)!important}
+html[data-theme="dark"] .bf-dept-page .bf-dept-main>p{color:var(--ui-muted)!important}
+/* Consistent keyboard skip link across all page templates */
+a.skip-link{position:absolute;left:12px;top:-100px;z-index:99999;border-radius:5px;background:var(--ui-surface);color:var(--ui-ink);padding:10px 14px;font:700 15px/1.5 var(--sans);border:2px solid var(--ui-ring)}
+a.skip-link:focus{top:10px}
+/* Account access: both halves must remain readable in dark mode */
+html[data-theme="dark"] .account-access{background:var(--ui-bg)!important;color:var(--ui-ink)!important}
+html[data-theme="dark"] .account-story{background:#213e30!important;color:#fffaf0!important}
+html[data-theme="dark"] .account-story :is(h1,h2,p,.account-story-foot){color:#fffaf0!important}
+html[data-theme="dark"] .account-story .account-eyebrow{color:#f3c49c!important}
+html[data-theme="dark"] .account-story h1 em{color:#f1c6a3!important}
+html[data-theme="dark"] .account-story-card{background:#ece6da!important;border-color:#c0aa8f!important}
+html[data-theme="dark"] .account-access-form{background:var(--ui-bg)!important;color:var(--ui-ink)!important}
+html[data-theme="dark"] .account-access-form :is(h2,.account-subline,.account-form-hint,.account-privacy-summary,.account-privacy-summary strong){color:var(--ui-ink)!important}
+html[data-theme="dark"] .account-access-form .account-eyebrow{color:var(--ui-accent)!important}
+html[data-theme="dark"] :is(.account-auth-form label,.account-editor-form label,.account-current-bag label,.account-access-form .account-check){color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.account-auth-form input:not([type=checkbox]),.account-editor-form input:not([type=checkbox]),.account-editor-form select,.settings-inline input,.account-current-bag input){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.account-switch button,.account-outline,.account-text-button){color:var(--ui-ink)!important}
+html[data-theme="dark"] .account-switch button[aria-selected=true]{color:var(--ui-ink)!important;border-bottom-color:var(--ui-accent)!important}
+html[data-theme="dark"] .account-notice{background:#2d4035!important;color:var(--ui-ink)!important;border-left-color:var(--ui-accent)!important}
+html[data-theme="dark"] .account-notice :is(strong,p,span){color:var(--ui-ink)!important}
+html[data-theme="dark"] .account-demo{background:var(--ui-button)!important;color:var(--ui-button-text)!important;border-color:var(--ui-button)!important}
+html[data-theme="dark"] .account-auth-form .account-primary{background:var(--ui-button)!important;color:var(--ui-button-text)!important}
+html[data-theme="dark"] :is(.account-privacy-summary,.account-current-bag,.account-settings,.account-table,.account-info,.account-tip){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.account-footer,.account-footer a){background:var(--ui-bg)!important;color:var(--ui-ink)!important}
+html[data-theme="dark"] .account-auth-form :is(input,textarea)::placeholder{color:#bdcfc1!important}
+/* Paper Trail hero uses decorative cream cards but readable dark copy */
+html[data-theme="dark"] .pt-hero{background:#21372c!important;color:#f8f7ef!important}
+html[data-theme="dark"] .pt-hero-content{background:#21372c!important;color:#f8f7ef!important}
+html[data-theme="dark"] .pt-hero-content :is(h1,h2,p,.pt-lede,.pt-privacy,.pt-hero-kicker,.pt-eyebrow){color:#f8f7ef!important}
+html[data-theme="dark"] .pt-hero h1 em,html[data-theme="dark"] .pt-hero-kicker{color:#ffc4a2!important}
+html[data-theme="dark"] .pt-hero a:not(.btn){color:#f8f7ef!important}
+html[data-theme="dark"] .pt-hero .btn{background:#d6e4d6!important;color:#21372c!important;border-color:#d6e4d6!important}
+html[data-theme="dark"] .pt-hero-art{background:#b88c6e!important}
+html[data-theme="dark"] :is(.pt-intro,.pt-desk,.pt-era-section,.pt-collector,.pt-challenge,.pt-end){background:var(--ui-bg)!important;color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.pt-section-heading h2,.pt-intro h2,.pt-end h2){color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.pt-lede,.pt-section-heading p,.pt-intro p,.pt-end p){color:var(--ui-muted)!important}
+/* The shipping estimator lives in the bag footer. Allow the ENTIRE bag to scroll
+   on compact screens, so all carrier choices and checkout controls remain reachable. */
+.cart-drawer{overflow-y:auto!important;overscroll-behavior-y:contain}
+.cart-drawer .cart-items{overflow:visible!important;flex:0 0 auto!important;min-height:0!important}
+.cart-drawer .cart-footer{overflow:visible!important;flex:0 0 auto!important;position:static!important}
+.cart-drawer .cart-header{position:sticky;top:0;z-index:2;background:var(--ui-surface)}
+html[data-theme="dark"] .cart-drawer :is(.cart-header,.cart-items,.cart-footer){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.shipping-estimator,.shipping-results,.shipping-choice){background:var(--ui-soft)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important}
+html[data-theme="dark"] :is(.shipping-estimator h3,.shipping-estimator p,.shipping-quote-date,.shipping-choice strong,.shipping-choice small,.shipping-choice b,.shipping-estimator label){color:var(--ui-ink)!important}
+html[data-theme="dark"] :is(.shipping-estimator input,.shipping-estimator select){background:var(--ui-surface)!important;color:var(--ui-ink)!important;border:1px solid var(--ui-line)!important}
+html[data-theme="dark"] .shipping-choice:has(input:checked){background:#365b48!important;border:2px solid #e7c997!important}
+@media(max-width:560px){.cart-drawer .cart-header{top:0}.cart-drawer .cart-footer{padding-bottom:calc(30px + env(safe-area-inset-bottom,0px))}}
+/* Final readability pass on real carrier-rate choices */
+.shipping-estimator :is(h3,h4){font-size:1.12rem!important;line-height:1.35!important}
+.shipping-estimator label{font-size:.91rem!important;line-height:1.45!important}
+.shipping-choice strong{font-size:.91rem!important;line-height:1.45!important}
+.shipping-choice small{font-size:.82rem!important;line-height:1.5!important}
+.shipping-quote-date,.shipping-estimator>p,.cart-footer small{font-size:.82rem!important;line-height:1.5!important}
+@media(max-width:600px){.topline{display:none!important}}

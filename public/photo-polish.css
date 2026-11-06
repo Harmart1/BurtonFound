@@ -1,0 +1,25 @@
+/* Burton & Found · refined collector photography */
+/* Physical paper still shows real patina, which must not be digitally erased or invented. */
+.product-card,.product-card:hover,.product-media,.product-media img,.product-media:hover img,
+.detail-media,.detail-hero-img,.detail-strip img,.thumb-btn,.thumb-btn img,
+.archive-item,.archive-item img,.feature-image img,.hero-photo,.hero-photo img,
+.market-art,.market-art img,.hollywood-portrait,.hollywood-portrait img,
+.hollywood-main,.hollywood-main img,.hollywood-card,.hollywood-card img,
+.photo-front,.photo-back,.photo-main,.zoom-dialog img,.zoom-dialog,
+.card-image,.card-image img{box-shadow:none!important;filter:none!important;text-shadow:none!important}
+.product-card,.product-card:hover{transform:none!important}
+.product-card:hover,.thumb-btn:hover{border-color:#b9ae98!important}
+.product-media{background:#f1eee8!important;border:1px solid #e2ddd3!important}
+.product-media img{max-width:95%;max-height:95%;width:auto;height:auto;object-fit:contain;image-rendering:auto}
+.product-media:hover img{transform:none!important}
+.detail-media{background:#f5f2eb!important}
+.detail-hero-img{max-height:65vh;object-fit:contain;background:#f5f2eb!important}
+.detail-original-toggle{display:inline-flex;gap:8px;justify-content:center;align-items:center;padding:10px 14px;margin:9px auto 12px;background:#fffdf7;color:#294339;border:1px solid #bab6ab;border-radius:3px;font-size:12px;font-weight:700;cursor:pointer;max-width:90%}
+.detail-original-toggle:hover{background:#eee8dd}
+.detail-photo-note{font:11px/1.45 Arial,sans-serif;color:#706a5d;margin:1px auto 8px;max-width:90%;text-align:center}
+.market-art,.market-art:hover{box-shadow:none!important;filter:none!important}
+.market-art{border:1px solid #cfc5b5!important}
+.market-art:hover{transform:translateY(-2px) rotate(0deg)!important}
+.market-art-stamp{box-shadow:none!important}
+.hollywood-still img,.hollywood-layer img{filter:none!important;box-shadow:none!important}
+@media (max-width:600px){.detail-original-toggle{font-size:12px;min-height:44px;width:92%}}

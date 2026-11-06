@@ -1,0 +1,158 @@
+/* Burton & Found · Dark-theme contrast repair · November 2026
+   Paired backgrounds and foregrounds for readable text (target >= 4.5:1).
+   Does not recolour the photographs or interfere with light mode. */
+html[data-theme="dark"] {
+  --read-bg:#15201b;
+  --read-panel:#26372e;
+  --read-surface:#2a3b32;
+  --read-strong:#f6f6f0;
+  --read-text:#e4ece1;
+  --read-secondary:#d2dfd3;
+  --read-accent:#ffc4a4;
+  --read-border:#9aafa0;
+}
+/* Genuine LIGHT controls retain DARK writing. Fixes white-on-cream buttons. */
+html[data-theme="dark"] body :is(.btn.btn-light,.btn.btn-light:hover) {
+  background:#f8f3e7!important;color:#183328!important;border-color:#e1d3bb!important;
+}
+html[data-theme="dark"] body .btn.btn-light :is(span,small,svg){color:#183328!important}
+html[data-theme="dark"] body .header a.account-create-header,
+html[data-theme="dark"] body .bf-dept-nav a.account-create-header,
+html[data-theme="dark"] body .account-create-header {
+  background:#deebd9!important;color:#173023!important;border:2px solid #deebd9!important;
+}
+html[data-theme="dark"] body .account-create-header:hover{background:#fff4da!important;color:#173023!important}
+html[data-theme="dark"] .bag-btn #cartCount,
+html[data-theme="dark"] .header .bag-btn span,
+html[data-theme="dark"] .header .bag-btn .bag-count {
+  background:#f3f7ee!important;color:#18352a!important;border:1px solid #c8d9c8!important;
+}
+/* Photos remain on neutral pale mats, but their overlay controls use dark ink. */
+html[data-theme="dark"] body .product-media .media-kicker,
+html[data-theme="dark"] body .product-media .media-view,
+html[data-theme="dark"] body .detail-media .media-kicker {
+  color:#1b362c!important;background:#fbf6ea!important;border-color:#b9bdac!important;
+}
+html[data-theme="dark"] body :is(.product-media,.detail-media) :is(.media-kicker,.media-view) * {color:#1b362c!important}
+/* The initial design retained several cream sections after changing their type to white.
+   Convert ONLY these editorial panels to dark; keep item imagery untouched. */
+html[data-theme="dark"] body :is(.papertrail-teaser,.papertrail-teaser-copy,.era-guide,.about-copy,.era-guide-header){
+  background:var(--read-panel)!important;color:var(--read-strong)!important;
+  border-color:var(--read-border)!important;
+}
+html[data-theme="dark"] body :is(.papertrail-teaser-copy,.era-guide,.about-copy) :is(h1,h2,h3,h4){color:var(--read-strong)!important}
+html[data-theme="dark"] body :is(.papertrail-teaser-copy,.era-guide,.about-copy) :is(p,small,.pt-teaser-note){color:var(--read-secondary)!important}
+html[data-theme="dark"] body :is(.papertrail-teaser-copy,.era-guide,.about-copy) :is(em,.eyebrow){color:var(--read-accent)!important}
+/* Explanatory photographs and illustration captions are on LIGHT image mats. */
+html[data-theme="dark"] body .papertrail-teaser-art :is(span,small,p){color:#24372c!important}
+/* Paper Trail Lab — input cards formerly had white writing on cream. */
+html[data-theme="dark"] body :is(.pt-drop,.pt-scan-panel,.pt-results-panel,.pt-card-fields,.pt-card-preview,.pt-era-object,.pt-game-art,.pt-scan-panel-header,.pt-card-form,.pt-card-preview-wrap){
+  background:var(--read-surface)!important;color:var(--read-strong)!important;
+  border-color:var(--read-border)!important;
+}
+html[data-theme="dark"] body :is(.pt-drop,.pt-scan-panel,.pt-results-panel,.pt-card-fields,.pt-card-preview,.pt-era-object) :is(h2,h3,h4,label,strong,p,span,small){color:var(--read-text)!important}
+html[data-theme="dark"] body :is(.pt-drop,.pt-scan-panel,.pt-results-panel,.pt-card-fields,.pt-card-preview,.pt-era-object) :is(.pt-index,.pt-preview-overline,#ptCardStatusView){color:var(--read-accent)!important}
+html[data-theme="dark"] body :is(.pt-drop,.pt-scan-panel,.pt-results-panel,.pt-card-fields,.pt-card-preview,.pt-era-object) :is(.pt-helper,.pt-field-hint,#ptCardMetaView,.pt-orbit-label){color:var(--read-secondary)!important}
+html[data-theme="dark"] body :is(.pt-scan-panel,.pt-card-fields) :is(input,textarea,select){
+  background:#1e3027!important;color:var(--read-strong)!important;border:1px solid var(--read-border)!important;
+}
+html[data-theme="dark"] body .pt-era-object img{background:#e7dfd0!important}
+html[data-theme="dark"] body :is(.pt-decade,.pt-decade:hover,.pt-button.pt-button-outline){
+  background:#324c3d!important;color:#f6f5ee!important;border:1px solid var(--read-border)!important;
+}
+html[data-theme="dark"] body .pt-decade.active,
+html[data-theme="dark"] body .pt-decade[aria-pressed="true"]{
+  background:#e5eddd!important;color:#1b3428!important;border-color:#e5eddd!important;
+}
+html[data-theme="dark"] body .pt-game-cover{background:#315042!important;color:#fff2e0!important;border:1px solid #a8bdac!important}
+html[data-theme="dark"] body :is(.pt-index,.pt-caption,.pt-card-preview-overline,.pt-section-heading .pt-eyebrow){color:var(--read-accent)!important}
+html[data-theme="dark"] body :is(.pt-era-object small,.pt-scan-panel small,.pt-results-panel small,.pt-card-preview small){color:var(--read-secondary)!important}
+/* Collector feedback and review screens. Formerly cream with light text. */
+html[data-theme="dark"] body :is(.pr-tour,.pr-share,.pr-share-inner,.pr-hero,.pr-hero-copy,.pr-feedback,.pr-form,.pr-survey,.pr-question,.pr-step){
+  background:var(--read-bg)!important;color:var(--read-strong)!important;
+  border-color:var(--read-border)!important;
+}
+html[data-theme="dark"] body :is(.pr-tour,.pr-share,.pr-hero,.pr-feedback,.pr-form) :is(h1,h2,h3,h4,strong,legend,label,p,small){color:var(--read-text)!important}
+html[data-theme="dark"] body :is(.pr-tour,.pr-share,.pr-hero,.pr-feedback,.pr-form) :is(.pr-eyebrow,em,.pr-card span){color:var(--read-accent)!important}
+html[data-theme="dark"] body :is(.pr-lede,.pr-card p,.pr-form small,.pr-share p,.pr-head>p:last-child){color:var(--read-secondary)!important}
+html[data-theme="dark"] body .pr-hero-media{background:#e4d7bd!important}
+html[data-theme="dark"] body .pr-hero-media span{background:#fff5e7!important;color:#19372d!important}
+html[data-theme="dark"] body .pr-button.pr-primary,
+html[data-theme="dark"] body .pr-button.pr-primary:hover{
+  background:#dcebd9!important;color:#19362a!important;border-color:#dcebd9!important;
+}
+html[data-theme="dark"] body .pr-button.pr-secondary,
+html[data-theme="dark"] body .pr-button.pr-secondary:hover{
+  background:#30473a!important;color:#f9f6ed!important;border:1px solid var(--read-border)!important;
+}
+html[data-theme="dark"] body :is(.pr-form,.pr-feedback) :is(input,select,textarea){background:#22342b!important;color:var(--read-strong)!important;border-color:var(--read-border)!important}
+html[data-theme="dark"] body .pr-form :is(input[type=radio],input[type=checkbox]){accent-color:#ffd19c!important}
+/* Compact rating boxes/role chips have stable ink and surfaces. */
+html[data-theme="dark"] body :is(.pr-roles label,.pr-rating label,.pr-rating-button,.pr-role-option,.pr-stars label,.pr-score label,.pr-choice label){
+  background:#30473a!important;color:var(--read-text)!important;border:1px solid var(--read-border)!important;
+}
+/* Books / collectibles page hero illustration uses beige background by design;
+   make letters dark on the visual mat, while keeping its product art unaltered. */
+html[data-theme="dark"] body .bf-dept-visual{background:#d7c7ae!important;color:#1b332a!important}
+html[data-theme="dark"] body .bf-dept-visual :is(span,small,strong,p,.bf-object-motif){color:#1b332a!important}
+html[data-theme="dark"] body .bf-dept-actions a.bf-outline{
+  background:transparent!important;color:var(--read-strong)!important;border-color:#c8d7c8!important;
+}
+html[data-theme="dark"] body .bf-dept-actions a.bf-outline:hover{background:#304b3b!important;color:#fff!important}
+html[data-theme="dark"] body .bf-dept-main :is(em,.bf-dept-eyebrow){color:var(--read-accent)!important}
+/* Active and disabled states cannot rely on colour alone. */
+html[data-theme="dark"] body :is(button,input,select,textarea,a):focus-visible{outline:3px solid #ffd18c!important;outline-offset:3px!important}
+html[data-theme="dark"] body button:disabled{color:#c6d4c8!important;opacity:.68}
+/* Smaller labels avoid microscopic tracking without removing vintage art direction. */
+html[data-theme="dark"] body :is(.product-meta,.cart-note,.checkout-help,.shipping-quote-date,.shipping-choice small,.pt-field-label){letter-spacing:.005em!important}
+/* Secondary informational text and collector callouts */
+html[data-theme="dark"] body .about-copy .signature,
+html[data-theme="dark"] body .about-copy .signature span{color:var(--read-accent)!important}
+html[data-theme="dark"] body .trustline b{color:#66412e!important}
+html[data-theme="dark"] body .collector-shop-invite{background:var(--read-panel)!important;color:var(--read-text)!important}
+html[data-theme="dark"] body .collector-shop-invite :is(h2,h3,p,span,strong){color:var(--read-text)!important}
+html[data-theme="dark"] body .collector-shop-invite :is(.account-eyebrow,em){color:var(--read-accent)!important}
+html[data-theme="dark"] body .product-info .card-provenance{color:var(--read-secondary)!important}
+html[data-theme="dark"] body .category-future :is(.cat-number,.category-ornament,.category-meta){color:var(--read-accent)!important}
+html[data-theme="dark"] body .market-rail span[aria-hidden="true"]{color:var(--read-secondary)!important}
+/* Paper Trail status, questions, game choices and copper highlights */
+html[data-theme="dark"] body .pt-scan-panel .pt-status{color:var(--read-secondary)!important}
+html[data-theme="dark"] body .pt-scan-panel #ptTryExample{color:var(--read-accent)!important}
+html[data-theme="dark"] body .pt-results-panel .pt-orbit{color:var(--read-accent)!important}
+html[data-theme="dark"] body .pt-game-choices button,
+html[data-theme="dark"] body .pt-game-choices button:disabled{background:#2d4538!important;color:#e5eee3!important;border:1px solid var(--read-border)!important;opacity:.8!important}
+html[data-theme="dark"] body .pt-hero-art .pt-hero-caption{color:#183228!important;background:#f4e5d1!important}
+html[data-theme="dark"] body .pt-header em,
+html[data-theme="dark"] body .pt-hero-content em,
+html[data-theme="dark"] body .pt-section em,
+html[data-theme="dark"] body .pt-index,
+html[data-theme="dark"] body .pt-era-section>span{color:var(--read-accent)!important}
+html[data-theme="dark"] body .bf-dept-nav em{color:var(--read-accent)!important}
+html[data-theme="dark"] body .pr-selects label,
+html[data-theme="dark"] body .pr-selects label:has(input:checked){
+  background:#30473a!important;color:var(--read-text)!important;border:1px solid var(--read-border)!important;
+}
+/* Final measured contrast repairs */
+html[data-theme="dark"] body .collector-shop-invite .account-small-link{color:#ffd0ae!important}
+html[data-theme="dark"] body .product-watch{background:#24382e!important;color:#fbf9f0!important;border:2px solid #dde7da!important;opacity:1!important}
+html[data-theme="dark"] body #ptDrop,
+html[data-theme="dark"] body .pt-scan-panel .pt-drop{background:#283c31!important;color:#f6f8f2!important;border-color:#b6c9b8!important}
+html[data-theme="dark"] body .pt-drop :is(h3,p,small,.pt-camera){color:#f6f8f2!important}
+html[data-theme="dark"] body .pt-hero-content span:not(.pt-hero-kicker){color:var(--read-accent)!important}
+html[data-theme="dark"] body .pt-era-section .pt-era-count{color:var(--read-accent)!important}
+html[data-theme="dark"] body .pt-era-section span:not(.pt-decade):not(.pt-index){color:var(--read-accent)!important}
+html[data-theme="dark"] body .papertrail-page :is(.pt-intro,.pt-desk,.pt-era-section,.pt-collector) em{color:var(--read-accent)!important}
+html[data-theme="dark"] body.papertrail-page :is(h1,h2,h3) em{color:#ffd2b1!important}
+/* The shopping bag is a distinct dark surface; its empty states and help text
+   must not retain the muted grey-green palette from the light theme. */
+html[data-theme="dark"] body .cart-drawer :is(.cart-empty,.cart-empty p,.cart-empty small,.cart-note,.checkout-help,.cart-footer small,.cart-items small,.cart-item small){
+  color:#d5e4d6!important;
+}
+html[data-theme="dark"] body .cart-drawer .cart-empty h3{color:#f6f7ef!important}
+html[data-theme="dark"] body .cart-drawer :is(.cart-top,.cart-top h2,.cart-sub,.cart-sub strong){color:#f7f7f0!important}
+html[data-theme="dark"] body .cart-drawer .cart-empty span{color:#ffc4a4!important}
+html[data-theme="dark"] body .cart-drawer .checkout-btn:disabled{
+  background:#c7d5c7!important;color:#193429!important;border-color:#c7d5c7!important;
+}
+html[data-theme="dark"] body .cart-drawer :is(.shipping-estimator,.shipping-choice,.shipping-results) :is(p,small,span,label){color:#e5eee2!important}
+html[data-theme="dark"] body .cart-drawer :is(.shipping-estimator,.shipping-choice,.shipping-results) :is(input,select){background:#253e31!important;color:#f9f9f2!important;border-color:#a4baaa!important}

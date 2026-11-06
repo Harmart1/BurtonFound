@@ -1,0 +1,16 @@
+/* Expanded catalogue departments and responsive header adjustments */
+.category-book,.category-collectibles{display:flex;flex-direction:column;background:linear-gradient(145deg,#f3ead9 0%,#dcd2bf 100%)!important;border-color:#d3bd9e!important;color:#254137;transition:transform .2s,box-shadow .2s}
+.category-book:hover,.category-collectibles:hover{transform:translateY(-3px);box-shadow:0 9px 26px #39403220}
+.category-collectibles{background:linear-gradient(145deg,#e4e8df 0%,#c6d1c3 100%)!important}
+.category-book .category-ornament,.category-collectibles .category-ornament{font-family:Georgia,serif;color:#9a5842;font-size:46px;line-height:.8;opacity:.8}
+.category-book .cat-number,.category-collectibles .cat-number{color:#79573d;font-size:8.6px}
+.category-book .cat-meta,.category-collectibles .cat-meta{color:#4d6153}
+.category-book .category-title,.category-collectibles .category-title{color:#214034}
+.header .main-nav{gap:clamp(8px,1.5vw,22px)}
+.header .main-nav a{font-size:11px;white-space:nowrap}
+.header .main-nav .review-nav-link{display:none}
+.logo-words small{letter-spacing:.15em}
+@media(max-width:1280px){.header .main-nav{display:none}.header .mobile-nav-btn{display:block;min-width:40px;width:40px}.header{gap:10px}}
+@media(max-width:700px){.category-book,.category-collectibles{min-height:190px}.category-book .category-title,.category-collectibles .category-title{font-size:20px}.category-book .cat-meta,.category-collectibles .cat-meta{font-size:10px}.logo-words small{letter-spacing:.08em}}
+@media(max-width:360px){.logo-words small{font-size:6px}.category-book .category-title,.category-collectibles .category-title{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.category-book,.category-collectibles{transition:none}}
