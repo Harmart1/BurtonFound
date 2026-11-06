@@ -1,0 +1,4 @@
+Deploy requested after Cloudflare credentials were added to GitHub Actions secrets.
+Target: burtonfound.timharmar.workers.dev
+Safety: LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false.
+2026-11-06 initial credentialed deployment check.
