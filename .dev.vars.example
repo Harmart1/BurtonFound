@@ -1,0 +1,18 @@
+# Local Cloudflare Pages development only. Copy to .dev.vars and fill credentials locally.
+# Never commit .dev.vars or upload private keys to the public directory.
+LIVE_CHECKOUT_ENABLED="false"
+TAX_CONFIGURATION_APPROVED="false"
+CARRIER_QUOTES_ENABLED="false"
+SHIPPING_MODE="flat_rate"
+SHIPPING_ALLOWED_COUNTRIES="CA"
+STRIPE_AUTOMATIC_TAX="false"
+
+SUPABASE_URL=""
+SUPABASE_PUBLISHABLE_KEY=""
+SUPABASE_SECRET_KEY=""
+STRIPE_SECRET_KEY=""
+STRIPE_WEBHOOK_SECRET=""
+SHIPPING_STANDARD_CA_CENTS=""
+SHIPPING_EXPRESS_CA_CENTS=""
+SHIPPING_QUOTE_SECRET=""
+SHIPPING_PACKAGES_JSON="{}"
