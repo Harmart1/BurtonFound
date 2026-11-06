@@ -47,3 +47,9 @@ test('catalog maps 22 sale listings to 40 physical units; no overlap inside each
  for(const p of data.inventory){assert.equal(new Set(p.catalogIds).size,p.catalogIds.length);assert.ok(existsSync(new URL(`../public/${p.image}`,import.meta.url)));}
  const marketing=readFileSync(new URL('../public/store.js',import.meta.url),'utf8');assert.ok(marketing.includes('/api/checkout'));
 });
+
+test('live Stripe keys are rejected unless separately and explicitly approved',()=>{
+ const maybeLive={...env,STRIPE_SECRET_KEY:'sk_live_unused_example',LIVE_PAYMENTS_APPROVED:'false'};
+ assert.equal(secure(maybeLive),false);
+ assert.equal(secure({...maybeLive,LIVE_PAYMENTS_APPROVED:undefined}),false);
+});
