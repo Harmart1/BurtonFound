@@ -3,3 +3,4 @@ Target: burtonfound.timharmar.workers.dev
 Safety: LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false.
 2026-11-06 initial credentialed deployment check.
 2026-11-07 retry requested after Cloudflare API token replacement; checkout remains disabled.
+2026-11-07 second retry after corrected Cloudflare Account ID; payment flags remain disabled.
