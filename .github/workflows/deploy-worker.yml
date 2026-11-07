@@ -39,29 +39,61 @@ jobs:
             if(vars[key]!=="false")throw Error(key+" must be false for this test-safe deployment");
           }
           '
-      - name: Verify Cloudflare deploy credentials exist
+      - name: Resolve Cloudflare account without displaying credentials
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
         run: |
-          if [[ -z "$CF_API_TOKEN" || -z "$CF_ACCOUNT_ID" ]]; then
-            echo "::error::Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository Actions secrets before deploying."
-            exit 1
-          fi
-          # Validate only the format; never print the values.
-          if [[ ! "$CF_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID should be exactly 32 hexadecimal characters, not a URL or account name."
-            exit 1
-          fi
-          if [[ ! "$CF_API_TOKEN" =~ ^[a-zA-Z0-9_.-]{30,120}$ || "$CF_API_TOKEN" == cfk_* || "$CF_API_TOKEN" == cfoat_* ]]; then
-            echo "::error::CLOUDFLARE_API_TOKEN must be the raw scoped Cloudflare API token, without 'Bearer', whitespace, quotes or a Global API Key."
-            exit 1
-          fi
+          python3 - <<'PY'
+          import json, os, re, sys, urllib.request, urllib.error
+          token=os.environ.get("CF_API_TOKEN","").strip()
+          raw=os.environ.get("CF_ACCOUNT_ID","").strip()
+          if not re.fullmatch(r"[A-Za-z0-9_.-]{30,120}",token) or token.startswith(("cfk_","cfoat_")):
+              sys.exit("Invalid CLOUDFLARE_API_TOKEN format; use raw Cloudflare scoped API token.")
+          if not raw:
+              sys.exit("CLOUDFLARE_ACCOUNT_ID secret is missing.")
+          def cf(path):
+              req=urllib.request.Request("https://api.cloudflare.com/client/v4"+path,
+                headers={"Authorization":"Bearer "+token,"Accept":"application/json"})
+              try:
+                  with urllib.request.urlopen(req,timeout=20) as res:
+                      return json.load(res)
+              except urllib.error.HTTPError as e:
+                  sys.exit("Cloudflare API rejected account discovery/verification (HTTP %s). Check scoped token permission for Workers Scripts Read/Write."%e.code)
+              except Exception:
+                  sys.exit("Cloudflare API connection failed during account discovery.")
+          matches=re.findall(r"(?<![a-fA-F0-9])[a-fA-F0-9]{32}(?![a-fA-F0-9])",raw)
+          candidates=[]
+          if re.fullmatch(r"[a-fA-F0-9]{32}",raw):
+              candidates=[raw]
+          elif len(matches)==1:
+              candidates=matches
+              print("Extracted an Account ID embedded in the pasted secret.")
+          else:
+              listing=cf("/accounts?per_page=50")
+              if not listing.get("success"):
+                  sys.exit("Could not list Cloudflare accounts with this token. Copy the Account ID from Workers & Pages.")
+              candidates=[a["id"] for a in listing.get("result",[]) if re.fullmatch(r"[a-fA-F0-9]{32}",a.get("id",""))]
+              if not candidates:
+                  sys.exit("No accessible Cloudflare account IDs found for this token.")
+              print("Consulting accessible Cloudflare accounts to identify the existing burtonfound Worker.")
+          selected=[]
+          for account in candidates:
+              data=cf("/accounts/"+account+"/workers/scripts")
+              if data.get("success") and any(w.get("id")=="burtonfound" for w in data.get("result",[])):
+                  selected.append(account)
+          if len(selected)!=1:
+              sys.exit("Cannot uniquely verify existing burtonfound Worker in the account(s) accessible to this token. Please correct CLOUDFLARE_ACCOUNT_ID or the token's account scope.")
+          with open(os.environ["GITHUB_ENV"],"a") as out:
+              out.write("CF_RESOLVED_ACCOUNT_ID="+selected[0]+"\n")
+          print("Cloudflare account confirmed: existing burtonfound Worker found. No secret contents displayed.")
+          PY
       - name: Deploy to existing burtonfound Worker
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: ${{ env.CF_RESOLVED_ACCOUNT_ID }}
           command: deploy
       - name: Verify public backend and disabled checkout
         shell: bash
