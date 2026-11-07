@@ -58,10 +58,10 @@ jobs:
               sys.exit("CLOUDFLARE_API_TOKEN includes 'Bearer '. Save only the raw API token value.")
           if not token:
               sys.exit("CLOUDFLARE_API_TOKEN secret is empty or unavailable to this workflow.")
-          if len(token)<30 or len(token)>120:
-              sys.exit("CLOUDFLARE_API_TOKEN has an unexpected length; paste the complete token value, not its name, identifier or verification URL.")
-          if not re.fullmatch(r"[A-Za-z0-9_.-]+",token):
-              sys.exit("CLOUDFLARE_API_TOKEN includes unsupported characters, such as whitespace, quotes or pasted code; save only the raw token value.")
+          if re.fullmatch(r"[a-fA-F0-9]{32}",token):
+              sys.exit("CLOUDFLARE_API_TOKEN looks like a 32-character Cloudflare Account ID, not an API token. Use the secret VALUE from My Profile > API Tokens.")
+          if not re.fullmatch(r"[A-Za-z0-9_.-]{1,512}",token):
+              sys.exit("CLOUDFLARE_API_TOKEN contains whitespace, quotes, a pasted command, or unsupported characters. Save only the raw token value.")
           if not raw:
               sys.exit("CLOUDFLARE_ACCOUNT_ID secret is missing.")
           def cf(path):
@@ -74,6 +74,19 @@ jobs:
                   sys.exit("Cloudflare API rejected account discovery/verification (HTTP %s). Check scoped token permission for Workers Scripts Read/Write."%e.code)
               except Exception:
                   sys.exit("Cloudflare API connection failed during account discovery.")
+          # Use the vendor's official verification endpoint instead of guessing token lengths.
+          if token.startswith("cfat_"):
+              # Account-owned tokens use account-scoped verification, if an ID is available.
+              account_match=re.findall(r"[a-fA-F0-9]{32}",raw)
+              if len(account_match)!=1:
+                  sys.exit("For an account-owned cfat_ token, update CLOUDFLARE_ACCOUNT_ID with the exact 32-character ID from the Workers dashboard.")
+              verify_path="/accounts/"+account_match[0]+"/tokens/verify"
+          else:
+              verify_path="/user/tokens/verify"
+          verified=cf(verify_path)
+          if not verified.get("success") or verified.get("result",{}).get("status")!="active":
+              sys.exit("Cloudflare rejected or deactivated the API token. Create and copy a new scoped Workers Editor token.")
+          print("Cloudflare confirms the API token is active.")
           matches=re.findall(r"(?<![a-fA-F0-9])[a-fA-F0-9]{32}(?![a-fA-F0-9])",raw)
           candidates=[]
           if re.fullmatch(r"[a-fA-F0-9]{32}",raw):
