@@ -47,21 +47,29 @@ jobs:
         run: |
           python3 - <<'PY'
           import json, os, re, sys, urllib.request, urllib.error
-          token=os.environ.get("CF_API_TOKEN","").strip()
+          entered=os.environ.get("CF_API_TOKEN","").strip()
           raw=os.environ.get("CF_ACCOUNT_ID","").strip()
-          # Diagnose by credential type only; never print the token or any substring of it.
-          if token.startswith("cfk_"):
-              sys.exit("CLOUDFLARE_API_TOKEN contains a Global API Key (cfk_); create a scoped user API token (cfut_) or account API token (cfat_) instead.")
-          if token.startswith("cfoat_"):
-              sys.exit("CLOUDFLARE_API_TOKEN contains a Wrangler OAuth token (cfoat_); use a scoped user/account API token for GitHub Actions.")
+          # Never print input, values, token fragments, or token length.
+          # Accept a raw token, or extract a SINGLE recognisable cfut_/cfat_ token from
+          # accidentally pasted quotation marks, Bearer prefixes, or command examples.
+          token=entered.strip().strip('"\\'').strip()
           if token.lower().startswith("bearer "):
-              sys.exit("CLOUDFLARE_API_TOKEN includes 'Bearer '. Save only the raw API token value.")
-          if not token:
-              sys.exit("CLOUDFLARE_API_TOKEN secret is empty or unavailable to this workflow.")
+              token=token[7:].strip().strip('"\\'')
+          if not re.fullmatch(r"[A-Za-z0-9_.-]+",token or ""):
+              candidates=re.findall(r"cf(?:ut|at)_[A-Za-z0-9_.-]+",entered)
+              if len(candidates)==1:
+                  token=candidates[0]
+                  print("Found one scoped Cloudflare API token in the pasted secret; validating it with Cloudflare.")
+              else:
+                  sys.exit("CLOUDFLARE_API_TOKEN is not a raw token. Copy only the token value from Cloudflare's 'Create Token' confirmation.")
+          if token.startswith("cfk_"):
+              sys.exit("CLOUDFLARE_API_TOKEN is a Global API Key; use a scoped Workers Editor API token instead.")
+          if token.startswith("cfoat_"):
+              sys.exit("CLOUDFLARE_API_TOKEN is a Wrangler OAuth token; use a scoped Cloudflare API token instead.")
           if re.fullmatch(r"[a-fA-F0-9]{32}",token):
-              sys.exit("CLOUDFLARE_API_TOKEN looks like a 32-character Cloudflare Account ID, not an API token. Use the secret VALUE from My Profile > API Tokens.")
-          if not re.fullmatch(r"[A-Za-z0-9_.-]{1,512}",token):
-              sys.exit("CLOUDFLARE_API_TOKEN contains whitespace, quotes, a pasted command, or unsupported characters. Save only the raw token value.")
+              sys.exit("CLOUDFLARE_API_TOKEN appears to hold an Account ID; this is the wrong GitHub secret. Copy the actual API token value.")
+          if not re.fullmatch(r"[A-Za-z0-9_.-]+",token or ""):
+              sys.exit("CLOUDFLARE_API_TOKEN is not valid token text.")
           if not raw:
               sys.exit("CLOUDFLARE_ACCOUNT_ID secret is missing.")
           def cf(path):
@@ -87,6 +95,9 @@ jobs:
           if not verified.get("success") or verified.get("result",{}).get("status")!="active":
               sys.exit("Cloudflare rejected or deactivated the API token. Create and copy a new scoped Workers Editor token.")
           print("Cloudflare confirms the API token is active.")
+          print("::add-mask::"+token)
+          with open(os.environ["GITHUB_ENV"],"a") as out:
+              out.write("CF_VERIFIED_API_TOKEN="+token+"\\n")
           matches=re.findall(r"(?<![a-fA-F0-9])[a-fA-F0-9]{32}(?![a-fA-F0-9])",raw)
           candidates=[]
           if re.fullmatch(r"[a-fA-F0-9]{32}",raw):
@@ -116,7 +127,7 @@ jobs:
       - name: Deploy to existing burtonfound Worker
         uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ env.CF_VERIFIED_API_TOKEN }}
           accountId: ${{ env.CF_RESOLVED_ACCOUNT_ID }}
           command: deploy
       - name: Verify public backend and disabled checkout
