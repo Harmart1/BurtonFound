@@ -49,8 +49,19 @@ jobs:
           import json, os, re, sys, urllib.request, urllib.error
           token=os.environ.get("CF_API_TOKEN","").strip()
           raw=os.environ.get("CF_ACCOUNT_ID","").strip()
-          if not re.fullmatch(r"[A-Za-z0-9_.-]{30,120}",token) or token.startswith(("cfk_","cfoat_")):
-              sys.exit("Invalid CLOUDFLARE_API_TOKEN format; use raw Cloudflare scoped API token.")
+          # Diagnose by credential type only; never print the token or any substring of it.
+          if token.startswith("cfk_"):
+              sys.exit("CLOUDFLARE_API_TOKEN contains a Global API Key (cfk_); create a scoped user API token (cfut_) or account API token (cfat_) instead.")
+          if token.startswith("cfoat_"):
+              sys.exit("CLOUDFLARE_API_TOKEN contains a Wrangler OAuth token (cfoat_); use a scoped user/account API token for GitHub Actions.")
+          if token.lower().startswith("bearer "):
+              sys.exit("CLOUDFLARE_API_TOKEN includes 'Bearer '. Save only the raw API token value.")
+          if not token:
+              sys.exit("CLOUDFLARE_API_TOKEN secret is empty or unavailable to this workflow.")
+          if len(token)<30 or len(token)>120:
+              sys.exit("CLOUDFLARE_API_TOKEN has an unexpected length; paste the complete token value, not its name, identifier or verification URL.")
+          if not re.fullmatch(r"[A-Za-z0-9_.-]+",token):
+              sys.exit("CLOUDFLARE_API_TOKEN includes unsupported characters, such as whitespace, quotes or pasted code; save only the raw token value.")
           if not raw:
               sys.exit("CLOUDFLARE_ACCOUNT_ID secret is missing.")
           def cf(path):
