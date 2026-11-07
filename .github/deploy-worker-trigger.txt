@@ -10,3 +10,4 @@ Safety: LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false.
 2026-11-07 verify refreshed token with Cloudflare API and retry deployment with no live checkout.
 2026-11-07 sanitized credential plus official token verification retry (disabled payment defaults).
 2026-11-07 retry after correcting verified token environment newline; checkout disabled.
+2026-11-07 deploy selected Supabase HTTPS API URL nyvdrgpcwfasajyncnhi with preview-only payment flags.
