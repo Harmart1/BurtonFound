@@ -97,7 +97,7 @@ jobs:
           print("Cloudflare confirms the API token is active.")
           print("::add-mask::"+token)
           with open(os.environ["GITHUB_ENV"],"a") as out:
-              out.write("CF_VERIFIED_API_TOKEN="+token+"\\n")
+              out.write("CF_VERIFIED_API_TOKEN="+token+chr(10))
           matches=re.findall(r"(?<![a-fA-F0-9])[a-fA-F0-9]{32}(?![a-fA-F0-9])",raw)
           candidates=[]
           if re.fullmatch(r"[a-fA-F0-9]{32}",raw):
