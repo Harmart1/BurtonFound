@@ -6,3 +6,4 @@ Safety: LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false.
 2026-11-07 second retry after corrected Cloudflare Account ID; payment flags remain disabled.
 2026-11-07 account auto-resolution retry; verify existing Worker and keep all payment flags disabled.
 2026-11-07 credential-type diagnosis retry; no live payments.
+2026-11-07 retry after user updated Cloudflare secrets again; test-safe payment flags unchanged.
