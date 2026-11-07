@@ -52,9 +52,9 @@ jobs:
           # Never print input, values, token fragments, or token length.
           # Accept a raw token, or extract a SINGLE recognisable cfut_/cfat_ token from
           # accidentally pasted quotation marks, Bearer prefixes, or command examples.
-          token=entered.strip().strip('"\\'').strip()
+          token=entered.strip().strip(chr(34)+chr(39)).strip()
           if token.lower().startswith("bearer "):
-              token=token[7:].strip().strip('"\\'')
+              token=token[7:].strip().strip(chr(34)+chr(39))
           if not re.fullmatch(r"[A-Za-z0-9_.-]+",token or ""):
               candidates=re.findall(r"cf(?:ut|at)_[A-Za-z0-9_.-]+",entered)
               if len(candidates)==1:
