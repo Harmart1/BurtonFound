@@ -12,3 +12,15 @@ main{max-width:none;padding:0}.archive-masthead{max-width:1490px;margin:0 auto;p
 @media(max-width:850px){.archive-masthead{grid-template-columns:1fr;gap:22px}.archive-masthead-copy h1{max-width:800px;font-size:clamp(3rem,7vw,5.4rem)}.archive-masthead-art{height:330px}.archive-gallery-heading{align-items:flex-start;flex-direction:column}.cards,.cards.compact-view{grid-template-columns:repeat(2,minmax(0,1fr))}.card img{height:325px}.archive-statline{justify-content:flex-start}.archive-statline span{border:0}}
 @media(max-width:550px){.archive-masthead{padding:28px 16px}.archive-masthead-copy h1{font-size:clamp(2.65rem,11vw,4rem)}.archive-masthead-art{height:245px;gap:8px}.archive-masthead-art figure{padding:7px}.archive-art-side{gap:8px}.archive-statline{padding:13px 10px}.archive-statline span{flex:1 1 43%;display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:9px}.archive-statline strong{font-size:1.35rem}.archive-gallery-section{padding:36px 15px 65px}.archive-gallery-heading h2{font-size:2.5rem}.controls{grid-template-columns:repeat(2,minmax(0,1fr));padding:12px;gap:9px}.controls label:first-child{grid-column:1/-1}.controls .clear-filters{grid-column:1/-1}.archive-results>p:last-child{display:none}.cards{grid-template-columns:1fr}.cards.compact-view{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card img{height:clamp(290px,83vw,430px)}.cards.compact-view img{height:175px}.cards.compact-view .card-body{padding:10px}.cards.compact-view h2{font-size:.95rem}.cards.compact-view .gallery-view-button{font-size:.78rem;padding:8px 5px}.archive-dialog{width:100vw;max-height:100dvh;border-radius:0}.archive-dialog-stage{grid-template-columns:34px minmax(0,1fr) 34px;padding:5px}.archive-dialog-stage button{width:33px}.archive-dialog-foot{align-items:flex-start}.archive-dialog-stage img{height:min(72dvh,650px)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card{transition:none}}
+
+/* Cohesive brand mark and a compact, scrollable two-row mobile navigation. */
+.header .logo{display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.header .logo img{flex:0 0 auto;width:36px;height:36px}
+@media(max-width:550px){
+ .header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px 14px;padding:11px 15px 0}
+ .header .logo{grid-column:1;grid-row:1;font-size:1.3rem;min-width:0}
+ .header .logo img{width:32px;height:32px}
+ .header .toggle{grid-column:2;grid-row:1;padding:8px 12px;min-height:43px;font-size:.82rem}
+ .header .nav{grid-column:1/-1;grid-row:2;order:unset;display:flex;flex-wrap:nowrap;gap:19px;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;white-space:nowrap;border-top:1px solid var(--gallery-border);padding:0 0 4px}
+ .header .nav a{display:inline-flex;flex:0 0 auto;align-items:center;font-size:.86rem;min-height:43px;white-space:nowrap}
+}
