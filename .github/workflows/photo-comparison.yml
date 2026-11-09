@@ -1,0 +1,62 @@
+name: Create product photograph before-after quality review (read only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/photo-comparison.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check out source and polished files
+        uses: actions/checkout@v4
+      - name: Install Pillow
+        run: python -m pip install Pillow==11.3.0
+      - name: Compose faithful before-after gallery
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageDraw,ImageFont
+          source=Path("public/assets/images")
+          items=[
+           "cc-001","cc-010","cc-023","cc-034","bundle-set-a",
+           "oh-001","oh-002","oh-003","oh-005","oh-006",
+           "vintage-cars/va-002","vintage-cars/va-010","vintage-cars/va-041",
+           "vintage-cars/va-049","vintage-cars/va-059","vintage-cars/va-070",
+           "vintage-cars/va-072","vintage-cars/va-077"
+          ]
+          font=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",15)
+          rows=(len(items)+1)//2
+          W=1240;blockW=620;tileW=306;rowH=345
+          out=Image.new("RGB",(W,rows*rowH+70),(245,243,235))
+          d=ImageDraw.Draw(out)
+          d.text((22,14),"BURTON & FOUND  |  Actual original vs optimized display photograph",font=font,fill=(26,52,41))
+          for n,name in enumerate(items):
+              x=(n%2)*blockW;y=(n//2)*rowH+55
+              d.text((x+12,y),name.upper()+"  /  Source at left, display version at right",font=font,fill=(26,52,41))
+              for side,p in enumerate([source/(name+".webp"),source/"polished"/(name+".webp")]):
+                  assert p.is_file(),name
+                  with Image.open(p) as original:
+                      photo=original.convert("RGB")
+                  photo.thumbnail((tileW-12,rowH-49),Image.Resampling.LANCZOS)
+                  left=x+side*tileW+(tileW-photo.width)//2
+                  top=y+28+((rowH-49)-photo.height)//2
+                  out.paste(photo,(left,top))
+          Path("quality-samples").mkdir(exist_ok=True)
+          out.save("quality-samples/burtonfound-source-vs-display.jpg",quality=89,optimize=True)
+          print("PASS: 18 paired image comparisons generated from real source and deployed-polished derivatives")
+          PY
+      - name: Preserve actual source-versus-display comparisons
+        uses: actions/upload-artifact@v4
+        with:
+          name: BurtonFound-Actual-Photo-Comparisons
+          path: quality-samples/burtonfound-source-vs-display.jpg
+          retention-days: 7
