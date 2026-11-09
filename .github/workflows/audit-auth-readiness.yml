@@ -79,3 +79,24 @@ jobs:
           print("All deployed API guards passed: unauthenticated customer/admin calls blocked, 22 products available, Stripe checkout disabled.")
           print("NOTE: Auth Site URL, redirect allowlist and custom SMTP deliverability require authenticated Dashboard configuration checks.")
           PY
+      - name: Verify private Supabase Auth Admin API accessibility without displaying users
+        shell: bash
+        env:
+          BF_SUPABASE_SECRET_KEY: ${{ secrets.BF_SUPABASE_SECRET_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os,sys,re,json,urllib.request,urllib.error
+          key=os.environ.get("BF_SUPABASE_SECRET_KEY","")
+          if not re.fullmatch(r"sb_secret_[A-Za-z0-9_-]+",key):
+              sys.exit("Supabase service secret absent or invalid format; owner activation cannot proceed.")
+          req=urllib.request.Request("https://nyvdrgpcwfasajyncnhi.supabase.co/auth/v1/admin/users?page=1&per_page=1",
+              headers={"apikey":key,"Accept":"application/json"})
+          try:
+              with urllib.request.urlopen(req,timeout=20) as response:
+                  result=json.load(response)
+          except urllib.error.HTTPError as e:
+              sys.exit("Supabase Auth administrative access unavailable (HTTP %s). No data was changed."%e.code)
+          if not isinstance(result,dict) or not isinstance(result.get("users"),list):
+              sys.exit("Unexpected Supabase Auth admin API response; no data was changed.")
+          print("Verified: read-only Supabase Auth Admin API access works with the stored server key. No users listed.")
+          PY
