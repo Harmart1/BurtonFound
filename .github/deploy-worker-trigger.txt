@@ -13,3 +13,4 @@ Safety: LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false.
 2026-11-07 deploy selected Supabase HTTPS API URL nyvdrgpcwfasajyncnhi with preview-only payment flags.
 2026-11-09 Deploy Burton & Found public Supabase publishable key after database migrations and inventory initialization. Stripe checkout disabled.
 2026-11-09 Redeploy public Supabase configuration after updating automated tests to distinguish publishable and private credentials. All payments disabled.
+2026-11-09 Deploy owner-verified admin identity endpoint and customer dashboard owner link. Payments remain disabled; no administrators promoted.
