@@ -1,0 +1,66 @@
+name: Verify deployed Vintage Automobiles gallery (read only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-vintage-gallery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify live page, navigation and all 93 image responses
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, json, re, time, urllib.request, urllib.error
+          root="https://burtonfound.timharmar.workers.dev"
+          def get(path):
+              request=urllib.request.Request(root+path,headers={"User-Agent":"BurtonFound-public-gallery-smoke-test/1.0","Cache-Control":"no-cache"})
+              last=None
+              for attempt in range(3):
+                  try:
+                      with urllib.request.urlopen(request,timeout=20) as response:
+                          assert response.status==200, (path,response.status)
+                          return response.read(),response.headers.get("Content-Type","")
+                  except Exception as ex:
+                      last=ex
+                      time.sleep(1+attempt)
+              raise AssertionError(str(path)+" failed: "+str(last))
+          html,kind=get("/vintage-cars.html")
+          assert b"not yet for sale" in html.lower(), "The browse-only disclaimer is missing"
+          assert b"vintage-cars-data.js" in html, "Gallery JS data is not linked"
+          assert b"noindex" in html, "Preview SEO must remain disabled"
+          assert "html" in kind.lower(), "Gallery did not return HTML"
+          for path in ["/index.html","/storefront.html"]:
+              data,ctype=get(path)
+              assert b'vintage-cars.html' in data, "Vintage automobiles navigation missing on "+path
+              assert "html" in ctype.lower(), "Store page is not HTML"
+          data,kind=get("/vintage-cars-data.js")
+          assert "javascript" in kind.lower() or "text/plain" in kind.lower(), "Expected JS, got "+kind
+          match=re.match(rb'window\.BURTON_VINTAGE_CARS=(\[.*\]);\s*$',data,re.DOTALL)
+          assert match, "Gallery catalog is not a JS array"
+          items=json.loads(match.group(1))
+          assert len(items)==93, "Expected 93 image records"
+          assert len(set(i["sku"] for i in items))==93, "Duplicate image SKU found"
+          assert all(x.get("salesEnabled") is False and "price" not in x for x in items), "Saleable preview record found"
+          paths=["/"+item["image"] for item in items]
+          assert len(set(paths))==93, "Unexpected duplicate image path"
+          def verify(path):
+              raw,content_type=get(path)
+              assert raw[:4]==b"RIFF" and raw[8:12]==b"WEBP", "Image response is not WebP: "+path
+              assert "image/webp" in content_type.lower(), "Bad content type: "+path+" "+content_type
+              assert len(raw)>2500, "Unexpected image length: "+path
+              return len(raw)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
+              sizes=list(pool.map(verify,paths))
+          print("PASS: 93/93 public WebP images accessible, total bytes:",sum(sizes))
+          print("PASS: both storefront pages link to Vintage Automobiles")
+          print("PASS: the new gallery displays a browse-only disclaimer and excludes prices and checkout")
+          PY
