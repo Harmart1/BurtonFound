@@ -6,6 +6,26 @@ const showMore=document.getElementById('showMore'),result=document.getElementByI
 const viewButton=document.getElementById('viewComfort'),compactButton=document.getElementById('viewCompact');
 const map=new Map(items.map(x=>[x.sku,x]));
 let shown=24,compact=false,dialogIndex=0,visibleItems=[];
+const themeButton=document.getElementById('themeToggle');
+function applyTheme(theme){
+ const dark=theme==='dark';
+ document.documentElement.dataset.theme=dark?'dark':'light';
+ themeButton.textContent=dark?'Light mode':'Dark mode';
+ themeButton.setAttribute('aria-pressed',String(dark));
+ themeButton.setAttribute('aria-label','Switch to '+(dark?'light':'dark')+' mode');
+}
+let initialTheme='light';
+try{if(localStorage.getItem('burton_found_theme')==='dark')initialTheme='dark'}catch{}
+applyTheme(initialTheme);
+themeButton.addEventListener('click',()=>{
+ const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
+ applyTheme(next);
+ try{localStorage.setItem('burton_found_theme',next)}catch{}
+});
+for(const make of [...new Set(items.map(x=>x.brand).filter(Boolean))].sort((a,b)=>a.localeCompare(b))){
+ const option=document.createElement('option');option.value=make;option.textContent=make;brand.appendChild(option);
+}
+
 const title=(x)=>x.title||'Untitled advertising page';
 function filterData(){
   const q=search.value.toLowerCase().trim(),b=brand.value,d=dups.value,seen=new Set();
