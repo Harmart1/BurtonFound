@@ -1,0 +1,70 @@
+name: Verify Burton & Found registration and API safeguards (read only)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/auth-audit-trigger.txt
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check software tests
+        run: |
+          npm run check:deploy
+          npm test
+      - name: Probe deployed account settings and reject unauthenticated admin access
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error,sys
+          base="https://burtonfound.timharmar.workers.dev"
+          project="https://nyvdrgpcwfasajyncnhi.supabase.co"
+          cfg=json.load(open("wrangler.jsonc",encoding="utf8"))["vars"]
+          public_key=cfg.get("SUPABASE_PUBLISHABLE_KEY","")
+          assert public_key.startswith("sb_publishable_"),"Missing browser publishable key"
+          def get(url,headers=None,method="GET",body=None):
+              req=urllib.request.Request(url,headers=headers or {},method=method,data=body)
+              try:
+                  with urllib.request.urlopen(req,timeout=20) as response:
+                      raw=response.read().decode("utf8")
+                      return response.status,json.loads(raw) if raw else {}
+              except urllib.error.HTTPError as e:
+                  return e.code,{}
+          status,health=get(base+"/api/health")
+          assert status==200 and health.get("checkout")=="preview_only","Payment collection must remain disabled"
+          status,account=get(base+"/api/public-account-config")
+          assert status==200 and account.get("configured") is True
+          assert account.get("supabaseUrl")==project
+          assert account.get("supabasePublishableKey")==public_key
+          assert "supabaseSecretKey" not in account
+          status,catalog=get(base+"/api/catalog")
+          assert status==200 and catalog.get("configured") is True and len(catalog.get("items",[]))==22
+          for path,expect in [("/api/account-orders",401),("/api/admin/orders",403),("/api/admin/holds",403),("/api/admin/fulfillment-history?order_id=00000000-0000-0000-0000-000000000000",403)]:
+              actual,_=get(base+path)
+              assert actual==expect,"Authentication guard regression for "+path+" (HTTP "+str(actual)+")"
+          actual,_=get(base+"/api/checkout",headers={"origin":base,"content-type":"application/json"},method="POST",body=b'{"skus":["OH-003"]}')
+          assert actual==503,"Checkout must refuse payment session creation during integration"
+          auth_status,auth=get(project+"/auth/v1/settings",{"apikey":public_key,"Accept":"application/json"})
+          assert auth_status==200 and isinstance(auth,dict),"Supabase Auth config API unavailable"
+          email_enabled=auth.get("external",{}).get("email",None) if isinstance(auth.get("external"),dict) else None
+          if email_enabled is False:
+              print("WARNING: Supabase email/password provider is disabled; signup cannot work.")
+          else:
+              print("Supabase Auth settings endpoint reachable. Email provider flag:",email_enabled if email_enabled is not None else "not exposed")
+          auto_confirm=auth.get("mailer_autoconfirm")
+          if auto_confirm is not None:
+              print("Email confirmation bypass enabled:",bool(auto_confirm))
+          print("All deployed API guards passed: unauthenticated customer/admin calls blocked, 22 products available, Stripe checkout disabled.")
+          print("NOTE: Auth Site URL, redirect allowlist and custom SMTP deliverability require authenticated Dashboard configuration checks.")
+          PY
