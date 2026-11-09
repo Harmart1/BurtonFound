@@ -1,0 +1,1 @@
+Reverify all 141 optimized live images after photo-polish commit and successfully completed checkout-safe Cloudflare deployment. Check existing and archive photos, original references and storefront health.
