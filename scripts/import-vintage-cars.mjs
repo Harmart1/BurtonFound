@@ -40,6 +40,8 @@ check(!html.includes('drive.google.com'),'private Drive references in public HTM
 check(html.includes('not yet for sale')&&html.includes('noindex'),'missing non-sale disclaimer');
 check(!browserJs.includes('/api/checkout'),'preview checkout prohibited');
 function addNav(source,homepage){
+ // Safe to rerun validation after a gallery has already been installed in this job.
+ if(source.includes('href="vintage-cars.html">Vintage Automobiles</a>') && source.includes('93 scans · Coming soon')) return source;
  const anchor='<a data-shop-hollywood="" href="#shop">Old Hollywood</a>';
  check(source.split(anchor).length>=3,'desktop/mobile nav anchors not found');
  let s=source.replaceAll(anchor,anchor+'<a href="vintage-cars.html">Vintage Automobiles</a>');
