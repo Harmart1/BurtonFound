@@ -42,6 +42,7 @@ jobs:
               except urllib.error.HTTPError as e:
                   return e.code,{}
           status,health=get(base+"/api/health")
+          print("Deployed health response: HTTP",status,"service",health.get("service"),"checkout",health.get("checkout"),"note",str(health.get("note",""))[:100])
           assert status==200 and health.get("checkout")=="preview_only","Payment collection must remain disabled"
           status,account=get(base+"/api/public-account-config")
           assert status==200 and account.get("configured") is True
