@@ -7,6 +7,7 @@ import {onRequestGet as checkoutStatus} from '../functions/api/checkout-status.j
 import {onRequestPost as checkout} from '../functions/api/checkout.js';
 import {onRequestPost as shippingQuotes} from '../functions/api/shipping-quotes.js';
 import {onRequestPost as stripeWebhook} from '../functions/api/stripe-webhook.js';
+import {onRequestGet as adminMe} from '../functions/api/admin/me.js';
 import {onRequestGet as adminOrders} from '../functions/api/admin/orders.js';
 import {onRequestGet as adminHolds} from '../functions/api/admin/holds.js';
 import {onRequestGet as fulfillmentHistory} from '../functions/api/admin/fulfillment-history.js';
@@ -23,6 +24,7 @@ const routes = {
   '/api/checkout': {POST: checkout},
   '/api/shipping-quotes': {POST: shippingQuotes},
   '/api/stripe-webhook': {POST: stripeWebhook},
+  '/api/admin/me': {GET: adminMe},
   '/api/admin/orders': {GET: adminOrders},
   '/api/admin/holds': {GET: adminHolds},
   '/api/admin/fulfillment-history': {GET: fulfillmentHistory},
