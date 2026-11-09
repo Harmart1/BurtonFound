@@ -1,0 +1,45 @@
+name: Verify Burton & Found deployed Supabase inventory (read only)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/supabase-verify-trigger.txt
+
+permissions:
+  contents: read
+
+jobs:
+  verify-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Confirm deployed inventory and preview-only checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://burtonfound.timharmar.workers.dev"
+          curl --fail --silent --show-error --max-time 25 \
+            "$base/api/health" -o /tmp/bf-health.json
+          curl --fail --silent --show-error --max-time 25 \
+            "$base/api/public-account-config" -o /tmp/bf-account.json
+          curl --fail --silent --show-error --max-time 25 \
+            "$base/api/catalog" -o /tmp/bf-catalog.json
+          python3 - <<'PY'
+          import json
+          health=json.load(open("/tmp/bf-health.json",encoding="utf8"))
+          account=json.load(open("/tmp/bf-account.json",encoding="utf8"))
+          catalog=json.load(open("/tmp/bf-catalog.json",encoding="utf8"))
+          assert health.get("service")=="Burton & Found"
+          assert health.get("checkout")=="preview_only", "Never enable payment collection during integration verification"
+          assert account.get("configured") is True
+          assert account.get("supabaseUrl")=="https://nyvdrgpcwfasajyncnhi.supabase.co"
+          assert account.get("supabasePublishableKey","").startswith("sb_publishable_")
+          assert catalog.get("configured") is True, "Deployed Worker cannot reach Supabase using its private server key"
+          items=catalog.get("items")
+          assert isinstance(items,list) and len(items)==22, "Expected 22 current listings; check catalogue sync and database"
+          assert all(isinstance(x.get("available"),bool) for x in items)
+          assert len(set(x["sku"] for x in items))==22
+          print("Verified: 22 product listing records read live through private Worker-to-Supabase API; checkout disabled.")
+          PY
