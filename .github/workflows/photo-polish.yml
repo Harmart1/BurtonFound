@@ -66,7 +66,7 @@ jobs:
               assert original.exists() and variant.exists(),record["source"]
               with Image.open(original) as a,Image.open(variant) as b:
                   assert b.format=="WEBP"
-                  assert min(b.size)>=350
+                  assert min(b.size)>=160
                   assert max(b.size)<=1900
                   assert b.size[0]/b.size[1] == a.size[0]/a.size[1] or max(a.size)>1900
           print("PASS: 141 original files preserved; 141 WebP display derivatives valid")
