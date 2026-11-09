@@ -54,7 +54,7 @@ jobs:
           assert "supabaseSecretKey" not in account
           status,catalog=get(base+"/api/catalog")
           assert status==200 and catalog.get("configured") is True and len(catalog.get("items",[]))==22
-          for path,expect in [("/api/account-orders",401),("/api/admin/me",403),("/api/admin/orders",403),("/api/admin/holds",403),("/api/admin/fulfillment-history?order_id=00000000-0000-0000-0000-000000000000",403)]:
+          for path,expect in [("/api/account-orders",401),("/api/admin/me",403),("/api/admin/readiness",403),("/api/admin/orders",403),("/api/admin/holds",403),("/api/admin/fulfillment-history?order_id=00000000-0000-0000-0000-000000000000",403)]:
               actual,_=get(base+path)
               assert actual==expect,"Authentication guard regression for "+path+" (HTTP "+str(actual)+")"
           actual,_=get(base+"/api/checkout",headers={"origin":base,"content-type":"application/json"},method="POST",body=b'{"skus":["OH-003"]}')
