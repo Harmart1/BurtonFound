@@ -3,3 +3,4 @@ No user registrations, emails, database mutations, checkouts, or payments.
 2026-11-09
 Rerun with sanitized health diagnostic for failed checkout safety assertion.
 Re-run with curl client to align with deployed smoke checks.
+Verify deployed owner identity API rejects anonymous requests after adding owner link.
