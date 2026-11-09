@@ -1,1 +1,3 @@
 Owner-requested archival-faithful product photo optimization. Run scripts/photo-polish.py for 48 existing catalogue images and 93 Vintage Automobiles scans. Keep original files intact, checkout disabled; deploy only after tests pass.
+
+Repeat with safe handling of small original Hollywood images; no invented resolution or altered paper condition.
