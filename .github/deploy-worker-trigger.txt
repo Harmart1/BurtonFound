@@ -1,18 +1,3 @@
-Deploy requested after Cloudflare credentials were added to GitHub Actions secrets.
-Target: burtonfound.timharmar.workers.dev
-Safety: LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false.
-2026-11-06 initial credentialed deployment check.
-2026-11-07 retry requested after Cloudflare API token replacement; checkout remains disabled.
-2026-11-07 second retry after corrected Cloudflare Account ID; payment flags remain disabled.
-2026-11-07 account auto-resolution retry; verify existing Worker and keep all payment flags disabled.
-2026-11-07 credential-type diagnosis retry; no live payments.
-2026-11-07 retry after user updated Cloudflare secrets again; test-safe payment flags unchanged.
-2026-11-07 verify refreshed token with Cloudflare API and retry deployment with no live checkout.
-2026-11-07 sanitized credential plus official token verification retry (disabled payment defaults).
-2026-11-07 retry after correcting verified token environment newline; checkout disabled.
-2026-11-07 deploy selected Supabase HTTPS API URL nyvdrgpcwfasajyncnhi with preview-only payment flags.
-2026-11-09 Deploy Burton & Found public Supabase publishable key after database migrations and inventory initialization. Stripe checkout disabled.
-2026-11-09 Redeploy public Supabase configuration after updating automated tests to distinguish publishable and private credentials. All payments disabled.
-2026-11-09 Deploy owner-verified admin identity endpoint and customer dashboard owner link. Payments remain disabled; no administrators promoted.
-2026-11-09 Deploy verified account security improvements: pinned Supabase JS SDK v2.119.0, password recovery session listener order, uniform account callback URL. No payment changes.
-2026-11-09 Deploy owner-only Stripe Tax, Supabase inventory, shipping and email readiness dashboard; payments remain disabled. 
+Deploy requested for the Burton & Found November 2026 editorial visual refresh.
+Safe scope: refreshed homepage and storefront, responsive three-collection cards, new Vintage Automobiles image-led gallery, filters and lightbox.
+All 58 tests passed. The 22 existing sale products remain unchanged; 93 automobile pages are browse-only; live checkout/tax/carrier approvals remain false.
