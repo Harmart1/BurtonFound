@@ -12,6 +12,7 @@ test('Product-photo workflow cannot overwrite originals or activate payments',()
  for(const key of ['LIVE_CHECKOUT_ENABLED','LIVE_PAYMENTS_APPROVED','TAX_CONFIGURATION_APPROVED','CARRIER_QUOTES_ENABLED'])
   assert.ok(workflow.includes(key),'Missing safety guard '+key);
  assert.match(script,/MAX_SIDE=1900/);
+ assert.match(script,/MIN_SIDE=160/);
  assert.match(script,/assets\/images\/polished\//);
  assert.match(script,/manual_review/);
  assert.match(script,/no.*artwork|No artwork/i);
