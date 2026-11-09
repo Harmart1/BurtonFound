@@ -25,3 +25,20 @@ test('public settings endpoint reveals only safe publishable account configurati
  const bad=await publicConfig({env:{...env,SUPABASE_PUBLISHABLE_KEY:'sb_secret_SHOULD_NOT_PUBLISH'}});
  assert.deepEqual(await bad.json(),{configured:false});
 });
+
+test('Supabase SDK is pinned and recovery callback attaches before session inspection',()=>{
+ const src=readFileSync(new URL('../public/account-core.js',import.meta.url),'utf8');
+ const page=readFileSync(new URL('../public/account.js',import.meta.url),'utf8');
+ assert.match(src,/@supabase\/supabase-js@2\.119\.0/);
+ assert.ok(src.indexOf('client.auth.onAuthStateChange(')<src.indexOf('client.auth.getSession()'));
+ assert.match(src,/resetPasswordForEmail\(email,\{redirectTo:new URL\('account\.html',location\.href\)\.href\}/);
+ assert.match(src,/event==='PASSWORD_RECOVERY'/);
+ assert.match(page,/bf:password-recovery/);
+ assert.match(page,/elements\.namedItem\('password'\)/);
+});
+
+test('account sign-up and password reset use one allowlisted callback path without custom fragment redirects',()=>{
+ const src=readFileSync(new URL('../public/account-core.js',import.meta.url),'utf8');
+ assert.match(src,/emailRedirectTo:redirectTo/);
+ assert.ok(!src.includes("new URL('account.html#security'"));
+});
