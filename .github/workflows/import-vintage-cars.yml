@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'imports/BurtonFound-Vintage-Cars-Site-Upload.zip'
+      - 'imports/BurtonFound-Vintage-Cars-Site-Upload*.zip'
+      - '.github/workflows/import-vintage-cars.yml'
   workflow_dispatch:
 
 permissions:
@@ -41,7 +42,7 @@ jobs:
       - name: Extract only the 93 photographs and gallery files
         shell: bash
         env:
-          UPLOAD_ZIP: imports/BurtonFound-Vintage-Cars-Site-Upload.zip
+          UPLOAD_ZIP: imports/BurtonFound-Vintage-Cars-Site-Upload (1).zip
         run: |
           python3 - <<'PY'
           import os,zipfile,sys,re,pathlib
@@ -85,7 +86,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/index.html public/storefront.html public/vintage-cars.html public/vintage-cars.css public/vintage-cars.js public/vintage-cars-data.js public/vintage-cars-promo.css public/assets/images/vintage-cars/
-          git rm -- imports/BurtonFound-Vintage-Cars-Site-Upload.zip
+          git rm -- 'imports/BurtonFound-Vintage-Cars-Site-Upload (1).zip'
           git commit -m "Publish 93 non-purchasable vintage automobile advertisement previews"
           git push origin HEAD:main
       - name: Request test-safe Cloudflare deployment
