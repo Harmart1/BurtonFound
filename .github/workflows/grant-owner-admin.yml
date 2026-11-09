@@ -1,0 +1,89 @@
+name: Securely authorize Burton & Found verified owner (no payments)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_owner_email:
+        description: "I saved MY verified Burton & Found signup email as BF_OWNER_EMAIL in encrypted GitHub repository secrets. Grant only that matching account administrator access."
+        type: boolean
+        required: true
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - .github/owner-admin-trigger.txt
+
+permissions:
+  contents: read
+
+jobs:
+  grant-verified-owner:
+    if: ${{ github.event_name == 'push' || inputs.confirm_owner_email }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Confirm sandbox-only deployment settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run check:deploy
+          npm test
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const v=JSON.parse(readFileSync("wrangler.jsonc","utf8")).vars;
+            if(v.SUPABASE_URL!=="https://nyvdrgpcwfasajyncnhi.supabase.co")throw Error("Wrong Supabase project");
+            for(const name of ["LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED","TAX_CONFIGURATION_APPROVED","CARRIER_QUOTES_ENABLED"])
+              if(v[name]!=="false")throw Error("Payment approval must stay disabled: "+name);
+          '
+      - name: Grant admin only to the named, confirmed Supabase account
+        shell: bash
+        env:
+          BF_OWNER_EMAIL: ${{ secrets.BF_OWNER_EMAIL }}
+          BF_SUPABASE_SECRET_KEY: ${{ secrets.BF_SUPABASE_SECRET_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json,os,re,sys,urllib.request,urllib.error
+          base="https://nyvdrgpcwfasajyncnhi.supabase.co"
+          key=os.environ.get("BF_SUPABASE_SECRET_KEY","")
+          owner=os.environ.get("BF_OWNER_EMAIL","").strip().casefold()
+          if not re.fullmatch(r"sb_secret_[A-Za-z0-9_-]+",key):
+              sys.exit("Missing BF_SUPABASE_SECRET_KEY; no administrator access was changed.")
+          if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+",owner) or len(owner)>254:
+              sys.exit("Add BF_OWNER_EMAIL as a GitHub Actions repository secret containing your exact registered email. No administrator access was changed.")
+          headers={"apikey":key,"Accept":"application/json"}
+          def call(path,method="GET",body=None,extra_headers=None):
+              h=dict(headers)
+              if extra_headers:h.update(extra_headers)
+              if body is not None:h["Content-Type"]="application/json"
+              req=urllib.request.Request(base+path,method=method,headers=h,data=json.dumps(body).encode() if body is not None else None)
+              try:
+                  with urllib.request.urlopen(req,timeout=25) as res:
+                      raw=res.read().decode()
+                      return json.loads(raw) if raw else None
+              except urllib.error.HTTPError as e:
+                  # No key, email, JWT, or response data echoed in logs
+                  sys.exit("Supabase verification or admin grant failed (HTTP %s); no additional actions attempted."%e.code)
+          matched=[]
+          for page in range(1,11):
+              results=call("/auth/v1/admin/users?page="+str(page)+"&per_page=100")
+              users=results.get("users",[]) if isinstance(results,dict) else []
+              for u in users:
+                  if str(u.get("email","")).strip().casefold()==owner:
+                      matched.append(u)
+              if len(users)<100:break
+          if len(matched)!=1:
+              sys.exit("No unique matching registered account found for BF_OWNER_EMAIL. Create and verify your account first; no admin access was granted.")
+          u=matched[0]
+          if not (u.get("email_confirmed_at") or u.get("confirmed_at")):
+              sys.exit("Owner email is not confirmed in Supabase. Complete email verification first; no admin access was granted.")
+          user_id=str(u.get("id",""))
+          if not re.fullmatch(r"[a-fA-F0-9-]{36}",user_id):
+              sys.exit("Invalid Supabase account identifier; no admin access was granted.")
+          call("/rest/v1/bf_admin_users","POST",{"user_id":user_id},{"Prefer":"resolution=merge-duplicates,return=minimal"})
+          entries=call("/rest/v1/bf_admin_users?user_id=eq."+user_id+"&select=user_id")
+          if not isinstance(entries,list) or len(entries)!=1 or entries[0].get("user_id")!=user_id:
+              sys.exit("Owner administrator record was not verifiable.")
+          print("Verified owner's confirmed Supabase account granted administrator access. No personal identifiers printed. No payments enabled.")
+          PY
