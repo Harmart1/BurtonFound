@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - name: Confirm sandbox-only deployment settings
         shell: bash
         run: |
@@ -76,7 +80,7 @@ jobs:
           if len(matched)!=1:
               sys.exit("No unique matching registered account found for BF_OWNER_EMAIL. Create and verify your account first; no admin access was granted.")
           u=matched[0]
-          if not (u.get("email_confirmed_at") or u.get("confirmed_at")):
+          if not u.get("email_confirmed_at"):
               sys.exit("Owner email is not confirmed in Supabase. Complete email verification first; no admin access was granted.")
           user_id=str(u.get("id",""))
           if not re.fullmatch(r"[a-fA-F0-9-]{36}",user_id):
