@@ -1,0 +1,55 @@
+name: Verify Burton & Found signed Stripe webhook (no payment events)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/stripe-webhook-verify-trigger.txt
+
+permissions:
+  contents: read
+
+jobs:
+  verify-test-webhook:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send verified non-checkout event and reject a tampered signature
+        shell: bash
+        env:
+          BF_STRIPE_TEST_WEBHOOK_SECRET: ${{ secrets.BF_STRIPE_TEST_WEBHOOK_SECRET }}
+        run: |
+          python3 - <<'PY'
+          import os,sys,json,hashlib,hmac,time,subprocess
+          secret=os.environ.get("BF_STRIPE_TEST_WEBHOOK_SECRET","")
+          if not secret.startswith("whsec_"):sys.exit("Missing encrypted Stripe test webhook secret.")
+          endpoint="https://burtonfound.timharmar.workers.dev/api/stripe-webhook"
+          body=json.dumps({
+              "id":"evt_bf_connection_probe",
+              "type":"bf.integration.ping",
+              "data":{"object":{"id":"cs_test_bf_connection_probe","payment_status":"unpaid"}}
+          },separators=(",",":")).encode()
+          t=str(int(time.time()))
+          signed_message=t.encode()+b"."+body
+          signature=hmac.new(secret.encode(),signed_message,hashlib.sha256).hexdigest()
+          def send(payload):
+              cmd=["curl","--silent","--show-error","--max-time","20",
+                   "--request","POST","--header","content-type: application/json",
+                   "--header","Stripe-Signature: t="+t+",v1="+signature,
+                   "--data-binary","@-","--write-out","\\n%{http_code}",endpoint]
+              result=subprocess.run(cmd,input=payload,stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=False)
+              if result.returncode:sys.exit("Could not reach deployed Stripe webhook.")
+              try:
+                  raw,status=result.stdout.decode("utf8").rsplit(chr(10),1)
+                  return int(status.strip()),json.loads(raw)
+              except:sys.exit("Malformed response from deployed webhook.")
+          status,result=send(body)
+          if status!=200 or result.get("received") is not True:
+              sys.exit("The Worker did not accept an authentic signed non-payment probe (HTTP "+str(status)+"). Check Cloudflare Stripe signing secret.")
+          altered=body+b" "
+          bad_status,bad_result=send(altered)
+          if bad_status!=400:
+              sys.exit("Invalid Stripe signature was not rejected (HTTP "+str(bad_status)+").")
+          print("Verified: deployed webhook accepts the matching test signature and rejects altered payloads. No Stripe payment, order, hold, or inventory updates were requested.")
+          PY
