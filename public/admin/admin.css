@@ -20,3 +20,11 @@ button.secondary{background:#fff;color:#243b38;border:1px solid #7a8c86}
 .shipping-review-alert label{display:flex;flex-direction:column;font-weight:700;font-size:13px;gap:7px}
 .shipping-review-alert textarea{padding:11px;border:1px solid #9c6549;max-width:100%;font:14px/1.5 system-ui,sans-serif;border-radius:4px}
 .shipping-review-alert button{margin-top:10px;background:#723c33}
+
+/* Compact, accessible readiness checklist; uses the site's light/dark palette. */
+.readiness-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;margin:1rem 0}
+.readiness-row{display:flex;flex-direction:column;gap:.3rem;background:var(--ui-surface,#fff);color:var(--ui-ink,#263a35);border:1px solid var(--ui-line,#d7cfbe);border-radius:8px;padding:1rem}
+.readiness-row strong{font-size:1rem;line-height:1.35}
+.readiness-row small{font-size:.88rem;color:var(--ui-muted,#52665b);line-height:1.45}
+.readiness-state{font-weight:750;font-size:.78rem;letter-spacing:.02em;color:var(--ui-ink,#263a35);text-transform:uppercase}
+.readiness-note{font-size:.9rem;color:var(--ui-muted,#52665b)}
