@@ -6,6 +6,7 @@ on:
     paths:
       - 'imports/BurtonFound-Vintage-Cars-Site-Upload*.zip'
       - '.github/workflows/import-vintage-cars.yml'
+      - 'scripts/import-vintage-cars.mjs'
   workflow_dispatch:
 
 permissions:
