@@ -1,0 +1,5 @@
+Burton & Found Stripe sandbox setup
+Owner confirmed both freshly rotated Stripe sandbox API key and webhook signing secret were added as GitHub encrypted repository secrets.
+Trigger authorized installation of only sk_test_ and whsec_ credentials to existing Cloudflare Worker.
+Keep LIVE_CHECKOUT_ENABLED=false and LIVE_PAYMENTS_APPROVED=false; no real or test charges authorized by this step.
+Date: 2026-11-09
