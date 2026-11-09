@@ -21,7 +21,7 @@ PUBLIC=ROOT/"public"
 IMAGE_DIR=PUBLIC/"assets"/"images"
 REPORT=ROOT/"reports"/"photo-polish-audit.json"
 MAX_SIDE=1900
-MIN_SIDE=350
+MIN_SIDE=160
 
 # Visually flagged for potentially distracting original page backgrounds,
 # shadows, edge distortion or glare: these warrant careful manual comparison.
@@ -113,7 +113,8 @@ def enhance(im):
     im=im.filter(ImageFilter.UnsharpMask(radius=.70,percent=36,threshold=4))
     return im,{"neutral_paper_fraction":round(fraction,3),"mild_white_balance":balance_applied,
                "paper_illumination_equalized":shadow_lift,"minor_contrast":contrast,
-               "original_dimensions":[*original_size],"display_dimensions":[*im.size]}
+               "original_dimensions":[*original_size],"display_dimensions":[*im.size],
+               "small_original_resolution":min(original_size)<350}
 
 def main():
     parser=argparse.ArgumentParser()
