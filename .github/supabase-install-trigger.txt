@@ -1,0 +1,5 @@
+Burton & Found preview-only Supabase key installation
+Owner confirmed BF_SUPABASE_SECRET_KEY has been securely added to GitHub Actions secrets.
+Validate against selected project nyvdrgpcwfasajyncnhi; install secret into Cloudflare burtonfound only.
+Keep LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false; no charges authorized.
+2026-11-09.
