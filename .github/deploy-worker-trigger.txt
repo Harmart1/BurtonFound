@@ -3,3 +3,5 @@ Safe scope: refreshed homepage and storefront, responsive three-collection cards
 All 58 tests passed. The 22 existing sale products remain unchanged; 93 automobile pages are browse-only; live checkout/tax/carrier approvals remain false.
 
 Final visual refinement: brand-mark consistency and two-row mobile gallery header. Safe Cloudflare redeploy requested after passing 58 tests.
+
+Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside horizontal nav; preserve no-sales preview mode.
