@@ -17,6 +17,7 @@
     "SHIPPING_MODE": "flat_rate",
     "SHIPPING_ALLOWED_COUNTRIES": "CA",
     "STRIPE_AUTOMATIC_TAX": "false",
-    "SUPABASE_URL": "https://nyvdrgpcwfasajyncnhi.supabase.co"
+    "SUPABASE_URL": "https://nyvdrgpcwfasajyncnhi.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_xGxEm5fncVZbHUhepQSpSg_3n7vnsbA"
   }
 }
