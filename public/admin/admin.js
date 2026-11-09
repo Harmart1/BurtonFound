@@ -36,7 +36,25 @@ function render(){
  <div class="order-actions"><button class="secondary" type="button" data-action="packing">Print packing slip</button><a class="secondary" href="https://www.canadapost-postescanada.ca/cpc/en/small-business/snap-ship.page" target="_blank" rel="noopener noreferrer">Canada Post Snap Ship ↗</a><a class="secondary" href="https://www.fedex.com/en-ca/shipping/ship-online.html" target="_blank" rel="noopener noreferrer">FedEx Ship Manager ↗</a><button class="secondary" type="button" data-action="address">Copy address</button><button class="secondary" type="button" data-action="email">Prepare update email</button><button class="secondary" type="button" data-action="history">View change history</button></div>
  <div class="history" hidden></div></article>`).join('')||'<div class="help">No orders match these filters</div>';
 }
-async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Paid orders only');$('dashboard').hidden=false;$('loginHelp').hidden=true;render()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
+async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Paid orders only');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
+async function loadReadiness(){
+ const el=$('readinessResults');if(!el)return;
+ el.textContent='Checking connected services…';
+ try{
+  const v=await request('/api/admin/readiness');
+  const rows=[
+   {title:'Supabase inventory',good:v.supabase?.connected===true,detail:v.supabase?.connected?`${v.supabase.listings} listings · ${v.supabase.available} currently available`:'Private catalogue connection unavailable'},
+   {title:'Stripe sandbox',good:v.stripe?.sandboxKeyPresent===true&&v.stripe?.webhookSigningKeyPresent===true,detail:'Test API key and webhook signing key'},
+   {title:'Stripe Tax settings',good:v.stripe?.taxSettings==='active',detail:v.stripe?.taxSettings==='pending'?`Pending: ${(v.stripe.missingTaxFields||[]).join(', ')||'complete business details'}`:`Status: ${v.stripe?.taxSettings||'unknown'}`},
+   {title:'Shipping quote configuration',good:v.shipping?.configured===true,detail:v.shipping?.mode==='live_carrier'?'Live carrier setup':'Flat-rate shipping amount'},
+   {title:'Tax approval',good:v.approvals?.taxApproved===true,detail:'Requires the owner to verify tax registration and collection settings'},
+   {title:'Customer email delivery',good:v.email?.deliveryVerifiedByApp===true,detail:'Verify the Supabase redirect allowlist and confirmation/reset emails'},
+   {title:'Checkout launch',good:v.checkout!=='preview_only',detail:v.checkout==='preview_only'?'Safely disabled pending launch approval':`Mode: ${v.checkout}`}
+  ];
+  el.innerHTML='<div class="readiness-grid">'+rows.map(r=>`<div class="readiness-row"><span class="readiness-state">${r.good?'Ready':'Needs review'}</span><strong>${esc(r.title)}</strong><small>${esc(r.detail)}</small></div>`).join('')+'</div><p class="readiness-note">Readiness is informational. No configuration, tax, carrier, or payment settings are changed here.</p>';
+ }catch(ex){el.textContent=ex.message||'Launch readiness temporarily unavailable';}
+}
+
 function customerEmail(o){
  const shipped=['shipped','delivered'].includes(o.fulfillment_status);
  const subject=`Burton & Found ${shipped?'shipping':'order'} update · ${o.id.slice(0,8)}`;
@@ -59,7 +77,8 @@ function exportCsv(){
  const csv='\ufeff'+[cols,...data].map(r=>r.map(csvCell).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`burton-found-orders-${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  status('Private order register downloaded. Store it securely; it contains customer personal information.');
 }
-$('reload').addEventListener('click',refresh);$('exportCsv').addEventListener('click',exportCsv);
+$('reload').addEventListener('click',refresh);
+$('refreshReadiness').addEventListener('click',loadReadiness);$('exportCsv').addEventListener('click',exportCsv);
 $('statusFilter').addEventListener('change',render);$('orderSearch').addEventListener('input',render);
 $('orders').addEventListener('submit',async e=>{
  if(!e.target.matches('form.form'))return;e.preventDefault();
