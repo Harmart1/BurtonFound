@@ -27,20 +27,23 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import json,urllib.request,urllib.error,sys
+          import json,subprocess,sys
           base="https://burtonfound.timharmar.workers.dev"
           project="https://nyvdrgpcwfasajyncnhi.supabase.co"
           cfg=json.load(open("wrangler.jsonc",encoding="utf8"))["vars"]
           public_key=cfg.get("SUPABASE_PUBLISHABLE_KEY","")
           assert public_key.startswith("sb_publishable_"),"Missing browser publishable key"
           def get(url,headers=None,method="GET",body=None):
-              req=urllib.request.Request(url,headers=headers or {},method=method,data=body)
-              try:
-                  with urllib.request.urlopen(req,timeout=20) as response:
-                      raw=response.read().decode("utf8")
-                      return response.status,json.loads(raw) if raw else {}
-              except urllib.error.HTTPError as e:
-                  return e.code,{}
+              cmd=["curl","--silent","--show-error","--max-time","20","--location","-w","\\n%{http_code}"]
+              for key,value in (headers or {}).items():cmd.extend(["-H",key+": "+value])
+              if method!="GET":cmd.extend(["--request",method])
+              if body is not None:cmd.extend(["--data-binary","@-"])
+              result=subprocess.run(cmd+[url],input=body,stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=False)
+              if result.returncode:raise AssertionError("Unable to request deployed endpoint")
+              raw,status=result.stdout.decode("utf8").rsplit("\\n",1)
+              try:parsed=json.loads(raw) if raw else {}
+              except:parsed={}
+              return int(status.strip()),parsed
           status,health=get(base+"/api/health")
           print("Deployed health response: HTTP",status,"service",health.get("service"),"checkout",health.get("checkout"),"note",str(health.get("note",""))[:100])
           assert status==200 and health.get("checkout")=="preview_only","Payment collection must remain disabled"
