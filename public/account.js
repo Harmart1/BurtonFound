@@ -95,7 +95,7 @@
     document.addEventListener('bf:account-change',()=>{if(!demo&&A.user())changeView()});
     document.addEventListener('bf:watch-change',()=>{if(!demo&&A.user())renderAll()});
     document.addEventListener('bf:account-error',e=>error(new Error(e.detail?.message||'Account data could not load.')));
-    document.addEventListener('bf:password-recovery',()=>{showPanel('preferences');flash('Set a new password in your security settings.');});
+    document.addEventListener('bf:password-recovery',()=>{if(A.user())changeView();showPanel('preferences');flash('Recovery link accepted. Choose a new password in Security settings.');const input=$('passwordForm')?.elements.namedItem('password');if(input){input.scrollIntoView({block:'center',behavior:'smooth'});input.focus({preventScroll:true});}});
     window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(!inAccount()&&(k==='signin'||k==='signup')){setAuthView(k);return;}if(k.startsWith('watchlist')||['overview','bags','profile','addresses','orders','preferences'].includes(k))showPanel(k,false)});
     A.ready().then(()=>{changeView();refreshOwnerLink();const route=location.hash.slice(1);if(!inAccount())setAuthView(route==='signup'?'signup':'signin');}).catch(error);
   }
