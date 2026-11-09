@@ -34,6 +34,8 @@ jobs:
           assert 'editorial-refresh.css' in home and 'editorial-refresh.css' in store
           assert 'editorial-archive-band' in store
           assert 'archive-masthead' in cars and 'imageDialog' in cars
+          assert 'burton-found-mark.svg' in cars, 'Archive header must carry brand mark'
+          assert 'grid-template-columns:minmax(0,1fr) auto' in gallerystyles, 'Mobile header must use the new two-row layout'
           assert 'noindex, nofollow' in home and 'noindex, nofollow' in cars
           assert 'max-width:590px' in styles and 'max-width:550px' in gallerystyles
           for name in ["va-001.webp","va-049.webp","va-093.webp"]:
