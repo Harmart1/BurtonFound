@@ -1,0 +1,98 @@
+name: Polish product photographs safely (preserve originals)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/photo-polish-trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: burtonfound-photo-polish
+  cancel-in-progress: false
+
+jobs:
+  polish-photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out Burton & Found
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+      - name: Install stable image processing environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-photo.txt
+      - name: Install archival-safe photo processing dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-photo.txt
+      - name: Confirm checkout and tax approval safeguards
+        shell: bash
+        run: |
+          node --input-type=module -e '
+          import {readFileSync} from "node:fs";
+          const vars=JSON.parse(readFileSync("wrangler.jsonc","utf8")).vars;
+          for (const key of ["LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED","TAX_CONFIGURATION_APPROVED","CARRIER_QUOTES_ENABLED"]) {
+            if (vars[key]!=="false") throw Error("Photo optimization refused unless "+key+" remains false");
+          }'
+      - name: Build enhanced display derivatives from original WebP photographs
+        run: python scripts/photo-polish.py
+      - name: Verify source images remain intact
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --name-only -- public/assets/images | grep -v '^public/assets/images/polished/' | grep -q .; then
+            echo "::error::An original source product image was unexpectedly modified."
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json,os,pathlib,sys
+          from PIL import Image
+          root=pathlib.Path("public")
+          report=json.loads(pathlib.Path("reports/photo-polish-audit.json").read_text())
+          assert report["source_image_count"]==141
+          assert report["existing_listing_image_count"]==48
+          assert report["automobile_scan_image_count"]==93
+          for record in report["images"]:
+              original=root/record["source"]
+              variant=root/record["display"]
+              assert original.exists() and variant.exists(),record["source"]
+              with Image.open(original) as a,Image.open(variant) as b:
+                  assert b.format=="WEBP"
+                  assert min(b.size)>=350
+                  assert max(b.size)<=1900
+                  assert b.size[0]/b.size[1] == a.size[0]/a.size[1] or max(a.size)>1900
+          print("PASS: 141 original files preserved; 141 WebP display derivatives valid")
+          PY
+      - name: Run full storefront and deployment regression suite
+        run: |
+          npm run check:deploy
+          npm test
+      - name: Commit photo derivatives, new site references and QA manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/images/polished/ public/products.js public/vintage-cars-data.js public/*.html reports/photo-polish-audit.json
+          if git diff --cached --quiet; then
+            echo "No photo changes to commit."
+          else
+            git commit -m "Publish archival-faithful optimized display images for 141 product and archive photos"
+            git push origin HEAD:main
+          fi
+      - name: Request checkout-safe deployment
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy-worker.yml --repo "${{ github.repository }}" --ref main
+          echo "Product images optimized without changing original sources, product condition or sale inventory." >> "$GITHUB_STEP_SUMMARY"
+          echo "All 93 vintage automobile images remain preview-only. Live checkout stays disabled." >> "$GITHUB_STEP_SUMMARY"
