@@ -21,8 +21,21 @@
   function safeAccountHash(view){try{history.replaceState(null,'','#'+view)}catch{}}
   function setAuthView(v){showAuth=v;for(const [k,id] of [['signin','signInForm'],['signup','signUpForm'],['forgot','forgotForm']])$(id).hidden=k!==v;$('tabSignIn').setAttribute('aria-selected',String(v==='signin'));$('tabSignUp').setAttribute('aria-selected',String(v==='signup'));notice('');}
   function showPanel(name,pushHash=true){const allow=['overview','watchlist','bags','profile','addresses','orders','preferences'];activePanel=allow.includes(name)?name:'overview';document.querySelectorAll('[data-panel]').forEach(btn=>{const on=btn.dataset.panel===activePanel;btn.classList.toggle('active',on);btn.setAttribute('aria-current',on?'page':'false');});document.querySelectorAll('.account-panel').forEach(s=>s.classList.toggle('active',s.id===`panel-${activePanel}`));if(pushHash)history.replaceState(null,'','#'+activePanel);}
+  async function refreshOwnerLink(){
+    const link=$('ownerConsoleLink');if(!link)return;
+    link.hidden=true;
+    const current=A.user();
+    if(demo||!current)return;
+    try{
+      const token=await A.authToken();if(!token)return;
+      const res=await fetch('/api/admin/me',{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+      if(!res.ok)return;
+      const result=await res.json();
+      if(result.admin===true && A.user()?.id===current.id && !demo)link.hidden=false;
+    }catch{/* Private owner access may be unavailable; ordinary accounts still work. */}
+  }
   function changeView(){
-    const on=inAccount();$('accountAccess').hidden=on;$('accountDashboard').hidden=!on;
+    const on=inAccount();if(demo)$('ownerConsoleLink').hidden=true;$('accountAccess').hidden=on;$('accountDashboard').hidden=!on;
     if(on){$('demoRibbon').hidden=!demo;$('dashboardEyebrow').textContent=demo?'COLLECTOR ACCOUNT INTERACTIVE TOUR':'THE COLLECTOR’S CABINET · MY ACCOUNT';const p=profile();const n=(p.full_name||A.user()?.user_metadata?.full_name||'Collector').split(' ')[0];$('dashboardTitle').innerHTML=`Welcome back, <em>${safe(n)}.</em>`;$('accountIdentity').textContent=demo?'SAMPLE COLLECTOR':A.user()?.email||'MEMBER';renderAll();showPanel(location.hash.replace('#','')||activePanel,false);}
     else{const connected=A.connected();$('accountSetupBanner').hidden=connected;$('startDemo').hidden=connected;if(!connected){const span=$('accountSetupBanner').querySelector('span');if(span)span.textContent=A.configured()?'Account connection is temporarily unavailable. No registration or sign-in has occurred. Please try again later.':'Customer accounts are not activated yet. Sign-in and registration will work after the store owner connects Supabase; no account is created in preview mode.';}}
   }
@@ -78,13 +91,13 @@
     $('passwordForm').addEventListener('submit',async e=>{e.preventDefault();if(demo){dashboardNotice('Password changes require a real account.');return}try{await A.updatePassword(e.currentTarget.elements.namedItem('password').value);flash('Password updated.');e.currentTarget.reset();}catch(ex){error(ex)}});
     $('exportAccount').addEventListener('click',async()=>{if(demo){dashboardNotice('The sample account contains no actual account records to export.');return}try{const blob=await A.exportData(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='burton-found-my-account.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);flash('Your account information was downloaded.');}catch(ex){error(ex)}});
     $('deleteAccount').addEventListener('click',async()=>{if(demo){dashboardNotice('The sample account does not exist online. Nothing to delete.');return}if(!confirm('Delete your Burton & Found account and its saved data permanently? This cannot be undone.'))return;const typed=prompt('Type DELETE to confirm permanent account deletion');if(typed!=='DELETE'){dashboardNotice('Account deletion cancelled.');return}try{await A.deleteMyAccount();changeView();flash('Your Burton & Found account was deleted.');}catch(ex){error(ex)}});
-    document.addEventListener('bf:auth-change',()=>{if(!demo)changeView()});
+    document.addEventListener('bf:auth-change',()=>{if(!demo)changeView();refreshOwnerLink()});
     document.addEventListener('bf:account-change',()=>{if(!demo&&A.user())changeView()});
     document.addEventListener('bf:watch-change',()=>{if(!demo&&A.user())renderAll()});
     document.addEventListener('bf:account-error',e=>error(new Error(e.detail?.message||'Account data could not load.')));
     document.addEventListener('bf:password-recovery',()=>{showPanel('preferences');flash('Set a new password in your security settings.');});
     window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(!inAccount()&&(k==='signin'||k==='signup')){setAuthView(k);return;}if(k.startsWith('watchlist')||['overview','bags','profile','addresses','orders','preferences'].includes(k))showPanel(k,false)});
-    A.ready().then(()=>{changeView();const route=location.hash.slice(1);if(!inAccount())setAuthView(route==='signup'?'signup':'signin');}).catch(error);
+    A.ready().then(()=>{changeView();refreshOwnerLink();const route=location.hash.slice(1);if(!inAccount())setAuthView(route==='signup'?'signup':'signin');}).catch(error);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
