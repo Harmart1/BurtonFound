@@ -59,6 +59,13 @@ jobs:
               assert actual==expect,"Authentication guard regression for "+path+" (HTTP "+str(actual)+")"
           actual,_=get(base+"/api/checkout",headers={"origin":base,"content-type":"application/json"},method="POST",body=b'{"skus":["OH-003"]}')
           assert actual==503,"Checkout must refuse payment session creation during integration"
+          # Private PostgREST tables must reject anonymous reads even though the project API is reachable.
+          for table in ["collector_profiles","bf_orders","bf_admin_users"]:
+              status,_=get(project+"/rest/v1/"+table+"?select=*&limit=1",{"apikey":public_key,"Accept":"application/json"})
+              assert status in (401,403),"Anonymous read must be rejected for "+table+"; received HTTP "+str(status)
+          # An invalid Stripe signature must never reach the privileged paid-order handling RPC.
+          status,_=get(base+"/api/stripe-webhook",headers={"origin":base,"content-type":"application/json","Stripe-Signature":"t=1,v1=invalid"},method="POST",body=b'{"id":"evt_invalid","type":"checkout.session.completed"}')
+          assert status==400,"Unsigned Stripe webhook must be rejected; received HTTP "+str(status)
           auth_status,auth=get(project+"/auth/v1/settings",{"apikey":public_key,"Accept":"application/json"})
           assert auth_status==200 and isinstance(auth,dict),"Supabase Auth config API unavailable"
           email_enabled=auth.get("external",{}).get("email",None) if isinstance(auth.get("external"),dict) else None
