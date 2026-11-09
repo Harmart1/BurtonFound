@@ -65,7 +65,7 @@
   async function injectSDK(){
     if(window.supabase?.createClient)return;
     await new Promise((resolve,reject)=>{
-      const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0';
       script.onload=resolve;script.onerror=()=>reject(new Error('Account connection unavailable. Check your internet connection.'));
       document.head.appendChild(script);
     });
@@ -93,8 +93,7 @@
       if(readyToConnect){
         try{
           await injectSDK();client=window.supabase.createClient(cfg.supabaseUrl.trim(),cfg.supabasePublishableKey.trim(),{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-          const {data,error}=await client.auth.getSession();if(error)throw error;
-          if(data?.session?.user)await loadUser(data.session.user);
+          // Subscribe before session recovery, or a password-reset redirect can be missed.
           client.auth.onAuthStateChange((event,session)=>{
             if(!['SIGNED_IN','SIGNED_OUT','USER_UPDATED','PASSWORD_RECOVERY','INITIAL_SESSION'].includes(event))return;
             // Avoid calls into Supabase's auth API while the auth callback holds the lock.
@@ -105,6 +104,8 @@
               if(event==='PASSWORD_RECOVERY')emit('password-recovery');
             },0);
           });
+          const {data,error}=await client.auth.getSession();if(error)throw error;
+          if(data?.session?.user && data.session.user.id!==user?.id)await loadUser(data.session.user);
         }catch(e){connectError=e.message||'Connection failed';emit('account-error',{message:connectError});}
       }
       tell();return {configured:readyToConnect,connected:!!client,user};
@@ -127,7 +128,7 @@
     demandAuth();check(await client.auth.signOut({scope:'local'}));await loadUser(null);
     try{localStorage.removeItem(keyCart);}catch{}
   }
-  async function forgotPassword(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resetPasswordForEmail(email,{redirectTo:new URL('account.html#security',location.href).href}));}
+  async function forgotPassword(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resetPasswordForEmail(email,{redirectTo:new URL('account.html',location.href).href}));}
   async function updatePassword(password){demandAuth();check(await client.auth.updateUser({password}));}
   async function updateEmail(email){demandAuth();check(await client.auth.updateUser({email:email.trim()}));}
   async function updateProfile(data){demandAuth();
