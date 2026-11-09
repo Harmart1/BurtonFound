@@ -1,3 +1,5 @@
 Deploy requested for the Burton & Found November 2026 editorial visual refresh.
 Safe scope: refreshed homepage and storefront, responsive three-collection cards, new Vintage Automobiles image-led gallery, filters and lightbox.
 All 58 tests passed. The 22 existing sale products remain unchanged; 93 automobile pages are browse-only; live checkout/tax/carrier approvals remain false.
+
+Final visual refinement: brand-mark consistency and two-row mobile gallery header. Safe Cloudflare redeploy requested after passing 58 tests.
