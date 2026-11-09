@@ -100,3 +100,38 @@ jobs:
               sys.exit("Unexpected Supabase Auth admin API response; no data was changed.")
           print("Verified: read-only Supabase Auth Admin API access works with the stored server key. No users listed.")
           PY
+      - name: Check owner-account activation readiness without granting privileges
+        shell: bash
+        env:
+          BF_OWNER_EMAIL: ${{ secrets.BF_OWNER_EMAIL }}
+          BF_SUPABASE_SECRET_KEY: ${{ secrets.BF_SUPABASE_SECRET_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json,os,re,urllib.request,urllib.error,sys
+          email=os.environ.get("BF_OWNER_EMAIL","").strip().casefold()
+          key=os.environ.get("BF_SUPABASE_SECRET_KEY","")
+          if not email:
+              print("Owner-admin activation pending: BF_OWNER_EMAIL is not set in GitHub Actions secrets.")
+              sys.exit(0)
+          if not re.fullmatch(r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+",email) or len(email)>254:
+              sys.exit("Owner email secret has invalid format; no administrator was granted.")
+          if not key.startswith("sb_secret_"):
+              sys.exit("Supabase secret unavailable; no administrator was granted.")
+          matches=[]
+          for page in range(1,11):
+              req=urllib.request.Request(
+                  "https://nyvdrgpcwfasajyncnhi.supabase.co/auth/v1/admin/users?page="+str(page)+"&per_page=100",
+                  headers={"apikey":key,"Accept":"application/json"}
+              )
+              try:
+                  with urllib.request.urlopen(req,timeout=20) as res: response=json.load(res)
+              except urllib.error.HTTPError as exc:
+                  sys.exit("Supabase owner verification failed (HTTP %s); no administrator was granted."%exc.code)
+              users=response.get("users",[])
+              matches.extend(user for user in users if str(user.get("email","")).strip().casefold()==email)
+              if len(users)<100:break
+          if len(matches)==1 and matches[0].get("email_confirmed_at"):
+              print("Owner email secret matches one verified Supabase account. Owner grant may now be triggered after authorization; no privileges changed.")
+          else:
+              print("Owner email secret does not yet match exactly one verified account; no privileges changed.")
+          PY
