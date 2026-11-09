@@ -1,0 +1,2718 @@
+{
+  "version": 1,
+  "method": "Conservative, archival-faithful display derivatives; originals preserved",
+  "source_image_count": 141,
+  "existing_listing_image_count": 48,
+  "automobile_scan_image_count": 93,
+  "all_automobile_previews_non_purchasable": true,
+  "original_bytes": 15234730,
+  "display_bytes": 14577252,
+  "html_pages_updated": [
+    "account.html",
+    "index.html",
+    "papertrail.html",
+    "storefront.html",
+    "vintage-cars.html"
+  ],
+  "notes": [
+    "No artwork, text, tears, folds or genuine print condition intentionally removed.",
+    "Automated processing cannot reliably reconstruct obscured details or fix severe perspective, glare or clipping.",
+    "Compare any flagged scans to the physical page before creating sale listings."
+  ],
+  "images": [
+    {
+      "source": "assets/images/bundle-set-a.webp",
+      "display": "assets/images/polished/bundle-set-a.webp",
+      "source_bytes": 56732,
+      "display_bytes": 57676,
+      "neutral_paper_fraction": 0.099,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        800,
+        900
+      ],
+      "display_dimensions": [
+        800,
+        900
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/bundle-set-b.webp",
+      "display": "assets/images/polished/bundle-set-b.webp",
+      "source_bytes": 44520,
+      "display_bytes": 46544,
+      "neutral_paper_fraction": 0.107,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        800,
+        900
+      ],
+      "display_dimensions": [
+        800,
+        900
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/bundle-set-c.webp",
+      "display": "assets/images/polished/bundle-set-c.webp",
+      "source_bytes": 48632,
+      "display_bytes": 50236,
+      "neutral_paper_fraction": 0.476,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": true,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        800,
+        900
+      ],
+      "display_dimensions": [
+        800,
+        900
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/bundle-set-d.webp",
+      "display": "assets/images/polished/bundle-set-d.webp",
+      "source_bytes": 41666,
+      "display_bytes": 42752,
+      "neutral_paper_fraction": 0.09,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        800,
+        900
+      ],
+      "display_dimensions": [
+        800,
+        900
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/bundle-set-e.webp",
+      "display": "assets/images/polished/bundle-set-e.webp",
+      "source_bytes": 42838,
+      "display_bytes": 42970,
+      "neutral_paper_fraction": 0.094,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        800,
+        900
+      ],
+      "display_dimensions": [
+        800,
+        900
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-001.webp",
+      "display": "assets/images/polished/cc-001.webp",
+      "source_bytes": 58256,
+      "display_bytes": 43306,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        788
+      ],
+      "display_dimensions": [
+        1050,
+        788
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-002.webp",
+      "display": "assets/images/polished/cc-002.webp",
+      "source_bytes": 122304,
+      "display_bytes": 94074,
+      "neutral_paper_fraction": 0.009,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1050,
+        1394
+      ],
+      "display_dimensions": [
+        1050,
+        1394
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-003.webp",
+      "display": "assets/images/polished/cc-003.webp",
+      "source_bytes": 63968,
+      "display_bytes": 52658,
+      "neutral_paper_fraction": 0.01,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        791
+      ],
+      "display_dimensions": [
+        1050,
+        791
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-004.webp",
+      "display": "assets/images/polished/cc-004.webp",
+      "source_bytes": 116360,
+      "display_bytes": 89850,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1394
+      ],
+      "display_dimensions": [
+        1050,
+        1394
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-005.webp",
+      "display": "assets/images/polished/cc-005.webp",
+      "source_bytes": 143804,
+      "display_bytes": 117756,
+      "neutral_paper_fraction": 0.018,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1394
+      ],
+      "display_dimensions": [
+        1050,
+        1394
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-006.webp",
+      "display": "assets/images/polished/cc-006.webp",
+      "source_bytes": 92794,
+      "display_bytes": 70602,
+      "neutral_paper_fraction": 0.029,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-007.webp",
+      "display": "assets/images/polished/cc-007.webp",
+      "source_bytes": 82750,
+      "display_bytes": 62668,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-008.webp",
+      "display": "assets/images/polished/cc-008.webp",
+      "source_bytes": 89230,
+      "display_bytes": 70324,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-009.webp",
+      "display": "assets/images/polished/cc-009.webp",
+      "source_bytes": 71222,
+      "display_bytes": 52004,
+      "neutral_paper_fraction": 0.001,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-010.webp",
+      "display": "assets/images/polished/cc-010.webp",
+      "source_bytes": 123798,
+      "display_bytes": 94758,
+      "neutral_paper_fraction": 0.016,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1394
+      ],
+      "display_dimensions": [
+        1050,
+        1394
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-011.webp",
+      "display": "assets/images/polished/cc-011.webp",
+      "source_bytes": 75422,
+      "display_bytes": 53474,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-012.webp",
+      "display": "assets/images/polished/cc-012.webp",
+      "source_bytes": 93700,
+      "display_bytes": 73284,
+      "neutral_paper_fraction": 0.009,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-013.webp",
+      "display": "assets/images/polished/cc-013.webp",
+      "source_bytes": 103354,
+      "display_bytes": 77298,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1394
+      ],
+      "display_dimensions": [
+        1050,
+        1394
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-014.webp",
+      "display": "assets/images/polished/cc-014.webp",
+      "source_bytes": 69940,
+      "display_bytes": 47190,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-015.webp",
+      "display": "assets/images/polished/cc-015.webp",
+      "source_bytes": 66712,
+      "display_bytes": 51946,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-016.webp",
+      "display": "assets/images/polished/cc-016.webp",
+      "source_bytes": 72912,
+      "display_bytes": 52512,
+      "neutral_paper_fraction": 0.007,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-017.webp",
+      "display": "assets/images/polished/cc-017.webp",
+      "source_bytes": 73334,
+      "display_bytes": 54792,
+      "neutral_paper_fraction": 0.005,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-018.webp",
+      "display": "assets/images/polished/cc-018.webp",
+      "source_bytes": 73274,
+      "display_bytes": 56426,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-019.webp",
+      "display": "assets/images/polished/cc-019.webp",
+      "source_bytes": 82342,
+      "display_bytes": 59856,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-020.webp",
+      "display": "assets/images/polished/cc-020.webp",
+      "source_bytes": 86336,
+      "display_bytes": 65636,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-021.webp",
+      "display": "assets/images/polished/cc-021.webp",
+      "source_bytes": 79324,
+      "display_bytes": 57788,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-022.webp",
+      "display": "assets/images/polished/cc-022.webp",
+      "source_bytes": 87704,
+      "display_bytes": 65362,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-023.webp",
+      "display": "assets/images/polished/cc-023.webp",
+      "source_bytes": 123150,
+      "display_bytes": 94732,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1050,
+        1394
+      ],
+      "display_dimensions": [
+        1050,
+        1394
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-024.webp",
+      "display": "assets/images/polished/cc-024.webp",
+      "source_bytes": 73434,
+      "display_bytes": 50902,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-025.webp",
+      "display": "assets/images/polished/cc-025.webp",
+      "source_bytes": 68800,
+      "display_bytes": 49834,
+      "neutral_paper_fraction": 0.002,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-026.webp",
+      "display": "assets/images/polished/cc-026.webp",
+      "source_bytes": 78570,
+      "display_bytes": 58150,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-027.webp",
+      "display": "assets/images/polished/cc-027.webp",
+      "source_bytes": 84532,
+      "display_bytes": 65786,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-028.webp",
+      "display": "assets/images/polished/cc-028.webp",
+      "source_bytes": 74202,
+      "display_bytes": 53692,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-029.webp",
+      "display": "assets/images/polished/cc-029.webp",
+      "source_bytes": 88270,
+      "display_bytes": 64472,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-030.webp",
+      "display": "assets/images/polished/cc-030.webp",
+      "source_bytes": 68468,
+      "display_bytes": 52024,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-031.webp",
+      "display": "assets/images/polished/cc-031.webp",
+      "source_bytes": 64448,
+      "display_bytes": 49048,
+      "neutral_paper_fraction": 0.009,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-032.webp",
+      "display": "assets/images/polished/cc-032.webp",
+      "source_bytes": 53556,
+      "display_bytes": 39698,
+      "neutral_paper_fraction": 0.004,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-033.webp",
+      "display": "assets/images/polished/cc-033.webp",
+      "source_bytes": 72648,
+      "display_bytes": 54028,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/cc-034.webp",
+      "display": "assets/images/polished/cc-034.webp",
+      "source_bytes": 71356,
+      "display_bytes": 54368,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1050,
+        1400
+      ],
+      "display_dimensions": [
+        1050,
+        1400
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/oh-001.webp",
+      "display": "assets/images/polished/oh-001.webp",
+      "source_bytes": 89856,
+      "display_bytes": 65072,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1100,
+        1467
+      ],
+      "display_dimensions": [
+        1100,
+        1467
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/oh-002.webp",
+      "display": "assets/images/polished/oh-002.webp",
+      "source_bytes": 129054,
+      "display_bytes": 98022,
+      "neutral_paper_fraction": 0.001,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1100,
+        1467
+      ],
+      "display_dimensions": [
+        1100,
+        1467
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/oh-003-caption.webp",
+      "display": "assets/images/polished/oh-003-caption.webp",
+      "source_bytes": 12444,
+      "display_bytes": 9902,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1024,
+        288
+      ],
+      "display_dimensions": [
+        1024,
+        288
+      ],
+      "small_original_resolution": true
+    },
+    {
+      "source": "assets/images/oh-003.webp",
+      "display": "assets/images/polished/oh-003.webp",
+      "source_bytes": 74046,
+      "display_bytes": 54024,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1100,
+        1467
+      ],
+      "display_dimensions": [
+        1100,
+        1467
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/oh-004.webp",
+      "display": "assets/images/polished/oh-004.webp",
+      "source_bytes": 85012,
+      "display_bytes": 64542,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1100,
+        1467
+      ],
+      "display_dimensions": [
+        1100,
+        1467
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/oh-005-caption.webp",
+      "display": "assets/images/polished/oh-005-caption.webp",
+      "source_bytes": 17800,
+      "display_bytes": 15428,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1152,
+        309
+      ],
+      "display_dimensions": [
+        1152,
+        309
+      ],
+      "small_original_resolution": true
+    },
+    {
+      "source": "assets/images/oh-005.webp",
+      "display": "assets/images/polished/oh-005.webp",
+      "source_bytes": 65956,
+      "display_bytes": 51370,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1100,
+        1467
+      ],
+      "display_dimensions": [
+        1100,
+        1467
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/oh-006-caption.webp",
+      "display": "assets/images/polished/oh-006-caption.webp",
+      "source_bytes": 12126,
+      "display_bytes": 9794,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1110,
+        266
+      ],
+      "display_dimensions": [
+        1110,
+        266
+      ],
+      "small_original_resolution": true
+    },
+    {
+      "source": "assets/images/oh-006.webp",
+      "display": "assets/images/polished/oh-006.webp",
+      "source_bytes": 79252,
+      "display_bytes": 53472,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.032,
+      "original_dimensions": [
+        1100,
+        1467
+      ],
+      "display_dimensions": [
+        1100,
+        1467
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-001.webp",
+      "display": "assets/images/polished/vintage-cars/va-001.webp",
+      "source_bytes": 128764,
+      "display_bytes": 130884,
+      "neutral_paper_fraction": 0.279,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1117,
+        1450
+      ],
+      "display_dimensions": [
+        1117,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-002.webp",
+      "display": "assets/images/polished/vintage-cars/va-002.webp",
+      "source_bytes": 98528,
+      "display_bytes": 99050,
+      "neutral_paper_fraction": 0.236,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        971,
+        1450
+      ],
+      "display_dimensions": [
+        971,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Repeated dark ring/mark along the scanned page edge"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-003.webp",
+      "display": "assets/images/polished/vintage-cars/va-003.webp",
+      "source_bytes": 86732,
+      "display_bytes": 86326,
+      "neutral_paper_fraction": 0.271,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1077,
+        1450
+      ],
+      "display_dimensions": [
+        1077,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-004.webp",
+      "display": "assets/images/polished/vintage-cars/va-004.webp",
+      "source_bytes": 138922,
+      "display_bytes": 137948,
+      "neutral_paper_fraction": 0.165,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1268,
+        1450
+      ],
+      "display_dimensions": [
+        1268,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-005.webp",
+      "display": "assets/images/polished/vintage-cars/va-005.webp",
+      "source_bytes": 131888,
+      "display_bytes": 137850,
+      "neutral_paper_fraction": 0.274,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1067,
+        1450
+      ],
+      "display_dimensions": [
+        1067,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-006.webp",
+      "display": "assets/images/polished/vintage-cars/va-006.webp",
+      "source_bytes": 97764,
+      "display_bytes": 98886,
+      "neutral_paper_fraction": 0.245,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1006,
+        1450
+      ],
+      "display_dimensions": [
+        1006,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-007.webp",
+      "display": "assets/images/polished/vintage-cars/va-007.webp",
+      "source_bytes": 97584,
+      "display_bytes": 98728,
+      "neutral_paper_fraction": 0.245,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1016,
+        1450
+      ],
+      "display_dimensions": [
+        1016,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-008.webp",
+      "display": "assets/images/polished/vintage-cars/va-008.webp",
+      "source_bytes": 92614,
+      "display_bytes": 93208,
+      "neutral_paper_fraction": 0.207,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1104,
+        1450
+      ],
+      "display_dimensions": [
+        1104,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-009.webp",
+      "display": "assets/images/polished/vintage-cars/va-009.webp",
+      "source_bytes": 96284,
+      "display_bytes": 97880,
+      "neutral_paper_fraction": 0.391,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1450,
+        1057
+      ],
+      "display_dimensions": [
+        1450,
+        1057
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-010.webp",
+      "display": "assets/images/polished/vintage-cars/va-010.webp",
+      "source_bytes": 190378,
+      "display_bytes": 192022,
+      "neutral_paper_fraction": 0.245,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        943,
+        1450
+      ],
+      "display_dimensions": [
+        943,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Uneven warm illumination; verify original printed colors"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-011.webp",
+      "display": "assets/images/polished/vintage-cars/va-011.webp",
+      "source_bytes": 141512,
+      "display_bytes": 138216,
+      "neutral_paper_fraction": 0.067,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        972,
+        1450
+      ],
+      "display_dimensions": [
+        972,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-012.webp",
+      "display": "assets/images/polished/vintage-cars/va-012.webp",
+      "source_bytes": 144922,
+      "display_bytes": 147868,
+      "neutral_paper_fraction": 0.204,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1082,
+        1450
+      ],
+      "display_dimensions": [
+        1082,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-013.webp",
+      "display": "assets/images/polished/vintage-cars/va-013.webp",
+      "source_bytes": 112032,
+      "display_bytes": 110552,
+      "neutral_paper_fraction": 0.246,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1313,
+        1450
+      ],
+      "display_dimensions": [
+        1313,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Possible page curvature/edge shadow"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-014.webp",
+      "display": "assets/images/polished/vintage-cars/va-014.webp",
+      "source_bytes": 95598,
+      "display_bytes": 97098,
+      "neutral_paper_fraction": 0.193,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        999,
+        1450
+      ],
+      "display_dimensions": [
+        999,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-015.webp",
+      "display": "assets/images/polished/vintage-cars/va-015.webp",
+      "source_bytes": 113488,
+      "display_bytes": 115542,
+      "neutral_paper_fraction": 0.262,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1053,
+        1450
+      ],
+      "display_dimensions": [
+        1053,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-016.webp",
+      "display": "assets/images/polished/vintage-cars/va-016.webp",
+      "source_bytes": 118050,
+      "display_bytes": 119920,
+      "neutral_paper_fraction": 0.216,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1051,
+        1450
+      ],
+      "display_dimensions": [
+        1051,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-017.webp",
+      "display": "assets/images/polished/vintage-cars/va-017.webp",
+      "source_bytes": 115908,
+      "display_bytes": 115128,
+      "neutral_paper_fraction": 0.188,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        981,
+        1450
+      ],
+      "display_dimensions": [
+        981,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-018.webp",
+      "display": "assets/images/polished/vintage-cars/va-018.webp",
+      "source_bytes": 87796,
+      "display_bytes": 90868,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        785,
+        1450
+      ],
+      "display_dimensions": [
+        785,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-019.webp",
+      "display": "assets/images/polished/vintage-cars/va-019.webp",
+      "source_bytes": 133932,
+      "display_bytes": 136488,
+      "neutral_paper_fraction": 0.004,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        954,
+        1450
+      ],
+      "display_dimensions": [
+        954,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-020.webp",
+      "display": "assets/images/polished/vintage-cars/va-020.webp",
+      "source_bytes": 127008,
+      "display_bytes": 126822,
+      "neutral_paper_fraction": 0.193,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1132,
+        1450
+      ],
+      "display_dimensions": [
+        1132,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-021.webp",
+      "display": "assets/images/polished/vintage-cars/va-021.webp",
+      "source_bytes": 150864,
+      "display_bytes": 152524,
+      "neutral_paper_fraction": 0.243,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1279,
+        1450
+      ],
+      "display_dimensions": [
+        1279,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-022.webp",
+      "display": "assets/images/polished/vintage-cars/va-022.webp",
+      "source_bytes": 109386,
+      "display_bytes": 108626,
+      "neutral_paper_fraction": 0.119,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        950,
+        1450
+      ],
+      "display_dimensions": [
+        950,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-023.webp",
+      "display": "assets/images/polished/vintage-cars/va-023.webp",
+      "source_bytes": 190702,
+      "display_bytes": 194916,
+      "neutral_paper_fraction": 0.305,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1076,
+        1450
+      ],
+      "display_dimensions": [
+        1076,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-024.webp",
+      "display": "assets/images/polished/vintage-cars/va-024.webp",
+      "source_bytes": 179508,
+      "display_bytes": 185476,
+      "neutral_paper_fraction": 0.216,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1450,
+        1268
+      ],
+      "display_dimensions": [
+        1450,
+        1268
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-025.webp",
+      "display": "assets/images/polished/vintage-cars/va-025.webp",
+      "source_bytes": 154888,
+      "display_bytes": 158196,
+      "neutral_paper_fraction": 0.315,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1159,
+        1450
+      ],
+      "display_dimensions": [
+        1159,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-026.webp",
+      "display": "assets/images/polished/vintage-cars/va-026.webp",
+      "source_bytes": 76974,
+      "display_bytes": 79252,
+      "neutral_paper_fraction": 0.182,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        984,
+        1450
+      ],
+      "display_dimensions": [
+        984,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-027.webp",
+      "display": "assets/images/polished/vintage-cars/va-027.webp",
+      "source_bytes": 147794,
+      "display_bytes": 148722,
+      "neutral_paper_fraction": 0.317,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1082,
+        1450
+      ],
+      "display_dimensions": [
+        1082,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-028.webp",
+      "display": "assets/images/polished/vintage-cars/va-028.webp",
+      "source_bytes": 160896,
+      "display_bytes": 161008,
+      "neutral_paper_fraction": 0.121,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1103,
+        1450
+      ],
+      "display_dimensions": [
+        1103,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-029.webp",
+      "display": "assets/images/polished/vintage-cars/va-029.webp",
+      "source_bytes": 111638,
+      "display_bytes": 115664,
+      "neutral_paper_fraction": 0.397,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        937,
+        1450
+      ],
+      "display_dimensions": [
+        937,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-030.webp",
+      "display": "assets/images/polished/vintage-cars/va-030.webp",
+      "source_bytes": 100352,
+      "display_bytes": 101064,
+      "neutral_paper_fraction": 0.404,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        948,
+        1450
+      ],
+      "display_dimensions": [
+        948,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-031.webp",
+      "display": "assets/images/polished/vintage-cars/va-031.webp",
+      "source_bytes": 146168,
+      "display_bytes": 152432,
+      "neutral_paper_fraction": 0.317,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        979,
+        1450
+      ],
+      "display_dimensions": [
+        979,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-032.webp",
+      "display": "assets/images/polished/vintage-cars/va-032.webp",
+      "source_bytes": 78720,
+      "display_bytes": 80848,
+      "neutral_paper_fraction": 0.247,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        970,
+        1450
+      ],
+      "display_dimensions": [
+        970,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-033.webp",
+      "display": "assets/images/polished/vintage-cars/va-033.webp",
+      "source_bytes": 128450,
+      "display_bytes": 132646,
+      "neutral_paper_fraction": 0.31,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1042,
+        1450
+      ],
+      "display_dimensions": [
+        1042,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-034.webp",
+      "display": "assets/images/polished/vintage-cars/va-034.webp",
+      "source_bytes": 107134,
+      "display_bytes": 109354,
+      "neutral_paper_fraction": 0.217,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1120,
+        1450
+      ],
+      "display_dimensions": [
+        1120,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Visible paper edge and warm illumination"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-035.webp",
+      "display": "assets/images/polished/vintage-cars/va-035.webp",
+      "source_bytes": 117144,
+      "display_bytes": 118322,
+      "neutral_paper_fraction": 0.223,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        970,
+        1450
+      ],
+      "display_dimensions": [
+        970,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-036.webp",
+      "display": "assets/images/polished/vintage-cars/va-036.webp",
+      "source_bytes": 159688,
+      "display_bytes": 166802,
+      "neutral_paper_fraction": 0.274,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1096,
+        1450
+      ],
+      "display_dimensions": [
+        1096,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-037.webp",
+      "display": "assets/images/polished/vintage-cars/va-037.webp",
+      "source_bytes": 124098,
+      "display_bytes": 125360,
+      "neutral_paper_fraction": 0.239,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        961,
+        1450
+      ],
+      "display_dimensions": [
+        961,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Color cast on page with illustrations"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-038.webp",
+      "display": "assets/images/polished/vintage-cars/va-038.webp",
+      "source_bytes": 122914,
+      "display_bytes": 127126,
+      "neutral_paper_fraction": 0.316,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        990,
+        1450
+      ],
+      "display_dimensions": [
+        990,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-039.webp",
+      "display": "assets/images/polished/vintage-cars/va-039.webp",
+      "source_bytes": 101564,
+      "display_bytes": 102854,
+      "neutral_paper_fraction": 0.251,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        989,
+        1450
+      ],
+      "display_dimensions": [
+        989,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-040.webp",
+      "display": "assets/images/polished/vintage-cars/va-040.webp",
+      "source_bytes": 137474,
+      "display_bytes": 142894,
+      "neutral_paper_fraction": 0.259,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1032,
+        1450
+      ],
+      "display_dimensions": [
+        1032,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-041.webp",
+      "display": "assets/images/polished/vintage-cars/va-041.webp",
+      "source_bytes": 92414,
+      "display_bytes": 96684,
+      "neutral_paper_fraction": 0.2,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        874,
+        1450
+      ],
+      "display_dimensions": [
+        874,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Ring/mark near right margin; verify whether from scan"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-042.webp",
+      "display": "assets/images/polished/vintage-cars/va-042.webp",
+      "source_bytes": 84444,
+      "display_bytes": 86966,
+      "neutral_paper_fraction": 0.2,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        979,
+        1450
+      ],
+      "display_dimensions": [
+        979,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Ring/mark near right margin; verify whether from scan"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-043.webp",
+      "display": "assets/images/polished/vintage-cars/va-043.webp",
+      "source_bytes": 113022,
+      "display_bytes": 114208,
+      "neutral_paper_fraction": 0.25,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1450,
+        1035
+      ],
+      "display_dimensions": [
+        1450,
+        1035
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-044.webp",
+      "display": "assets/images/polished/vintage-cars/va-044.webp",
+      "source_bytes": 124746,
+      "display_bytes": 128402,
+      "neutral_paper_fraction": 0.224,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        955,
+        1450
+      ],
+      "display_dimensions": [
+        955,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-045.webp",
+      "display": "assets/images/polished/vintage-cars/va-045.webp",
+      "source_bytes": 152168,
+      "display_bytes": 153110,
+      "neutral_paper_fraction": 0.317,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        940,
+        1450
+      ],
+      "display_dimensions": [
+        940,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-046.webp",
+      "display": "assets/images/polished/vintage-cars/va-046.webp",
+      "source_bytes": 102152,
+      "display_bytes": 101972,
+      "neutral_paper_fraction": 0.191,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1009,
+        1450
+      ],
+      "display_dimensions": [
+        1009,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-047.webp",
+      "display": "assets/images/polished/vintage-cars/va-047.webp",
+      "source_bytes": 90860,
+      "display_bytes": 90752,
+      "neutral_paper_fraction": 0.158,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1450,
+        1087
+      ],
+      "display_dimensions": [
+        1450,
+        1087
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-048.webp",
+      "display": "assets/images/polished/vintage-cars/va-048.webp",
+      "source_bytes": 168826,
+      "display_bytes": 169324,
+      "neutral_paper_fraction": 0.333,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1164,
+        1450
+      ],
+      "display_dimensions": [
+        1164,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-049.webp",
+      "display": "assets/images/polished/vintage-cars/va-049.webp",
+      "source_bytes": 118964,
+      "display_bytes": 120626,
+      "neutral_paper_fraction": 0.25,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1450,
+        1041
+      ],
+      "display_dimensions": [
+        1450,
+        1041
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-050.webp",
+      "display": "assets/images/polished/vintage-cars/va-050.webp",
+      "source_bytes": 118724,
+      "display_bytes": 121046,
+      "neutral_paper_fraction": 0.223,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1030,
+        1450
+      ],
+      "display_dimensions": [
+        1030,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-051.webp",
+      "display": "assets/images/polished/vintage-cars/va-051.webp",
+      "source_bytes": 154336,
+      "display_bytes": 154356,
+      "neutral_paper_fraction": 0.105,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        981,
+        1450
+      ],
+      "display_dimensions": [
+        981,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-052.webp",
+      "display": "assets/images/polished/vintage-cars/va-052.webp",
+      "source_bytes": 136738,
+      "display_bytes": 140504,
+      "neutral_paper_fraction": 0.334,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        938,
+        1450
+      ],
+      "display_dimensions": [
+        938,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-053.webp",
+      "display": "assets/images/polished/vintage-cars/va-053.webp",
+      "source_bytes": 153410,
+      "display_bytes": 156306,
+      "neutral_paper_fraction": 0.215,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1002,
+        1450
+      ],
+      "display_dimensions": [
+        1002,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-054.webp",
+      "display": "assets/images/polished/vintage-cars/va-054.webp",
+      "source_bytes": 154912,
+      "display_bytes": 156078,
+      "neutral_paper_fraction": 0.525,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        937,
+        1450
+      ],
+      "display_dimensions": [
+        937,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-055.webp",
+      "display": "assets/images/polished/vintage-cars/va-055.webp",
+      "source_bytes": 139466,
+      "display_bytes": 142920,
+      "neutral_paper_fraction": 0.251,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        927,
+        1450
+      ],
+      "display_dimensions": [
+        927,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-056.webp",
+      "display": "assets/images/polished/vintage-cars/va-056.webp",
+      "source_bytes": 162722,
+      "display_bytes": 166638,
+      "neutral_paper_fraction": 0.265,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1066,
+        1450
+      ],
+      "display_dimensions": [
+        1066,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-057.webp",
+      "display": "assets/images/polished/vintage-cars/va-057.webp",
+      "source_bytes": 167464,
+      "display_bytes": 168592,
+      "neutral_paper_fraction": 0.168,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1083,
+        1450
+      ],
+      "display_dimensions": [
+        1083,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-058.webp",
+      "display": "assets/images/polished/vintage-cars/va-058.webp",
+      "source_bytes": 159020,
+      "display_bytes": 162842,
+      "neutral_paper_fraction": 0.251,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1082,
+        1450
+      ],
+      "display_dimensions": [
+        1082,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-059.webp",
+      "display": "assets/images/polished/vintage-cars/va-059.webp",
+      "source_bytes": 80896,
+      "display_bytes": 81344,
+      "neutral_paper_fraction": 0.387,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1139,
+        1450
+      ],
+      "display_dimensions": [
+        1139,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Strong diagonal shadow over original page and text"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-060.webp",
+      "display": "assets/images/polished/vintage-cars/va-060.webp",
+      "source_bytes": 73730,
+      "display_bytes": 73732,
+      "neutral_paper_fraction": 0.187,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        960,
+        1450
+      ],
+      "display_dimensions": [
+        960,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-061.webp",
+      "display": "assets/images/polished/vintage-cars/va-061.webp",
+      "source_bytes": 107408,
+      "display_bytes": 109046,
+      "neutral_paper_fraction": 0.23,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1072,
+        1450
+      ],
+      "display_dimensions": [
+        1072,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Uneven source lighting and print texture"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-062.webp",
+      "display": "assets/images/polished/vintage-cars/va-062.webp",
+      "source_bytes": 115204,
+      "display_bytes": 114266,
+      "neutral_paper_fraction": 0.309,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1162,
+        1450
+      ],
+      "display_dimensions": [
+        1162,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-063.webp",
+      "display": "assets/images/polished/vintage-cars/va-063.webp",
+      "source_bytes": 105012,
+      "display_bytes": 106430,
+      "neutral_paper_fraction": 0.309,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        998,
+        1450
+      ],
+      "display_dimensions": [
+        998,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-064.webp",
+      "display": "assets/images/polished/vintage-cars/va-064.webp",
+      "source_bytes": 100394,
+      "display_bytes": 100450,
+      "neutral_paper_fraction": 0.262,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        981,
+        1450
+      ],
+      "display_dimensions": [
+        981,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-065.webp",
+      "display": "assets/images/polished/vintage-cars/va-065.webp",
+      "source_bytes": 91908,
+      "display_bytes": 92570,
+      "neutral_paper_fraction": 0.199,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        984,
+        1450
+      ],
+      "display_dimensions": [
+        984,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-066.webp",
+      "display": "assets/images/polished/vintage-cars/va-066.webp",
+      "source_bytes": 95948,
+      "display_bytes": 98512,
+      "neutral_paper_fraction": 0.229,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1055,
+        1450
+      ],
+      "display_dimensions": [
+        1055,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Page skew and dark edge"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-067.webp",
+      "display": "assets/images/polished/vintage-cars/va-067.webp",
+      "source_bytes": 122126,
+      "display_bytes": 126092,
+      "neutral_paper_fraction": 0.266,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1054,
+        1450
+      ],
+      "display_dimensions": [
+        1054,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-068.webp",
+      "display": "assets/images/polished/vintage-cars/va-068.webp",
+      "source_bytes": 124910,
+      "display_bytes": 126090,
+      "neutral_paper_fraction": 0.242,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        965,
+        1450
+      ],
+      "display_dimensions": [
+        965,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-069.webp",
+      "display": "assets/images/polished/vintage-cars/va-069.webp",
+      "source_bytes": 144522,
+      "display_bytes": 148324,
+      "neutral_paper_fraction": 0.282,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1085,
+        1450
+      ],
+      "display_dimensions": [
+        1085,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-070.webp",
+      "display": "assets/images/polished/vintage-cars/va-070.webp",
+      "source_bytes": 142872,
+      "display_bytes": 140474,
+      "neutral_paper_fraction": 0.066,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1052,
+        1450
+      ],
+      "display_dimensions": [
+        1052,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-071.webp",
+      "display": "assets/images/polished/vintage-cars/va-071.webp",
+      "source_bytes": 103906,
+      "display_bytes": 106774,
+      "neutral_paper_fraction": 0.278,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        942,
+        1450
+      ],
+      "display_dimensions": [
+        942,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-072.webp",
+      "display": "assets/images/polished/vintage-cars/va-072.webp",
+      "source_bytes": 78310,
+      "display_bytes": 75158,
+      "neutral_paper_fraction": 0.117,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1171,
+        1450
+      ],
+      "display_dimensions": [
+        1171,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Photographed page is tilted; manual perspective review"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-073.webp",
+      "display": "assets/images/polished/vintage-cars/va-073.webp",
+      "source_bytes": 74066,
+      "display_bytes": 70462,
+      "neutral_paper_fraction": 0.103,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1154,
+        1450
+      ],
+      "display_dimensions": [
+        1154,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Photographed page is tilted; manual perspective review"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-074.webp",
+      "display": "assets/images/polished/vintage-cars/va-074.webp",
+      "source_bytes": 149068,
+      "display_bytes": 148764,
+      "neutral_paper_fraction": 0.194,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1155,
+        1450
+      ],
+      "display_dimensions": [
+        1155,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-075.webp",
+      "display": "assets/images/polished/vintage-cars/va-075.webp",
+      "source_bytes": 98112,
+      "display_bytes": 100180,
+      "neutral_paper_fraction": 0.229,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1155,
+        1450
+      ],
+      "display_dimensions": [
+        1155,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-076.webp",
+      "display": "assets/images/polished/vintage-cars/va-076.webp",
+      "source_bytes": 131300,
+      "display_bytes": 133414,
+      "neutral_paper_fraction": 0.282,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1047,
+        1450
+      ],
+      "display_dimensions": [
+        1047,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-077.webp",
+      "display": "assets/images/polished/vintage-cars/va-077.webp",
+      "source_bytes": 87664,
+      "display_bytes": 88064,
+      "neutral_paper_fraction": 0.362,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        848,
+        1450
+      ],
+      "display_dimensions": [
+        848,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Uneven grey illumination on the page"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-078.webp",
+      "display": "assets/images/polished/vintage-cars/va-078.webp",
+      "source_bytes": 80916,
+      "display_bytes": 82684,
+      "neutral_paper_fraction": 0.375,
+      "mild_white_balance": true,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        951,
+        1450
+      ],
+      "display_dimensions": [
+        951,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Visible paper edge/shadow"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-079.webp",
+      "display": "assets/images/polished/vintage-cars/va-079.webp",
+      "source_bytes": 119316,
+      "display_bytes": 123044,
+      "neutral_paper_fraction": 0.186,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1061,
+        1450
+      ],
+      "display_dimensions": [
+        1061,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-080.webp",
+      "display": "assets/images/polished/vintage-cars/va-080.webp",
+      "source_bytes": 85540,
+      "display_bytes": 87212,
+      "neutral_paper_fraction": 0.212,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        975,
+        1450
+      ],
+      "display_dimensions": [
+        975,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-081.webp",
+      "display": "assets/images/polished/vintage-cars/va-081.webp",
+      "source_bytes": 144180,
+      "display_bytes": 146444,
+      "neutral_paper_fraction": 0.148,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        955,
+        1450
+      ],
+      "display_dimensions": [
+        955,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-082.webp",
+      "display": "assets/images/polished/vintage-cars/va-082.webp",
+      "source_bytes": 94722,
+      "display_bytes": 99022,
+      "neutral_paper_fraction": 0.355,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        959,
+        1450
+      ],
+      "display_dimensions": [
+        959,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-083.webp",
+      "display": "assets/images/polished/vintage-cars/va-083.webp",
+      "source_bytes": 150174,
+      "display_bytes": 153846,
+      "neutral_paper_fraction": 0.39,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1104,
+        1450
+      ],
+      "display_dimensions": [
+        1104,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-084.webp",
+      "display": "assets/images/polished/vintage-cars/va-084.webp",
+      "source_bytes": 162470,
+      "display_bytes": 164414,
+      "neutral_paper_fraction": 0.0,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        949,
+        1450
+      ],
+      "display_dimensions": [
+        949,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-085.webp",
+      "display": "assets/images/polished/vintage-cars/va-085.webp",
+      "source_bytes": 97478,
+      "display_bytes": 98986,
+      "neutral_paper_fraction": 0.267,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        927,
+        1450
+      ],
+      "display_dimensions": [
+        927,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-086.webp",
+      "display": "assets/images/polished/vintage-cars/va-086.webp",
+      "source_bytes": 207852,
+      "display_bytes": 211836,
+      "neutral_paper_fraction": 0.245,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1032,
+        1450
+      ],
+      "display_dimensions": [
+        1032,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-087.webp",
+      "display": "assets/images/polished/vintage-cars/va-087.webp",
+      "source_bytes": 143030,
+      "display_bytes": 147770,
+      "neutral_paper_fraction": 0.312,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1008,
+        1450
+      ],
+      "display_dimensions": [
+        1008,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-088.webp",
+      "display": "assets/images/polished/vintage-cars/va-088.webp",
+      "source_bytes": 134094,
+      "display_bytes": 137412,
+      "neutral_paper_fraction": 0.285,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        965,
+        1450
+      ],
+      "display_dimensions": [
+        965,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-089.webp",
+      "display": "assets/images/polished/vintage-cars/va-089.webp",
+      "source_bytes": 123784,
+      "display_bytes": 129142,
+      "neutral_paper_fraction": 0.27,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        969,
+        1450
+      ],
+      "display_dimensions": [
+        969,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-090.webp",
+      "display": "assets/images/polished/vintage-cars/va-090.webp",
+      "source_bytes": 107682,
+      "display_bytes": 109880,
+      "neutral_paper_fraction": 0.256,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        929,
+        1450
+      ],
+      "display_dimensions": [
+        929,
+        1450
+      ],
+      "small_original_resolution": false,
+      "manual_review": "Darker page background may be genuine print design"
+    },
+    {
+      "source": "assets/images/vintage-cars/va-091.webp",
+      "display": "assets/images/polished/vintage-cars/va-091.webp",
+      "source_bytes": 167222,
+      "display_bytes": 168908,
+      "neutral_paper_fraction": 0.245,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1032,
+        1450
+      ],
+      "display_dimensions": [
+        1032,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-092.webp",
+      "display": "assets/images/polished/vintage-cars/va-092.webp",
+      "source_bytes": 202702,
+      "display_bytes": 206304,
+      "neutral_paper_fraction": 0.401,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1230,
+        1450
+      ],
+      "display_dimensions": [
+        1230,
+        1450
+      ],
+      "small_original_resolution": false
+    },
+    {
+      "source": "assets/images/vintage-cars/va-093.webp",
+      "display": "assets/images/polished/vintage-cars/va-093.webp",
+      "source_bytes": 185556,
+      "display_bytes": 191404,
+      "neutral_paper_fraction": 0.377,
+      "mild_white_balance": false,
+      "paper_illumination_equalized": false,
+      "minor_contrast": 1.012,
+      "original_dimensions": [
+        1123,
+        1450
+      ],
+      "display_dimensions": [
+        1123,
+        1450
+      ],
+      "small_original_resolution": false
+    }
+  ]
+}
