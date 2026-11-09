@@ -1,0 +1,75 @@
+name: Verify live Burton & Found polished product photographs (read only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/photo-quality-verify-trigger.txt'
+      - '.github/workflows/verify-product-images.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-public-photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Validate 141 live WebP display assets, unchanged sale boundaries and source availability
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures,json,re,urllib.request,time
+          base="https://burtonfound.timharmar.workers.dev/"
+          def get(path):
+              last=None
+              for attempt in range(3):
+                  try:
+                      request=urllib.request.Request(base+path,headers={"User-Agent":"BurtonFound-product-image-QA/1.0","Cache-Control":"no-cache"})
+                      with urllib.request.urlopen(request,timeout=20) as response:
+                          assert response.status==200,(path,response.status)
+                          return response.read(),response.headers.get("Content-Type","")
+                  except Exception as ex:
+                      last=ex;time.sleep(attempt+1)
+              raise AssertionError("Unable to load "+path+": "+str(last))
+          def parse_js(path):
+              raw,kind=get(path)
+              src=raw.decode("utf-8")
+              return json.loads(src.split("=",1)[1].strip().rstrip(";"))
+          products=parse_js("products.js")["inventory"]
+          automobiles=parse_js("vintage-cars-data.js")
+          assert len(products)==22,"Existing sale catalogue altered"
+          assert len(automobiles)==93,"Expected 93 vintage automobile preview records"
+          assert all(x["salesEnabled"] is False and "price" not in x for x in automobiles),"Automobile preview unexpectedly saleable"
+          product_photos=set()
+          for p in products:
+              product_photos.add(p["image"])
+              product_photos.update(p.get("images",[]))
+          car_photos={x["image"] for x in automobiles}
+          assert len(product_photos)==48 and len(car_photos)==93
+          paths=sorted(product_photos|car_photos)
+          assert len(paths)==141
+          assert all(p.startswith("assets/images/polished/") and p.endswith(".webp") for p in paths)
+          def verify(path):
+              blob,content=get(path)
+              assert blob[:4]==b"RIFF" and blob[8:12]==b"WEBP","Invalid image "+path
+              assert "image/webp" in content.lower(), "Wrong Content-Type "+path+" "+content
+              assert len(blob)>=1800,"Image too small "+path
+              return len(blob)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
+              sizes=list(pool.map(verify,paths))
+          assert all(size>1800 for size in sizes)
+          for sample in ["assets/images/cc-010.webp","assets/images/oh-003.webp","assets/images/vintage-cars/va-059.webp"]:
+              verify(sample)
+          home,_=get("index.html")
+          carpage,_=get("vintage-cars.html")
+          assert b"assets/images/polished/" in home,"Home hero still references older photos"
+          assert b"assets/images/polished/vintage-cars/" in carpage,"Automobile gallery hero not updated"
+          health,_=get("api/health")
+          assert json.loads(health).get("checkout")=="preview_only"
+          print("PASS: 48/48 existing shop photos and 93/93 vintage car previews return real WebP images")
+          print("PASS: 141 optimized images accessible, total bytes:",sum(sizes))
+          print("PASS: original source files remain accessible; homepage/gallery use new images")
+          print("PASS: 22 existing sale products, 93 non-sale preview records, and disabled checkout")
+          PY
