@@ -3,3 +3,4 @@ Owner confirmed both freshly rotated Stripe sandbox API key and webhook signing 
 Trigger authorized installation of only sk_test_ and whsec_ credentials to existing Cloudflare Worker.
 Keep LIVE_CHECKOUT_ENABLED=false and LIVE_PAYMENTS_APPROVED=false; no real or test charges authorized by this step.
 Date: 2026-11-09
+2026-11-09 re-run with Stripe API account ownership validation before installing sandbox credentials; checkout disabled.
