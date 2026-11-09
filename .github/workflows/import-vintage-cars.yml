@@ -1,0 +1,98 @@
+name: Install Vintage Automobiles preview archive (93 images, no sales)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'imports/BurtonFound-Vintage-Cars-Site-Upload.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: burtonfound-vintage-preview-import
+  cancel-in-progress: false
+
+jobs:
+  import-gallery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Confirm financial approvals remain disabled
+        shell: bash
+        run: |
+          node --input-type=module -e '
+          import {readFileSync} from "node:fs";
+          const vars=JSON.parse(readFileSync("wrangler.jsonc","utf8")).vars;
+          for(const key of ["LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED","TAX_CONFIGURATION_APPROVED","CARRIER_QUOTES_ENABLED"]){
+            if(vars[key]!=="false")throw Error("Import refused: "+key+" must remain false");
+          }'
+      - name: Extract only the 93 photographs and gallery files
+        shell: bash
+        env:
+          UPLOAD_ZIP: imports/BurtonFound-Vintage-Cars-Site-Upload.zip
+        run: |
+          python3 - <<'PY'
+          import os,zipfile,sys,re,pathlib
+          archive=pathlib.Path(os.environ["UPLOAD_ZIP"])
+          if not archive.is_file():
+              sys.exit("Upload the Vintage Cars Site Upload ZIP to imports/ before running this workflow.")
+          if archive.stat().st_size>25_000_000:sys.exit("Unexpectedly large preview archive.")
+          dst=pathlib.Path(os.environ["RUNNER_TEMP"])/"vintage_preview_import"
+          dst.mkdir(parents=True,exist_ok=True)
+          pattern=re.compile(r"public/assets/images/vintage-cars/va-\d{3}\.webp$")
+          expected={"public/vintage-cars.html","public/vintage-cars.css","public/vintage-cars.js","public/vintage-cars-data.js"}
+          with zipfile.ZipFile(archive) as z:
+              names=set(z.namelist())
+              images={n for n in names if pattern.fullmatch(n)}
+              if len(names)!=97 or len(images)!=93 or not expected.issubset(names):
+                  sys.exit("Archive mismatch: expected 93 scans and four gallery files.")
+              if any(n not in expected and n not in images for n in names):
+                  sys.exit("Unexpected path in ZIP.")
+              if sum(z.getinfo(n).file_size for n in names)>32_000_000:
+                  sys.exit("Image archive exceeds uncompressed size cap.")
+              for name in sorted(names):
+                  info=z.getinfo(name)
+                  if (info.external_attr>>16)&0o170000 == 0o120000:
+                      sys.exit("Symlinks are not allowed.")
+                  if info.file_size>550_000:sys.exit("Unexpectedly large individual file.")
+                  target=dst/name
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(z.read(name))
+          print("Validated 93 WebP assets and four collection files.")
+          PY
+      - name: Validate product records, protect checkout and integrate collection
+        shell: bash
+        run: |
+          node scripts/import-vintage-cars.mjs "$RUNNER_TEMP/vintage_preview_import"
+          npm run check:deploy
+          npm test
+      - name: Commit browse-only collection and remove temporary upload ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/index.html public/storefront.html public/vintage-cars.html public/vintage-cars.css public/vintage-cars.js public/vintage-cars-data.js public/vintage-cars-promo.css public/assets/images/vintage-cars/
+          git rm -- imports/BurtonFound-Vintage-Cars-Site-Upload.zip
+          git commit -m "Publish 93 non-purchasable vintage automobile advertisement previews"
+          git push origin HEAD:main
+      - name: Request test-safe Cloudflare deployment
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy-worker.yml --repo "${{ github.repository }}" --ref main
+          echo "The 93-image preview was imported and the test-safe Cloudflare deployment was requested." >> "$GITHUB_STEP_SUMMARY"
+          echo "No Supabase sale listings, stock records or Stripe charges were created." >> "$GITHUB_STEP_SUMMARY"
