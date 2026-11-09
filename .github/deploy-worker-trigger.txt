@@ -15,3 +15,4 @@ Safety: LIVE_CHECKOUT_ENABLED=false, LIVE_PAYMENTS_APPROVED=false.
 2026-11-09 Redeploy public Supabase configuration after updating automated tests to distinguish publishable and private credentials. All payments disabled.
 2026-11-09 Deploy owner-verified admin identity endpoint and customer dashboard owner link. Payments remain disabled; no administrators promoted.
 2026-11-09 Deploy verified account security improvements: pinned Supabase JS SDK v2.119.0, password recovery session listener order, uniform account callback URL. No payment changes.
+2026-11-09 Deploy owner-only Stripe Tax, Supabase inventory, shipping and email readiness dashboard; payments remain disabled. 
