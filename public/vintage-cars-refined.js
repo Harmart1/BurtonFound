@@ -144,7 +144,7 @@ function update(){
   const n=Math.min(shown,visibleItems.length);
   const chosen=document.getElementById('activeSetNote');
   chosen.hidden=!activeSet;
-  chosen.textContent=activeSet?'Viewing proposed set: '+activeSet.title+'. Suggested set price '+cad(activeSet.suggestedSetPriceCAD)+'. Clear filters to return to all 93 pages.':'';
+  chosen.textContent=activeSet?'Viewing proposed set: '+activeSet.title+'. Suggested set price '+cad(activeSet.suggestedSetPriceCAD)+'. Clear filters to return to all 80 distinct pictured designs.':'';
   result.textContent=n===visibleItems.length?n+' scanned page'+(n===1?'':'s')+' displayed':n+' of '+visibleItems.length+' scanned pages shown';
   showMore.hidden=n>=visibleItems.length;
   showMore.textContent='Show '+Math.min(24,visibleItems.length-n)+' more pages';
