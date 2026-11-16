@@ -59,7 +59,7 @@ jobs:
               raise SystemExit(0)
           root="https://burtonfound.timharmar.workers.dev/vintage-cars.html"
           dest=pathlib.Path("/tmp/auto-price-qa");dest.mkdir(parents=True,exist_ok=True)
-          base=[chrome,"--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--disable-extensions","--hide-scrollbars","--virtual-time-budget=4500"]
+          base=[chrome,"--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--disable-extensions","--hide-scrollbars","--force-prefers-reduced-motion","--virtual-time-budget=4500"]
           for width,height,label in [(1440,900,"desktop"),(390,844,"mobile")]:
               options=base+["--window-size="+str(width)+","+str(height)]
               r=subprocess.run(options+["--dump-dom",root],capture_output=True,text=True,timeout=100)
