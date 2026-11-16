@@ -1,3 +1,5 @@
+> **Superseded on 16 November 2026:** This earlier 93-scan / 10-set research is retained for historical comparison only. Current approved *preview* guidance is [the final 80-design / 18-set curation report](VINTAGE_AUTOMOBILES_FINAL_CURATION_2026-11.md). No prices are live sale offers.
+
 # Burton & Found — Vintage Automobile Price Research and Curated Sets
 
 **Prepared:** 15 November 2026  
