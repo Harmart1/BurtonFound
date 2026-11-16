@@ -32,11 +32,11 @@ jobs:
           cars=data("vintage-cars-data.js")
           sets=data("vintage-cars-sets.js")
           products=data("products.js")["inventory"]
-          assert len(cars)==93 and len(sets)==10 and len(products)==22
+          assert len(cars)==80 and len(sets)==18 and len(products)==22
           assert all(c.get("salesEnabled") is False and not c.get("physicalItemVerified") and "price" not in c for c in cars)
-          assert all(c.get("description") and 14<=c.get("suggestedPriceCAD",0)<=30 for c in cars)
+          assert all(c.get("description") and 12.95<=c.get("suggestedPriceCAD",0)<=24.95 and c.get("image","").startswith("assets/images/curated/") for c in cars)
           assert all(b.get("salesEnabled") is False and b["suggestedSetPriceCAD"]<b["individualSuggestedTotalCAD"] for b in sets)
-          assert len(set(s for b in sets for s in b["componentSkus"]))==29
+          assert len(set(s for b in sets for s in b["componentSkus"]))==53
           html=get("vintage-cars.html").decode()
           for s in ["vintage-cars-sets.js","vintage-cars-pricing.css","bundleGrid","pricingMethod","not yet for sale","noindex"]:
               assert s in html,("Missing gallery element",s)
@@ -44,8 +44,8 @@ jobs:
               assert "vintage-cars.html" in get(p).decode()
           healthy=json.loads(get("api/health"))
           assert healthy.get("checkout")=="preview_only","Live payments must remain disabled"
-          print("PASS: 93 published CAD price proposals and individual descriptions")
-          print("PASS: 10 unique curated grouping recommendations covering 29 scan records")
+          print("PASS: 80 deduplicated CAD price proposals, original-scan comparisons and individually written descriptions")
+          print("PASS: 18 unique curated grouping recommendations covering 53 distinct designs")
           print("PASS: 22 original listings unchanged and checkout held in preview_only")
           PY
       - name: Install browser automation for reliable visual inspection
@@ -71,11 +71,14 @@ jobs:
                       page.goto(root,wait_until="domcontentloaded",timeout=60000)
                       page.locator(".archive-bundle-card").first.wait_for(state="visible",timeout=20000)
                       page.locator("#cards .card").first.wait_for(state="visible",timeout=20000)
-                      assert page.locator(".archive-bundle-card").count()==10,("Missing set cards",label)
+                      assert page.locator(".archive-bundle-card").count()==18,("Missing set cards",label)
                       assert page.locator("#cards .archive-page-price").count()==24,("Missing priced cards",label)
                       assert page.locator("#cards .archive-page-description").count()==24,("Missing page descriptions",label)
                       assert page.locator("#cards .archive-page-details").count()==24,("Missing full descriptions",label)
-                      assert page.get_by_text("Suggested set asking price").count()==10
+                      assert page.locator("#showAllSets").count()==1,("Set expansion control missing",label)
+                      assert page.locator("#toggleOriginal").count()==1,("Original scan comparison control missing",label)
+                      assert page.locator(".archive-bundle-card:visible").count()==6,("Expected 6 initial featured sets",label)
+                      assert page.get_by_text("Suggested set asking price").count()==18
                       assert not errors,("Browser JS error",label,errors)
                       page.locator(".archive-bundle-card").first.scroll_into_view_if_needed()
                       page.wait_for_timeout(350)
@@ -92,7 +95,7 @@ jobs:
                       context.close()
               finally:
                   browser.close()
-          print("PASS: desktop and phone render 10 curated sets and 24 priced, detailed visible gallery cards with no JS errors")
+          print("PASS: desktop and phone render 18 curated sets and 24 priced, detailed visible gallery cards with no JS errors")
           PY
       - name: Attach real responsive screenshots for review
         if: always()
