@@ -8,7 +8,7 @@ test('Three visually equal collection spotlights appear on the homepage without 
  for(const cls of ['spotlight-coke','spotlight-hollywood','spotlight-cars'])assert.match(html,new RegExp('class="spotlight '+cls+'"'));
  assert.equal((html.match(/class="spotlight spotlight-/g)||[]).length,3);
  assert.match(html,/href="vintage-cars\.html"/);
- assert.match(html,/93 PAGE PREVIEWS/);
+ assert.match(html,/80 DISTINCT AD DESIGNS/);
  assert.doesNotMatch(html,/class="vintage-cars-promo"/);
  assert.match(html,/editorial-refresh\.css/);
  assert.match(html,/noindex, nofollow/);
@@ -28,7 +28,7 @@ test('Vintage archive image previews preserve browse-only guard and responsive f
  const html=read('public/vintage-cars.html');
  assert.match(html,/noindex, nofollow/);
  assert.match(html,/not yet for sale/);
- for(const id of ['archiveHeroTitle','archiveGalleryTitle','cards','search','brand','duplicates','sort','showMore','imageDialog','viewComfort','viewCompact','clearFilters'])
+ for(const id of ['archiveHeroTitle','archiveGalleryTitle','cards','search','brand','era','sort','showMore','imageDialog','viewComfort','viewCompact','clearFilters','showAllSets','toggleOriginal'])
   assert.match(html,new RegExp('id="'+id+'"'),'Missing UI control: '+id);
  assert.match(html,/vintage-cars-refined\.js/);
  assert.match(html,/vintage-cars-refined\.css/);
