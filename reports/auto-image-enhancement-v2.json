@@ -1,0 +1,1544 @@
+{
+  "distinct_display_design_count": 80,
+  "redundant_scans_hidden": 13,
+  "retained_original_source_count": 93,
+  "removed_records_map": {
+    "VA-007": "VA-006",
+    "VA-009": "VA-049",
+    "VA-043": "VA-049",
+    "VA-050": "VA-044",
+    "VA-015": "VA-079",
+    "VA-019": "VA-028",
+    "VA-021": "VA-069",
+    "VA-008": "VA-022",
+    "VA-042": "VA-041",
+    "VA-088": "VA-040",
+    "VA-059": "VA-060",
+    "VA-075": "VA-066",
+    "VA-073": "VA-072"
+  },
+  "note": "Photographic similarity does not establish physical stock. Original, polished and removed scan files are preserved.",
+  "processing": "Conservative source-faithful WebP display derivatives; separate files, neutral-paper lighting, slight sharpening; manual page perspective correction VA-072",
+  "items": [
+    {
+      "sku": "VA-001",
+      "source": "assets/images/vintage-cars/va-001.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-001.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-001.webp",
+      "source_bytes": 128764,
+      "new_bytes": 146734,
+      "source_dimensions": [
+        1117,
+        1450
+      ],
+      "new_dimensions": [
+        1117,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-002",
+      "source": "assets/images/vintage-cars/va-002.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-002.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-002.webp",
+      "source_bytes": 98528,
+      "new_bytes": 109886,
+      "source_dimensions": [
+        971,
+        1450
+      ],
+      "new_dimensions": [
+        971,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-003",
+      "source": "assets/images/vintage-cars/va-003.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-003.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-003.webp",
+      "source_bytes": 86732,
+      "new_bytes": 94046,
+      "source_dimensions": [
+        1077,
+        1450
+      ],
+      "new_dimensions": [
+        1077,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-004",
+      "source": "assets/images/vintage-cars/va-004.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-004.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-004.webp",
+      "source_bytes": 138922,
+      "new_bytes": 152516,
+      "source_dimensions": [
+        1268,
+        1450
+      ],
+      "new_dimensions": [
+        1268,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-005",
+      "source": "assets/images/vintage-cars/va-005.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-005.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-005.webp",
+      "source_bytes": 131888,
+      "new_bytes": 150142,
+      "source_dimensions": [
+        1067,
+        1450
+      ],
+      "new_dimensions": [
+        1067,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-006",
+      "source": "assets/images/vintage-cars/va-006.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-006.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-006.webp",
+      "source_bytes": 97764,
+      "new_bytes": 108512,
+      "source_dimensions": [
+        1006,
+        1450
+      ],
+      "new_dimensions": [
+        1006,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-010",
+      "source": "assets/images/vintage-cars/va-010.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-010.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-010.webp",
+      "source_bytes": 190378,
+      "new_bytes": 209764,
+      "source_dimensions": [
+        943,
+        1450
+      ],
+      "new_dimensions": [
+        943,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-011",
+      "source": "assets/images/vintage-cars/va-011.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-011.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-011.webp",
+      "source_bytes": 141512,
+      "new_bytes": 152214,
+      "source_dimensions": [
+        972,
+        1450
+      ],
+      "new_dimensions": [
+        972,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-012",
+      "source": "assets/images/vintage-cars/va-012.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-012.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-012.webp",
+      "source_bytes": 144922,
+      "new_bytes": 157076,
+      "source_dimensions": [
+        1082,
+        1450
+      ],
+      "new_dimensions": [
+        1082,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-013",
+      "source": "assets/images/vintage-cars/va-013.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-013.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-013.webp",
+      "source_bytes": 112032,
+      "new_bytes": 120948,
+      "source_dimensions": [
+        1313,
+        1450
+      ],
+      "new_dimensions": [
+        1313,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-014",
+      "source": "assets/images/vintage-cars/va-014.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-014.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-014.webp",
+      "source_bytes": 95598,
+      "new_bytes": 105772,
+      "source_dimensions": [
+        999,
+        1450
+      ],
+      "new_dimensions": [
+        999,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-016",
+      "source": "assets/images/vintage-cars/va-016.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-016.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-016.webp",
+      "source_bytes": 118050,
+      "new_bytes": 130704,
+      "source_dimensions": [
+        1051,
+        1450
+      ],
+      "new_dimensions": [
+        1051,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-017",
+      "source": "assets/images/vintage-cars/va-017.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-017.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-017.webp",
+      "source_bytes": 115908,
+      "new_bytes": 125182,
+      "source_dimensions": [
+        981,
+        1450
+      ],
+      "new_dimensions": [
+        981,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-018",
+      "source": "assets/images/vintage-cars/va-018.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-018.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-018.webp",
+      "source_bytes": 87796,
+      "new_bytes": 100532,
+      "source_dimensions": [
+        785,
+        1450
+      ],
+      "new_dimensions": [
+        785,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": false,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-020",
+      "source": "assets/images/vintage-cars/va-020.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-020.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-020.webp",
+      "source_bytes": 127008,
+      "new_bytes": 138076,
+      "source_dimensions": [
+        1132,
+        1450
+      ],
+      "new_dimensions": [
+        1132,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-022",
+      "source": "assets/images/vintage-cars/va-022.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-022.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-022.webp",
+      "source_bytes": 109386,
+      "new_bytes": 119406,
+      "source_dimensions": [
+        950,
+        1450
+      ],
+      "new_dimensions": [
+        950,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-023",
+      "source": "assets/images/vintage-cars/va-023.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-023.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-023.webp",
+      "source_bytes": 190702,
+      "new_bytes": 216110,
+      "source_dimensions": [
+        1076,
+        1450
+      ],
+      "new_dimensions": [
+        1076,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-024",
+      "source": "assets/images/vintage-cars/va-024.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-024.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-024.webp",
+      "source_bytes": 179508,
+      "new_bytes": 203288,
+      "source_dimensions": [
+        1450,
+        1268
+      ],
+      "new_dimensions": [
+        1450,
+        1268
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-025",
+      "source": "assets/images/vintage-cars/va-025.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-025.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-025.webp",
+      "source_bytes": 154888,
+      "new_bytes": 176080,
+      "source_dimensions": [
+        1159,
+        1450
+      ],
+      "new_dimensions": [
+        1159,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-026",
+      "source": "assets/images/vintage-cars/va-026.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-026.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-026.webp",
+      "source_bytes": 76974,
+      "new_bytes": 87132,
+      "source_dimensions": [
+        984,
+        1450
+      ],
+      "new_dimensions": [
+        984,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-027",
+      "source": "assets/images/vintage-cars/va-027.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-027.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-027.webp",
+      "source_bytes": 147794,
+      "new_bytes": 163056,
+      "source_dimensions": [
+        1082,
+        1450
+      ],
+      "new_dimensions": [
+        1082,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-028",
+      "source": "assets/images/vintage-cars/va-028.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-028.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-028.webp",
+      "source_bytes": 160896,
+      "new_bytes": 173622,
+      "source_dimensions": [
+        1103,
+        1450
+      ],
+      "new_dimensions": [
+        1103,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-029",
+      "source": "assets/images/vintage-cars/va-029.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-029.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-029.webp",
+      "source_bytes": 111638,
+      "new_bytes": 127326,
+      "source_dimensions": [
+        937,
+        1450
+      ],
+      "new_dimensions": [
+        937,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-030",
+      "source": "assets/images/vintage-cars/va-030.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-030.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-030.webp",
+      "source_bytes": 100352,
+      "new_bytes": 113050,
+      "source_dimensions": [
+        948,
+        1450
+      ],
+      "new_dimensions": [
+        948,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-031",
+      "source": "assets/images/vintage-cars/va-031.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-031.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-031.webp",
+      "source_bytes": 146168,
+      "new_bytes": 167164,
+      "source_dimensions": [
+        979,
+        1450
+      ],
+      "new_dimensions": [
+        979,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-032",
+      "source": "assets/images/vintage-cars/va-032.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-032.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-032.webp",
+      "source_bytes": 78720,
+      "new_bytes": 90344,
+      "source_dimensions": [
+        970,
+        1450
+      ],
+      "new_dimensions": [
+        970,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-033",
+      "source": "assets/images/vintage-cars/va-033.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-033.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-033.webp",
+      "source_bytes": 128450,
+      "new_bytes": 145630,
+      "source_dimensions": [
+        1042,
+        1450
+      ],
+      "new_dimensions": [
+        1042,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-034",
+      "source": "assets/images/vintage-cars/va-034.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-034.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-034.webp",
+      "source_bytes": 107134,
+      "new_bytes": 119248,
+      "source_dimensions": [
+        1120,
+        1450
+      ],
+      "new_dimensions": [
+        1120,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-035",
+      "source": "assets/images/vintage-cars/va-035.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-035.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-035.webp",
+      "source_bytes": 117144,
+      "new_bytes": 132078,
+      "source_dimensions": [
+        970,
+        1450
+      ],
+      "new_dimensions": [
+        970,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-036",
+      "source": "assets/images/vintage-cars/va-036.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-036.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-036.webp",
+      "source_bytes": 159688,
+      "new_bytes": 182640,
+      "source_dimensions": [
+        1096,
+        1450
+      ],
+      "new_dimensions": [
+        1096,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-037",
+      "source": "assets/images/vintage-cars/va-037.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-037.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-037.webp",
+      "source_bytes": 124098,
+      "new_bytes": 137194,
+      "source_dimensions": [
+        961,
+        1450
+      ],
+      "new_dimensions": [
+        961,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-038",
+      "source": "assets/images/vintage-cars/va-038.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-038.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-038.webp",
+      "source_bytes": 122914,
+      "new_bytes": 139620,
+      "source_dimensions": [
+        990,
+        1450
+      ],
+      "new_dimensions": [
+        990,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-039",
+      "source": "assets/images/vintage-cars/va-039.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-039.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-039.webp",
+      "source_bytes": 101564,
+      "new_bytes": 113650,
+      "source_dimensions": [
+        989,
+        1450
+      ],
+      "new_dimensions": [
+        989,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-040",
+      "source": "assets/images/vintage-cars/va-040.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-040.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-040.webp",
+      "source_bytes": 137474,
+      "new_bytes": 157786,
+      "source_dimensions": [
+        1032,
+        1450
+      ],
+      "new_dimensions": [
+        1032,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-041",
+      "source": "assets/images/vintage-cars/va-041.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-041.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-041.webp",
+      "source_bytes": 92414,
+      "new_bytes": 108986,
+      "source_dimensions": [
+        874,
+        1450
+      ],
+      "new_dimensions": [
+        874,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-044",
+      "source": "assets/images/vintage-cars/va-044.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-044.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-044.webp",
+      "source_bytes": 124746,
+      "new_bytes": 140962,
+      "source_dimensions": [
+        955,
+        1450
+      ],
+      "new_dimensions": [
+        955,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-045",
+      "source": "assets/images/vintage-cars/va-045.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-045.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-045.webp",
+      "source_bytes": 152168,
+      "new_bytes": 173784,
+      "source_dimensions": [
+        940,
+        1450
+      ],
+      "new_dimensions": [
+        940,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-046",
+      "source": "assets/images/vintage-cars/va-046.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-046.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-046.webp",
+      "source_bytes": 102152,
+      "new_bytes": 111892,
+      "source_dimensions": [
+        1009,
+        1450
+      ],
+      "new_dimensions": [
+        1009,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-047",
+      "source": "assets/images/vintage-cars/va-047.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-047.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-047.webp",
+      "source_bytes": 90860,
+      "new_bytes": 99148,
+      "source_dimensions": [
+        1450,
+        1087
+      ],
+      "new_dimensions": [
+        1450,
+        1087
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-048",
+      "source": "assets/images/vintage-cars/va-048.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-048.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-048.webp",
+      "source_bytes": 168826,
+      "new_bytes": 186938,
+      "source_dimensions": [
+        1164,
+        1450
+      ],
+      "new_dimensions": [
+        1164,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-049",
+      "source": "assets/images/vintage-cars/va-049.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-049.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-049.webp",
+      "source_bytes": 118964,
+      "new_bytes": 132956,
+      "source_dimensions": [
+        1450,
+        1041
+      ],
+      "new_dimensions": [
+        1450,
+        1041
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-051",
+      "source": "assets/images/vintage-cars/va-051.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-051.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-051.webp",
+      "source_bytes": 154336,
+      "new_bytes": 165790,
+      "source_dimensions": [
+        981,
+        1450
+      ],
+      "new_dimensions": [
+        981,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-052",
+      "source": "assets/images/vintage-cars/va-052.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-052.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-052.webp",
+      "source_bytes": 136738,
+      "new_bytes": 155462,
+      "source_dimensions": [
+        938,
+        1450
+      ],
+      "new_dimensions": [
+        938,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-053",
+      "source": "assets/images/vintage-cars/va-053.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-053.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-053.webp",
+      "source_bytes": 153410,
+      "new_bytes": 170406,
+      "source_dimensions": [
+        1002,
+        1450
+      ],
+      "new_dimensions": [
+        1002,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-054",
+      "source": "assets/images/vintage-cars/va-054.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-054.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-054.webp",
+      "source_bytes": 154912,
+      "new_bytes": 167628,
+      "source_dimensions": [
+        937,
+        1450
+      ],
+      "new_dimensions": [
+        937,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-055",
+      "source": "assets/images/vintage-cars/va-055.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-055.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-055.webp",
+      "source_bytes": 139466,
+      "new_bytes": 157290,
+      "source_dimensions": [
+        927,
+        1450
+      ],
+      "new_dimensions": [
+        927,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-056",
+      "source": "assets/images/vintage-cars/va-056.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-056.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-056.webp",
+      "source_bytes": 162722,
+      "new_bytes": 181242,
+      "source_dimensions": [
+        1066,
+        1450
+      ],
+      "new_dimensions": [
+        1066,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-057",
+      "source": "assets/images/vintage-cars/va-057.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-057.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-057.webp",
+      "source_bytes": 167464,
+      "new_bytes": 181448,
+      "source_dimensions": [
+        1083,
+        1450
+      ],
+      "new_dimensions": [
+        1083,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-058",
+      "source": "assets/images/vintage-cars/va-058.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-058.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-058.webp",
+      "source_bytes": 159020,
+      "new_bytes": 181672,
+      "source_dimensions": [
+        1082,
+        1450
+      ],
+      "new_dimensions": [
+        1082,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-060",
+      "source": "assets/images/vintage-cars/va-060.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-060.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-060.webp",
+      "source_bytes": 73730,
+      "new_bytes": 82556,
+      "source_dimensions": [
+        960,
+        1450
+      ],
+      "new_dimensions": [
+        960,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-061",
+      "source": "assets/images/vintage-cars/va-061.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-061.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-061.webp",
+      "source_bytes": 107408,
+      "new_bytes": 117956,
+      "source_dimensions": [
+        1072,
+        1450
+      ],
+      "new_dimensions": [
+        1072,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-062",
+      "source": "assets/images/vintage-cars/va-062.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-062.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-062.webp",
+      "source_bytes": 115204,
+      "new_bytes": 125096,
+      "source_dimensions": [
+        1162,
+        1450
+      ],
+      "new_dimensions": [
+        1162,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-063",
+      "source": "assets/images/vintage-cars/va-063.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-063.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-063.webp",
+      "source_bytes": 105012,
+      "new_bytes": 118050,
+      "source_dimensions": [
+        998,
+        1450
+      ],
+      "new_dimensions": [
+        998,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-064",
+      "source": "assets/images/vintage-cars/va-064.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-064.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-064.webp",
+      "source_bytes": 100394,
+      "new_bytes": 110906,
+      "source_dimensions": [
+        981,
+        1450
+      ],
+      "new_dimensions": [
+        981,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-065",
+      "source": "assets/images/vintage-cars/va-065.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-065.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-065.webp",
+      "source_bytes": 91908,
+      "new_bytes": 101316,
+      "source_dimensions": [
+        984,
+        1450
+      ],
+      "new_dimensions": [
+        984,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-066",
+      "source": "assets/images/vintage-cars/va-066.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-066.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-066.webp",
+      "source_bytes": 95948,
+      "new_bytes": 110298,
+      "source_dimensions": [
+        1055,
+        1450
+      ],
+      "new_dimensions": [
+        1055,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-067",
+      "source": "assets/images/vintage-cars/va-067.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-067.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-067.webp",
+      "source_bytes": 122126,
+      "new_bytes": 140776,
+      "source_dimensions": [
+        1054,
+        1450
+      ],
+      "new_dimensions": [
+        1054,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-068",
+      "source": "assets/images/vintage-cars/va-068.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-068.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-068.webp",
+      "source_bytes": 124910,
+      "new_bytes": 137832,
+      "source_dimensions": [
+        965,
+        1450
+      ],
+      "new_dimensions": [
+        965,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-069",
+      "source": "assets/images/vintage-cars/va-069.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-069.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-069.webp",
+      "source_bytes": 144522,
+      "new_bytes": 162640,
+      "source_dimensions": [
+        1085,
+        1450
+      ],
+      "new_dimensions": [
+        1085,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-070",
+      "source": "assets/images/vintage-cars/va-070.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-070.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-070.webp",
+      "source_bytes": 142872,
+      "new_bytes": 149532,
+      "source_dimensions": [
+        1052,
+        1450
+      ],
+      "new_dimensions": [
+        1052,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-071",
+      "source": "assets/images/vintage-cars/va-071.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-071.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-071.webp",
+      "source_bytes": 103906,
+      "new_bytes": 118796,
+      "source_dimensions": [
+        942,
+        1450
+      ],
+      "new_dimensions": [
+        942,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-072",
+      "source": "assets/images/vintage-cars/va-072.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-072.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-072.webp",
+      "source_bytes": 78310,
+      "new_bytes": 79950,
+      "source_dimensions": [
+        1171,
+        1450
+      ],
+      "new_dimensions": [
+        986,
+        1351
+      ],
+      "page_perspective_corrected": true,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-074",
+      "source": "assets/images/vintage-cars/va-074.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-074.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-074.webp",
+      "source_bytes": 149068,
+      "new_bytes": 162572,
+      "source_dimensions": [
+        1155,
+        1450
+      ],
+      "new_dimensions": [
+        1155,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-076",
+      "source": "assets/images/vintage-cars/va-076.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-076.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-076.webp",
+      "source_bytes": 131300,
+      "new_bytes": 145826,
+      "source_dimensions": [
+        1047,
+        1450
+      ],
+      "new_dimensions": [
+        1047,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-077",
+      "source": "assets/images/vintage-cars/va-077.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-077.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-077.webp",
+      "source_bytes": 87664,
+      "new_bytes": 97552,
+      "source_dimensions": [
+        848,
+        1450
+      ],
+      "new_dimensions": [
+        848,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-078",
+      "source": "assets/images/vintage-cars/va-078.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-078.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-078.webp",
+      "source_bytes": 80916,
+      "new_bytes": 89796,
+      "source_dimensions": [
+        951,
+        1450
+      ],
+      "new_dimensions": [
+        951,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-079",
+      "source": "assets/images/vintage-cars/va-079.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-079.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-079.webp",
+      "source_bytes": 119316,
+      "new_bytes": 136246,
+      "source_dimensions": [
+        1061,
+        1450
+      ],
+      "new_dimensions": [
+        1061,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-080",
+      "source": "assets/images/vintage-cars/va-080.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-080.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-080.webp",
+      "source_bytes": 85540,
+      "new_bytes": 95152,
+      "source_dimensions": [
+        975,
+        1450
+      ],
+      "new_dimensions": [
+        975,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-081",
+      "source": "assets/images/vintage-cars/va-081.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-081.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-081.webp",
+      "source_bytes": 144180,
+      "new_bytes": 159648,
+      "source_dimensions": [
+        955,
+        1450
+      ],
+      "new_dimensions": [
+        955,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-082",
+      "source": "assets/images/vintage-cars/va-082.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-082.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-082.webp",
+      "source_bytes": 94722,
+      "new_bytes": 108464,
+      "source_dimensions": [
+        959,
+        1450
+      ],
+      "new_dimensions": [
+        959,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-083",
+      "source": "assets/images/vintage-cars/va-083.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-083.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-083.webp",
+      "source_bytes": 150174,
+      "new_bytes": 171624,
+      "source_dimensions": [
+        1104,
+        1450
+      ],
+      "new_dimensions": [
+        1104,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-084",
+      "source": "assets/images/vintage-cars/va-084.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-084.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-084.webp",
+      "source_bytes": 162470,
+      "new_bytes": 177888,
+      "source_dimensions": [
+        949,
+        1450
+      ],
+      "new_dimensions": [
+        949,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": false,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-085",
+      "source": "assets/images/vintage-cars/va-085.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-085.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-085.webp",
+      "source_bytes": 97478,
+      "new_bytes": 111062,
+      "source_dimensions": [
+        927,
+        1450
+      ],
+      "new_dimensions": [
+        927,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-086",
+      "source": "assets/images/vintage-cars/va-086.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-086.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-086.webp",
+      "source_bytes": 207852,
+      "new_bytes": 234942,
+      "source_dimensions": [
+        1032,
+        1450
+      ],
+      "new_dimensions": [
+        1032,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-087",
+      "source": "assets/images/vintage-cars/va-087.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-087.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-087.webp",
+      "source_bytes": 143030,
+      "new_bytes": 162694,
+      "source_dimensions": [
+        1008,
+        1450
+      ],
+      "new_dimensions": [
+        1008,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-089",
+      "source": "assets/images/vintage-cars/va-089.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-089.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-089.webp",
+      "source_bytes": 123784,
+      "new_bytes": 140714,
+      "source_dimensions": [
+        969,
+        1450
+      ],
+      "new_dimensions": [
+        969,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-090",
+      "source": "assets/images/vintage-cars/va-090.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-090.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-090.webp",
+      "source_bytes": 107682,
+      "new_bytes": 119258,
+      "source_dimensions": [
+        929,
+        1450
+      ],
+      "new_dimensions": [
+        929,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-091",
+      "source": "assets/images/vintage-cars/va-091.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-091.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-091.webp",
+      "source_bytes": 167222,
+      "new_bytes": 186806,
+      "source_dimensions": [
+        1032,
+        1450
+      ],
+      "new_dimensions": [
+        1032,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-092",
+      "source": "assets/images/vintage-cars/va-092.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-092.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-092.webp",
+      "source_bytes": 202702,
+      "new_bytes": 220274,
+      "source_dimensions": [
+        1230,
+        1450
+      ],
+      "new_dimensions": [
+        1230,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    },
+    {
+      "sku": "VA-093",
+      "source": "assets/images/vintage-cars/va-093.webp",
+      "previous_display": "assets/images/polished/vintage-cars/va-093.webp",
+      "new_display": "assets/images/curated/vintage-cars/va-093.webp",
+      "source_bytes": 185556,
+      "new_bytes": 213470,
+      "source_dimensions": [
+        1123,
+        1450
+      ],
+      "new_dimensions": [
+        1123,
+        1450
+      ],
+      "page_perspective_corrected": false,
+      "neutral_lighting_adjusted": true,
+      "original_preserved": true
+    }
+  ]
+}
