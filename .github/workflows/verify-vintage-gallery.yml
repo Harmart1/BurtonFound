@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Verify live page, navigation and all 93 image responses
+      - name: Verify live page, navigation and all 80 curated image responses
         shell: bash
         run: |
           python3 - <<'PY'
@@ -47,11 +47,11 @@ jobs:
           match=re.match(rb'window\.BURTON_VINTAGE_CARS=(\[.*\]);\s*$',data,re.DOTALL)
           assert match, "Gallery catalog is not a JS array"
           items=json.loads(match.group(1))
-          assert len(items)==93, "Expected 93 image records"
-          assert len(set(i["sku"] for i in items))==93, "Duplicate image SKU found"
-          assert all(x.get("salesEnabled") is False and "price" not in x for x in items), "Saleable preview record found"
+          assert len(items)==80, "Expected 80 distinct pictured advertising designs"
+          assert len(set(i["sku"] for i in items))==80, "Duplicate image SKU found"
+          assert all(x.get("salesEnabled") is False and "price" not in x and x.get("image","").startswith("assets/images/curated/") for x in items), "Saleable preview record found"
           paths=["/"+item["image"] for item in items]
-          assert len(set(paths))==93, "Unexpected duplicate image path"
+          assert len(set(paths))==80, "Unexpected duplicate image path"
           def verify(path):
               raw,content_type=get(path)
               assert raw[:4]==b"RIFF" and raw[8:12]==b"WEBP", "Image response is not WebP: "+path
@@ -60,7 +60,7 @@ jobs:
               return len(raw)
           with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
               sizes=list(pool.map(verify,paths))
-          print("PASS: 93/93 public WebP images accessible, total bytes:",sum(sizes))
+          print("PASS: 80/80 curated WebP advertising photographs accessible, total bytes:",sum(sizes))
           print("PASS: both storefront pages link to Vintage Automobiles")
           print("PASS: the new gallery displays a browse-only disclaimer and excludes prices and checkout")
           PY
