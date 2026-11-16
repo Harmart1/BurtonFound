@@ -7,3 +7,5 @@ Final visual refinement: brand-mark consistency and two-row mobile gallery heade
 Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside horizontal nav; preserve no-sales preview mode.
 
 15 November 2026: publish researched suggested CAD price tags and individually written descriptions for 93 automotive scans; 10 proposed curated sets with preview-only pricing; original 22 priced listings unchanged; no purchase authorization.
+
+16 Nov 2026: deploy evidence-based 80 distinct Vintage Automobiles designs, 13 redundant scan listing removals, 80 enhanced source-faithful photos, 18 non-overlapping suggested-price collections, 80 provisional CAD individual prices, no purchasable inventory; preserve original files and existing 22 store products.
