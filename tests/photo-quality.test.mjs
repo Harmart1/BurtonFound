@@ -18,11 +18,11 @@ test('Product-photo workflow cannot overwrite originals or activate payments',()
  assert.match(script,/no.*artwork|No artwork/i);
  assert.doesNotMatch(script,/DROP TABLE|DELETE FROM|Stripe\.checkout/);
 });
-test('Photo-display derivatives preserve 22 existing sale products and 93 non-sale automobile previews',()=>{
+test('Photo-display derivatives preserve 22 existing sale products, 80 unique previews and all 93 original scans',()=>{
  const products=parse('public/products.js').inventory;
  const cars=parse('public/vintage-cars-data.js');
  assert.equal(products.length,22);
- assert.equal(cars.length,93);
+ assert.equal(cars.length,80);
  assert.ok(cars.every(c=>c.salesEnabled===false&&!('price' in c)));
  assert.ok(products.every(p=>!p.sku.startsWith('VA-')));
  const manifest=join(ROOT,'reports/photo-polish-audit.json');
@@ -39,5 +39,11 @@ test('Photo-display derivatives preserve 22 existing sale products and 93 non-sa
   assert.ok(statSync(join(ROOT,'public',item.display)).size>2000);
  }
  assert.ok(products.every(p=>p.image.includes('/polished/')));
- assert.ok(cars.every(p=>p.image.includes('/polished/')));
+ assert.ok(cars.every(p=>p.image.includes('/curated/vintage-cars/')));
+ assert.ok(cars.every(p=>existsSync(join(ROOT,'public',p.originalImage))));
+ const upgrade=JSON.parse(read('reports/auto-image-enhancement-v2.json'));
+ assert.equal(upgrade.distinct_display_design_count,80);
+ assert.equal(upgrade.redundant_scans_hidden,13);
+ assert.equal(upgrade.items.length,80);
+ for(const item of upgrade.items)assert.ok(existsSync(join(ROOT,'public',item.new_display)),'Missing curated image '+item.sku);
 });
