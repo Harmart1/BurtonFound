@@ -1,11 +1,14 @@
 /* Gallery progressive disclosure, full-image dialog and responsive display. */
 (()=>{'use strict';
 const items=window.BURTON_VINTAGE_CARS||[],root=document.getElementById('cards');
+const proposedSets=Array.isArray(window.BURTON_VINTAGE_SETS)?window.BURTON_VINTAGE_SETS:[];
 const search=document.getElementById('search'),brand=document.getElementById('brand'),dups=document.getElementById('duplicates'),sort=document.getElementById('sort');
 const showMore=document.getElementById('showMore'),result=document.getElementById('result'),dialog=document.getElementById('imageDialog');
 const viewButton=document.getElementById('viewComfort'),compactButton=document.getElementById('viewCompact');
 const map=new Map(items.map(x=>[x.sku,x]));
 let shown=24,compact=false,dialogIndex=0,visibleItems=[];
+let activeSet=null;
+const cad=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n);
 const themeButton=document.getElementById('themeToggle');
 function applyTheme(theme){
  const dark=theme==='dark';
@@ -27,9 +30,69 @@ for(const make of [...new Set(items.map(x=>x.brand).filter(Boolean))].sort((a,b)
 }
 
 const title=(x)=>x.title||'Untitled advertising page';
+
+function makeElement(tag,className,content){
+ const node=document.createElement(tag);
+ if(className)node.className=className;
+ if(content!==undefined)node.textContent=content;
+ return node;
+}
+function renderCuratedSets(){
+ const grid=document.getElementById('bundleGrid');if(!grid)return;
+ const lookup=new Map(items.map(x=>[x.sku,x]));
+ for(const set of proposedSets){
+  if(!Array.isArray(set.componentSkus)||set.salesEnabled!==false)continue;
+  const components=set.componentSkus.map(sku=>lookup.get(sku)).filter(Boolean);
+  if(components.length!==set.componentCount)continue;
+  const card=makeElement('article','archive-bundle-card');
+  const gallery=makeElement('div','archive-bundle-photos');
+  for(const [index,item] of components.entries()){
+   const img=document.createElement('img');
+   img.src=item.image;img.alt='Page '+(index+1)+': '+item.title;
+   img.loading='lazy';img.decoding='async';
+   gallery.appendChild(img);
+  }
+  const copy=makeElement('div','archive-bundle-content');
+  copy.appendChild(makeElement('p','archive-bundle-kicker',set.theme+' · '+set.componentCount+' pages'));
+  copy.appendChild(makeElement('h3','archive-bundle-title',set.title));
+  copy.appendChild(makeElement('p','archive-bundle-description',set.description));
+  const list=makeElement('ul','archive-bundle-includes');
+  for(const item of components){
+   const li=makeElement('li','',item.sku+' · '+item.brand+' · '+item.title);
+   list.appendChild(li);
+  }
+  copy.appendChild(list);
+  const price=makeElement('div','archive-bundle-price');
+  const label=makeElement('div','');
+  label.appendChild(makeElement('span','archive-bundle-label','Suggested set asking price'));
+  label.appendChild(makeElement('strong','',cad(set.suggestedSetPriceCAD)));
+  price.appendChild(label);
+  const total=makeElement('p','',cad(set.individualSuggestedTotalCAD)+' separately · Potential saving '+cad(set.potentialSavingsCAD));
+  price.appendChild(total);
+  copy.appendChild(price);
+  const action=makeElement('button','archive-bundle-view','View '+set.componentCount+' page previews ↗');
+  action.type='button';action.dataset.setSku=set.sku;
+  action.setAttribute('aria-label','View pages in proposed set '+set.title);
+  copy.appendChild(action);
+  copy.appendChild(makeElement('p','archive-bundle-review','Proposed grouping · not available for purchase'));
+  card.append(gallery,copy);grid.appendChild(card);
+ }
+ grid.addEventListener('click',event=>{
+  const button=event.target.closest('button[data-set-sku]');
+  if(!button)return;
+  const set=proposedSets.find(x=>x.sku===button.dataset.setSku);
+  if(!set)return;
+  activeSet=set;
+  search.value='';brand.value='';dups.value='all';sort.value='catalogue';
+  shown=24;update();
+  document.getElementById('gallery').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+ });
+}
+
 function filterData(){
   const q=search.value.toLowerCase().trim(),b=brand.value,d=dups.value,seen=new Set();
   const list=items.filter(x=>{
+    if(activeSet&&!activeSet.componentSkus.includes(x.sku))return false;
     if(q&&!((x.title||'')+' '+(x.brand||'')+' '+(x.year||'')+' '+x.sku).toLowerCase().includes(q))return false;
     if(b&&x.brand!==b)return false;
     if(d==='flagged'&&!x.duplicateGroup)return false;
@@ -39,6 +102,8 @@ function filterData(){
   if(sort.value==='make')list.sort((a,b)=>a.brand.localeCompare(b.brand)||a.sku.localeCompare(b.sku));
   else if(sort.value==='oldest')list.sort((a,b)=>(a.year??9999)-(b.year??9999)||a.sku.localeCompare(b.sku));
   else if(sort.value==='newest')list.sort((a,b)=>(b.year??0)-(a.year??0)||a.sku.localeCompare(b.sku));
+  else if(sort.value==='lowprice')list.sort((a,b)=>a.suggestedPriceCAD-b.suggestedPriceCAD||a.sku.localeCompare(b.sku));
+  else if(sort.value==='highprice')list.sort((a,b)=>b.suggestedPriceCAD-a.suggestedPriceCAD||a.sku.localeCompare(b.sku));
   return list;
 }
 function update(){
@@ -55,18 +120,33 @@ function update(){
     const heading=document.createElement('h2');heading.textContent=title(x);
     body.append(meta,heading);
     if(x.duplicateGroup){const flag=document.createElement('p');flag.className='flag';flag.textContent='Possible repeat scan · '+x.duplicateGroup;body.appendChild(flag)}
+    const description=makeElement('p','archive-page-description',x.summary||x.description);
+    body.appendChild(description);
+    const price=makeElement('div','archive-page-price');
+    price.appendChild(makeElement('span','archive-price-label','Suggested asking price · CAD'));
+    price.appendChild(makeElement('strong','',cad(x.suggestedPriceCAD)));
+    body.appendChild(price);
+    const details=makeElement('details','archive-page-details');
+    const detailsLabel=makeElement('summary','','More about this page');
+    const detailsCopy=makeElement('p','',x.description||'Full print details are being checked');
+    const condition=makeElement('p','archive-page-condition','Physical print, dimensions and paper condition not yet verified.');
+    details.append(detailsLabel,detailsCopy,condition);body.appendChild(details);
+
     const button=document.createElement('button');button.type='button';button.className='gallery-view-button';button.dataset.sku=x.sku;button.textContent='View full photograph ↗';button.setAttribute('aria-label','Enlarge photograph of '+title(x));body.appendChild(button);
-    const notSale=document.createElement('p');notSale.className='small';notSale.textContent='Preview only · Not for sale';body.appendChild(notSale);
+    const notSale=document.createElement('p');notSale.className='small';notSale.textContent='Proposed CAD value only · Not for sale';body.appendChild(notSale);
     card.appendChild(body);root.appendChild(card);
   }
   if(!visibleItems.length){const empty=document.createElement('p');empty.textContent='No pages match those filters. Try a different search or clear the filters.';root.appendChild(empty)}
   const n=Math.min(shown,visibleItems.length);
+  const chosen=document.getElementById('activeSetNote');
+  chosen.hidden=!activeSet;
+  chosen.textContent=activeSet?'Viewing proposed set: '+activeSet.title+'. Suggested set price '+cad(activeSet.suggestedSetPriceCAD)+'. Clear filters to return to all 93 pages.':'';
   result.textContent=n===visibleItems.length?n+' scanned page'+(n===1?'':'s')+' displayed':n+' of '+visibleItems.length+' scanned pages shown';
   showMore.hidden=n>=visibleItems.length;
   showMore.textContent='Show '+Math.min(24,visibleItems.length-n)+' more pages';
 }
-for(const input of [search,brand,dups,sort])input.addEventListener(input===search?'input':'change',()=>{shown=24;update()});
-document.getElementById('clearFilters').addEventListener('click',()=>{search.value='';brand.value='';dups.value='all';sort.value='catalogue';shown=24;update();search.focus()});
+for(const input of [search,brand,dups,sort])input.addEventListener(input===search?'input':'change',()=>{if(input!==sort)activeSet=null;shown=24;update()});
+document.getElementById('clearFilters').addEventListener('click',()=>{activeSet=null;search.value='';brand.value='';dups.value='all';sort.value='catalogue';shown=24;update();search.focus()});
 showMore.addEventListener('click',()=>{shown+=24;update()});
 viewButton.addEventListener('click',()=>{compact=false;viewButton.setAttribute('aria-pressed','true');compactButton.setAttribute('aria-pressed','false');update()});
 compactButton.addEventListener('click',()=>{compact=true;viewButton.setAttribute('aria-pressed','false');compactButton.setAttribute('aria-pressed','true');update()});
@@ -74,7 +154,7 @@ function updateDialog(){
   const item=visibleItems[dialogIndex];if(!item)return;
   const image=document.getElementById('dialogImage');image.src=item.image;image.alt='Full photograph of '+title(item);
   document.getElementById('dialogTitle').textContent=title(item);
-  document.getElementById('dialogInfo').textContent=item.sku+' · '+item.brand+(item.year?' · '+item.year:'')+(item.duplicateGroup?' · Possible repeat: '+item.duplicateGroup:'');
+  document.getElementById('dialogInfo').textContent=item.sku+' · '+item.brand+(item.year?' · '+item.year:'')+' · Suggested CAD '+cad(item.suggestedPriceCAD)+' · Not for sale'+(item.duplicateGroup?' · Possible repeat: '+item.duplicateGroup:'');
   document.getElementById('prevImage').disabled=dialogIndex===0;
   document.getElementById('nextImage').disabled=dialogIndex===visibleItems.length-1;
 }
@@ -84,5 +164,6 @@ document.getElementById('prevImage').addEventListener('click',()=>{if(dialogInde
 document.getElementById('nextImage').addEventListener('click',()=>{if(dialogIndex<visibleItems.length-1){dialogIndex++;updateDialog()}});
 dialog.addEventListener('keydown',e=>{if(e.key==='ArrowRight'&&dialogIndex<visibleItems.length-1){e.preventDefault();dialogIndex++;updateDialog()}else if(e.key==='ArrowLeft'&&dialogIndex>0){e.preventDefault();dialogIndex--;updateDialog()}});
 dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
+renderCuratedSets();
 update();
 })();
