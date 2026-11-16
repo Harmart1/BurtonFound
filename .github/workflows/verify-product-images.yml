@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Validate 141 live WebP display assets, unchanged sale boundaries and source availability
+      - name: Validate 128 active WebP display assets, unchanged sale boundaries and source availability
         shell: bash
         run: |
           python3 - <<'PY'
@@ -40,17 +40,17 @@ jobs:
           products=parse_js("products.js")["inventory"]
           automobiles=parse_js("vintage-cars-data.js")
           assert len(products)==22,"Existing sale catalogue altered"
-          assert len(automobiles)==93,"Expected 93 vintage automobile preview records"
+          assert len(automobiles)==80,"Expected 80 deduplicated vintage automobile design records"
           assert all(x["salesEnabled"] is False and "price" not in x for x in automobiles),"Automobile preview unexpectedly saleable"
           product_photos=set()
           for p in products:
               product_photos.add(p["image"])
               product_photos.update(p.get("images",[]))
           car_photos={x["image"] for x in automobiles}
-          assert len(product_photos)==48 and len(car_photos)==93
+          assert len(product_photos)==48 and len(car_photos)==80
           paths=sorted(product_photos|car_photos)
-          assert len(paths)==141
-          assert all(p.startswith("assets/images/polished/") and p.endswith(".webp") for p in paths)
+          assert len(paths)==128
+          assert all((p.startswith("assets/images/polished/") or p.startswith("assets/images/curated/")) and p.endswith(".webp") for p in paths)
           def verify(path):
               blob,content=get(path)
               assert blob[:4]==b"RIFF" and blob[8:12]==b"WEBP","Invalid image "+path
@@ -65,11 +65,11 @@ jobs:
           home,_=get("index.html")
           carpage,_=get("vintage-cars.html")
           assert b"assets/images/polished/" in home,"Home hero still references older photos"
-          assert b"assets/images/polished/vintage-cars/" in carpage,"Automobile gallery hero not updated"
+          assert b"assets/images/curated/vintage-cars/" in carpage,"Automobile gallery hero not updated"
           health,_=get("api/health")
           assert json.loads(health).get("checkout")=="preview_only"
-          print("PASS: 48/48 existing shop photos and 93/93 vintage car previews return real WebP images")
-          print("PASS: 141 optimized images accessible, total bytes:",sum(sizes))
+          print("PASS: 48/48 existing shop photos and 80/80 curated automobile preview images return real WebP images")
+          print("PASS: 128 active optimized images accessible, total bytes:",sum(sizes))
           print("PASS: original source files remain accessible; homepage/gallery use new images")
-          print("PASS: 22 existing sale products, 93 non-sale preview records, and disabled checkout")
+          print("PASS: 22 existing sale products, 80 non-sale automobile designs, and disabled checkout")
           PY
