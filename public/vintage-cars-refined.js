@@ -2,11 +2,11 @@
 (()=>{'use strict';
 const items=window.BURTON_VINTAGE_CARS||[],root=document.getElementById('cards');
 const proposedSets=Array.isArray(window.BURTON_VINTAGE_SETS)?window.BURTON_VINTAGE_SETS:[];
-const search=document.getElementById('search'),brand=document.getElementById('brand'),dups=document.getElementById('duplicates'),sort=document.getElementById('sort');
+const search=document.getElementById('search'),brand=document.getElementById('brand'),era=document.getElementById('era'),sort=document.getElementById('sort');
 const showMore=document.getElementById('showMore'),result=document.getElementById('result'),dialog=document.getElementById('imageDialog');
 const viewButton=document.getElementById('viewComfort'),compactButton=document.getElementById('viewCompact');
 const map=new Map(items.map(x=>[x.sku,x]));
-let shown=24,compact=false,dialogIndex=0,visibleItems=[];
+let shown=24,compact=false,dialogIndex=0,visibleItems=[],showOriginal=false;
 let activeSet=null;
 const cad=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n);
 const themeButton=document.getElementById('themeToggle');
@@ -40,11 +40,12 @@ function makeElement(tag,className,content){
 function renderCuratedSets(){
  const grid=document.getElementById('bundleGrid');if(!grid)return;
  const lookup=new Map(items.map(x=>[x.sku,x]));
- for(const set of proposedSets){
+ for(const [setIndex,set] of proposedSets.entries()){
   if(!Array.isArray(set.componentSkus)||set.salesEnabled!==false)continue;
   const components=set.componentSkus.map(sku=>lookup.get(sku)).filter(Boolean);
   if(components.length!==set.componentCount)continue;
   const card=makeElement('article','archive-bundle-card');
+  if(setIndex>=6){card.hidden=true;card.dataset.collapsed='true';}
   const gallery=makeElement('div','archive-bundle-photos');
   for(const [index,item] of components.entries()){
    const img=document.createElement('img');
@@ -77,26 +78,29 @@ function renderCuratedSets(){
   copy.appendChild(makeElement('p','archive-bundle-review','Proposed grouping · not available for purchase'));
   card.append(gallery,copy);grid.appendChild(card);
  }
+ const expand=document.getElementById('showAllSets');
+ if(expand){expand.hidden=proposedSets.length<=6;expand.addEventListener('click',()=>{const open=expand.getAttribute('aria-expanded')==='true';for(const card of grid.querySelectorAll('[data-collapsed]'))card.hidden=open;expand.setAttribute('aria-expanded',String(!open));expand.textContent=open?'Show all '+proposedSets.length+' curated set ideas':'Show fewer curated sets';if(open)grid.scrollIntoView({block:'start',behavior:'instant'});});}
  grid.addEventListener('click',event=>{
   const button=event.target.closest('button[data-set-sku]');
   if(!button)return;
   const set=proposedSets.find(x=>x.sku===button.dataset.setSku);
   if(!set)return;
   activeSet=set;
-  search.value='';brand.value='';dups.value='all';sort.value='catalogue';
+  search.value='';brand.value='';era.value='all';sort.value='catalogue';
   shown=24;update();
   document.getElementById('gallery').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
  });
 }
 
 function filterData(){
-  const q=search.value.toLowerCase().trim(),b=brand.value,d=dups.value,seen=new Set();
+  const q=search.value.toLowerCase().trim(),b=brand.value,period=era.value;
   const list=items.filter(x=>{
     if(activeSet&&!activeSet.componentSkus.includes(x.sku))return false;
     if(q&&!((x.title||'')+' '+(x.brand||'')+' '+(x.year||'')+' '+x.sku).toLowerCase().includes(q))return false;
     if(b&&x.brand!==b)return false;
-    if(d==='flagged'&&!x.duplicateGroup)return false;
-    if(d==='unique'&&x.duplicateGroup){if(seen.has(x.duplicateGroup))return false;seen.add(x.duplicateGroup);}
+    if(period==='prewar'&&!(Number.isInteger(x.year)&&x.year<=1945))return false;
+    if(period==='postwar'&&!(Number.isInteger(x.year)&&x.year>1945))return false;
+    if(period==='undated'&&x.year!==null)return false;
     return true;
   });
   if(sort.value==='make')list.sort((a,b)=>a.brand.localeCompare(b.brand)||a.sku.localeCompare(b.sku));
@@ -145,21 +149,23 @@ function update(){
   showMore.hidden=n>=visibleItems.length;
   showMore.textContent='Show '+Math.min(24,visibleItems.length-n)+' more pages';
 }
-for(const input of [search,brand,dups,sort])input.addEventListener(input===search?'input':'change',()=>{if(input!==sort)activeSet=null;shown=24;update()});
-document.getElementById('clearFilters').addEventListener('click',()=>{activeSet=null;search.value='';brand.value='';dups.value='all';sort.value='catalogue';shown=24;update();search.focus()});
+for(const input of [search,brand,era,sort])input.addEventListener(input===search?'input':'change',()=>{if(input!==sort)activeSet=null;shown=24;update()});
+document.getElementById('clearFilters').addEventListener('click',()=>{activeSet=null;search.value='';brand.value='';era.value='all';sort.value='catalogue';shown=24;update();search.focus()});
 showMore.addEventListener('click',()=>{shown+=24;update()});
 viewButton.addEventListener('click',()=>{compact=false;viewButton.setAttribute('aria-pressed','true');compactButton.setAttribute('aria-pressed','false');update()});
 compactButton.addEventListener('click',()=>{compact=true;viewButton.setAttribute('aria-pressed','false');compactButton.setAttribute('aria-pressed','true');update()});
 function updateDialog(){
   const item=visibleItems[dialogIndex];if(!item)return;
-  const image=document.getElementById('dialogImage');image.src=item.image;image.alt='Full photograph of '+title(item);
+  const image=document.getElementById('dialogImage');image.src=showOriginal?(item.originalImage||item.image):item.image;image.alt=(showOriginal?'Unmodified source scan of ':'Enhanced display photograph of ')+title(item);
+  const sourceToggle=document.getElementById('toggleOriginal');sourceToggle.setAttribute('aria-pressed',String(showOriginal));sourceToggle.textContent=showOriginal?'Return to enhanced display':'View original scan';
   document.getElementById('dialogTitle').textContent=title(item);
   document.getElementById('dialogInfo').textContent=item.sku+' · '+item.brand+(item.year?' · '+item.year:'')+' · Suggested CAD '+cad(item.suggestedPriceCAD)+' · Not for sale'+(item.duplicateGroup?' · Possible repeat: '+item.duplicateGroup:'');
   document.getElementById('prevImage').disabled=dialogIndex===0;
   document.getElementById('nextImage').disabled=dialogIndex===visibleItems.length-1;
 }
-root.addEventListener('click',e=>{const button=e.target.closest('.gallery-view-button');if(!button)return;const idx=visibleItems.findIndex(x=>x.sku===button.dataset.sku);if(idx<0)return;dialogIndex=idx;updateDialog();if(dialog.showModal)dialog.showModal()});
+root.addEventListener('click',e=>{const button=e.target.closest('.gallery-view-button');if(!button)return;const idx=visibleItems.findIndex(x=>x.sku===button.dataset.sku);if(idx<0)return;dialogIndex=idx;showOriginal=false;updateDialog();if(dialog.showModal)dialog.showModal()});
 document.getElementById('closeDialog').addEventListener('click',()=>dialog.close());
+document.getElementById('toggleOriginal').addEventListener('click',()=>{showOriginal=!showOriginal;updateDialog()});
 document.getElementById('prevImage').addEventListener('click',()=>{if(dialogIndex>0){dialogIndex--;updateDialog()}});
 document.getElementById('nextImage').addEventListener('click',()=>{if(dialogIndex<visibleItems.length-1){dialogIndex++;updateDialog()}});
 dialog.addEventListener('keydown',e=>{if(e.key==='ArrowRight'&&dialogIndex<visibleItems.length-1){e.preventDefault();dialogIndex++;updateDialog()}else if(e.key==='ArrowLeft'&&dialogIndex>0){e.preventDefault();dialogIndex--;updateDialog()}});
