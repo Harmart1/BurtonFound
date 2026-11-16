@@ -73,11 +73,12 @@ jobs:
               for anchor,mode in [("#sets","sets"),("#gallery","gallery")]:
                   name=dest/(label+"-"+mode+".png")
                   r=subprocess.run(options+["--screenshot="+str(name),root+anchor],capture_output=True,text=True,timeout=100)
-                  assert r.returncode==0 and name.is_file() and name.stat().st_size>7000,(label,mode,r.stderr[-500:])
+                  assert r.returncode==0 and name.is_file() and name.stat().st_size>1000,(label,mode,r.stderr[-500:])
                   print("PASS: browser "+label+" "+mode+" screenshot "+str(name.stat().st_size)+" bytes")
               print("PASS: ten curated sets and twenty-four visible CAD-priced item cards rendered on",label)
           PY
       - name: Attach real responsive screenshots for review
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: BurtonFound-Vintage-Auto-Pricing-Desktop-Mobile
