@@ -1,0 +1,85 @@
+/* Burton & Found · research-priced Vintage Automobile archive, November 2026 */
+/* These are proposed CAD asking prices. All items and sets stay non-purchasable. */
+.archive-sets-section{padding:clamp(43px,5vw,72px) clamp(18px,4vw,60px) clamp(49px,5.6vw,80px);background:var(--gallery-panel);border-bottom:1px solid var(--gallery-border)}
+.archive-sets-heading,.archive-sets-warning,.archive-set-grid,.archive-sets-footnote{max-width:1380px;margin-left:auto;margin-right:auto}
+.archive-sets-heading{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:23px}
+.archive-sets-heading .eyebrow{margin:0 0 9px}
+.archive-sets-heading h2{font:normal clamp(2.55rem,4.5vw,4.65rem)/1.06 Georgia,serif;color:var(--gallery-ink);letter-spacing:-.042em;margin:0 0 12px;text-wrap:balance}
+.archive-sets-heading h2 em{color:var(--gallery-accent)}
+.archive-sets-heading p:not(.eyebrow){max-width:74ch;font-size:1rem;color:var(--gallery-soft);line-height:1.6;margin:0}
+.archive-sets-skip{color:var(--gallery-accent);text-underline-offset:6px;text-decoration:underline;font-weight:750;white-space:nowrap;padding:12px 0;min-height:44px}
+.archive-sets-warning{border-left:4px solid var(--gallery-accent);background:var(--bg);border-block:1px solid var(--gallery-border);border-right:1px solid var(--gallery-border);padding:16px 20px;font-size:.91rem;color:var(--gallery-soft);line-height:1.58;margin-bottom:29px}
+.archive-sets-warning strong{color:var(--gallery-ink)}
+.archive-set-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.65vw,24px)}
+.archive-bundle-card{border:1px solid var(--gallery-border);border-radius:9px;background:var(--bg);overflow:hidden;display:flex;flex-direction:column;min-width:0;box-shadow:none}
+.archive-bundle-photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;height:clamp(150px,14vw,210px);padding:10px;background:var(--gallery-mat);border-bottom:1px solid #c0b5a5}
+.archive-bundle-photos:has(img:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
+.archive-bundle-photos img{display:block;min-width:0;width:100%;height:100%;object-fit:contain;background:#f8f5ed;border:1px solid #d6cab8;padding:4px;filter:none!important;mix-blend-mode:normal!important}
+.archive-bundle-content{display:flex;flex-direction:column;gap:9px;padding:clamp(17px,1.9vw,24px);flex:1;min-height:0}
+.archive-bundle-kicker{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gallery-accent);font-weight:750;margin:0}
+.archive-bundle-title{font:normal clamp(1.38rem,1.8vw,1.8rem)/1.17 Georgia,serif;letter-spacing:-.02em;margin:0;color:var(--gallery-ink)}
+.archive-bundle-description{font-size:.89rem;line-height:1.64;color:var(--gallery-soft);margin:0}
+.archive-bundle-includes{padding:11px 12px 11px 29px;margin:4px 0 0;background:var(--gallery-panel);border:1px solid var(--gallery-border);border-radius:6px;font-size:.8rem;line-height:1.5;color:var(--gallery-soft)}
+.archive-bundle-includes li{padding-block:4px}
+.archive-bundle-price{margin-top:auto;padding-top:14px;border-top:1px solid var(--gallery-border)}
+.archive-bundle-price>div{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
+.archive-bundle-price strong{font:normal clamp(1.6rem,2vw,1.9rem)/1.1 Georgia,serif;color:var(--gallery-ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.archive-bundle-label{color:var(--gallery-soft);font-size:.81rem;font-weight:750;max-width:14ch;line-height:1.4}
+.archive-bundle-price p{font-size:.77rem;color:var(--gallery-soft);margin:7px 0 0}
+.archive-bundle-view{margin-top:6px;width:100%;min-height:47px;padding:11px 16px;background:var(--gallery-action);color:var(--gallery-action-text);border:1px solid var(--gallery-action);border-radius:6px;font-weight:750}
+.archive-bundle-view:hover,.archive-bundle-view:focus-visible{filter:brightness(1.04)}
+.archive-bundle-review{margin:0;font-size:.76rem;font-weight:650;color:var(--gallery-accent);line-height:1.5;text-align:center}
+.archive-sets-footnote{margin-top:24px;color:var(--gallery-soft);font-size:.88rem;line-height:1.65}
+.archive-sets-footnote a{color:var(--gallery-accent);font-weight:750;text-underline-offset:3px}
+.archive-gallery-section .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,26px)}
+.archive-gallery-section .cards.compact-view{grid-template-columns:repeat(4,minmax(0,1fr))}
+.archive-gallery-section .card-body{display:flex;flex-direction:column;gap:10px}
+.archive-gallery-section .card-body h2{min-height:0;margin:0;font:normal clamp(1.17rem,1.65vw,1.53rem)/1.23 Georgia,serif;color:var(--gallery-ink)}
+.archive-page-description{font-size:.9rem;line-height:1.65;color:var(--gallery-soft);margin:0}
+.archive-page-price{display:flex;justify-content:space-between;align-items:end;gap:10px;border-top:1px solid var(--gallery-border);padding:12px 0 3px;margin-top:auto}
+.archive-page-price strong{color:var(--gallery-ink);font:normal clamp(1.38rem,2vw,1.8rem)/1.1 Georgia,serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.archive-price-label{max-width:18ch;line-height:1.4;color:var(--gallery-soft);font-size:.83rem;font-weight:750}
+.archive-page-details{font-size:.83rem;line-height:1.6;color:var(--gallery-soft)}
+.archive-page-details summary{display:flex;align-items:center;min-height:44px;cursor:pointer;font-weight:700;color:var(--gallery-accent);text-decoration:underline;text-underline-offset:4px}
+.archive-page-details p{margin:7px 0 0}
+.archive-page-condition{font-weight:700}
+.archive-gallery-section .card .gallery-view-button{margin-top:5px;font-size:.86rem}
+.archive-gallery-section .card .gallery-view-button+.small{color:var(--gallery-accent);font-size:.76rem}
+.archive-active-set{display:block;padding:13px 17px;color:var(--gallery-ink);background:var(--gallery-panel);border-left:4px solid var(--gallery-accent);font-weight:700;line-height:1.5}
+.archive-research{margin-top:38px;padding:25px 27px;border-top:1px solid var(--gallery-border);border-bottom:1px solid var(--gallery-border);background:var(--gallery-panel);color:var(--gallery-soft);border-radius:6px}
+.archive-research h3{font:normal clamp(1.65rem,2.5vw,2.2rem)/1.1 Georgia,serif;color:var(--gallery-ink);margin:0 0 9px}
+.archive-research p{max-width:100ch;font-size:.91rem;line-height:1.72;margin:10px 0}
+.archive-research a{color:var(--gallery-accent);font-weight:750;text-underline-offset:4px}
+.archive-gallery-section .cards.compact-view .archive-page-description{font-size:.8rem;line-height:1.48}
+.archive-gallery-section .cards.compact-view .archive-page-price{display:block}
+.archive-gallery-section .cards.compact-view .archive-page-price strong{display:block;font-size:1.33rem;margin-top:6px}
+.archive-gallery-section .cards.compact-view .archive-price-label{font-size:.75rem}
+.archive-gallery-section .cards.compact-view .archive-page-details{font-size:.75rem}
+@media(max-width:1180px){
+ .archive-set-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .archive-bundle-photos{height:195px}
+ .archive-gallery-section .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .archive-gallery-section .cards.compact-view{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:750px){
+ .archive-sets-heading{align-items:flex-start;flex-direction:column;gap:12px}
+ .archive-bundle-content{padding:17px}
+ .archive-bundle-photos{height:165px}
+ .archive-gallery-section .cards.compact-view{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:570px){
+ .archive-sets-section{padding:39px 15px 50px}
+ .archive-sets-heading h2{font-size:clamp(2.35rem,9vw,3.2rem)}
+ .archive-sets-warning{padding:14px 16px}
+ .archive-set-grid{grid-template-columns:1fr;gap:17px}
+ .archive-bundle-photos{height:190px;gap:8px;padding:10px}
+ .archive-bundle-title{font-size:1.65rem}
+ .archive-bundle-price strong{font-size:1.8rem}
+ .archive-gallery-section .cards{grid-template-columns:1fr;gap:18px}
+ .archive-gallery-section .cards.compact-view{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .archive-gallery-section .cards.compact-view .card-body{padding:11px;gap:7px}
+ .archive-gallery-section .cards.compact-view .card-body h2{font-size:1rem}
+ .archive-gallery-section .cards.compact-view .archive-page-description{font-size:.76rem}
+ .archive-gallery-section .cards.compact-view .archive-page-price strong{font-size:1.24rem}
+ .archive-research{padding:18px 17px}
+}
