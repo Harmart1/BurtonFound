@@ -83,3 +83,18 @@
  .archive-gallery-section .cards.compact-view .archive-page-price strong{font-size:1.24rem}
  .archive-research{padding:18px 17px}
 }
+
+/* Final de-duplicated 80-image collection improvements. */
+.archive-bundle-card[hidden]{display:none!important}
+.archive-show-more{text-align:center;max-width:1380px;margin:26px auto 0}
+.archive-show-more button{min-height:49px;padding:13px 25px;border-radius:7px;background:var(--gallery-action);color:var(--gallery-action-text);border:1px solid var(--gallery-action);font-size:.92rem;font-weight:750;cursor:pointer}
+.archive-show-more button:hover,.archive-show-more button:focus-visible{filter:brightness(1.06)}
+.archive-original-controls{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.archive-original-controls button{min-height:44px;padding:9px 16px;border:1px solid var(--gallery-border);border-radius:6px;background:var(--gallery-panel);color:var(--gallery-ink);font-weight:750;font-size:.86rem}
+.archive-original-controls button:hover{border-color:var(--gallery-accent);color:var(--gallery-accent)}
+.archive-original-controls span{font-size:.75rem;color:var(--gallery-accent);font-weight:750}
+@media(max-width:570px){
+ .archive-original-controls{width:100%;flex-direction:row;justify-content:space-between;align-items:center;gap:10px}
+ .archive-original-controls button{flex:0 0 auto}
+ .archive-show-more button{width:100%}
+}
