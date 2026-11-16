@@ -48,34 +48,51 @@ jobs:
           print("PASS: 10 unique curated grouping recommendations covering 29 scan records")
           print("PASS: 22 original listings unchanged and checkout held in preview_only")
           PY
-      - name: Check rendered JavaScript for set cards and all first-page prices on phone and desktop
+      - name: Install browser automation for reliable visual inspection
+        run: python3 -m pip install --disable-pip-version-check playwright==1.56.0
+      - name: Render real curated sets and product cards on desktop and mobile
         shell: bash
         run: |
           python3 - <<'PY'
-          import os,shutil,subprocess,pathlib
+          import os,shutil,pathlib
+          from playwright.sync_api import sync_playwright
           chrome=next((shutil.which(n) for n in ["google-chrome","google-chrome-stable","chromium","chromium-browser"] if shutil.which(n)),None)
-          if not chrome:
-              print("No browser binary available; the public data checks above succeeded")
-              raise SystemExit(0)
+          assert chrome, "Chrome/Chromium browser is required for real visual verification"
           root="https://burtonfound.timharmar.workers.dev/vintage-cars.html"
           dest=pathlib.Path("/tmp/auto-price-qa");dest.mkdir(parents=True,exist_ok=True)
-          base=[chrome,"--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--disable-extensions","--hide-scrollbars","--force-prefers-reduced-motion","--virtual-time-budget=4500"]
-          for width,height,label in [(1440,900,"desktop"),(390,844,"mobile")]:
-              options=base+["--window-size="+str(width)+","+str(height)]
-              r=subprocess.run(options+["--dump-dom",root],capture_output=True,text=True,timeout=100)
-              assert r.returncode==0,("Failed page JS",label,r.stderr[-600:])
-              dom=r.stdout
-              assert dom.count('class="archive-bundle-card"')==10,("Bundle cards missing",label,dom.count('class="archive-bundle-card"'))
-              assert dom.count('class="archive-page-price"')==24,("Suggested prices missing",label,dom.count('class="archive-page-price"'))
-              assert "Suggested set asking price" in dom,("Bundle price missing",label)
-              assert "More about this page" in dom,("Item description disclosure missing",label)
-              assert "VA-001" in dom,("First item not loaded",label)
-              for anchor,mode in [("#sets","sets"),("#gallery","gallery")]:
-                  name=dest/(label+"-"+mode+".png")
-                  r=subprocess.run(options+["--screenshot="+str(name),root+anchor],capture_output=True,text=True,timeout=100)
-                  assert r.returncode==0 and name.is_file() and name.stat().st_size>1000,(label,mode,r.stderr[-500:])
-                  print("PASS: browser "+label+" "+mode+" screenshot "+str(name.stat().st_size)+" bytes")
-              print("PASS: ten curated sets and twenty-four visible CAD-priced item cards rendered on",label)
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=chrome,headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
+              try:
+                  for width,height,label in [(1440,900,"desktop"),(390,844,"mobile")]:
+                      context=browser.new_context(viewport={"width":width,"height":height},device_scale_factor=1,reduced_motion="reduce")
+                      page=context.new_page()
+                      errors=[]
+                      page.on("pageerror",lambda err:errors.append(str(err)))
+                      page.goto(root,wait_until="domcontentloaded",timeout=60000)
+                      page.locator(".archive-bundle-card").first.wait_for(state="visible",timeout=20000)
+                      page.locator("#cards .card").first.wait_for(state="visible",timeout=20000)
+                      assert page.locator(".archive-bundle-card").count()==10,("Missing set cards",label)
+                      assert page.locator("#cards .archive-page-price").count()==24,("Missing priced cards",label)
+                      assert page.locator("#cards .archive-page-description").count()==24,("Missing page descriptions",label)
+                      assert page.locator("#cards .archive-page-details").count()==24,("Missing full descriptions",label)
+                      assert page.get_by_text("Suggested set asking price").count()==10
+                      assert not errors,("Browser JS error",label,errors)
+                      page.locator(".archive-bundle-card").first.scroll_into_view_if_needed()
+                      page.wait_for_timeout(350)
+                      out=dest/(label+"-sets.png")
+                      page.screenshot(path=str(out),animations="disabled")
+                      assert out.stat().st_size>15000,("Unpainted bundle viewport",label,out.stat().st_size)
+                      print("PASS: real set-card viewport",label,out.stat().st_size)
+                      page.locator("#cards .card").first.scroll_into_view_if_needed()
+                      page.wait_for_timeout(500)
+                      out=dest/(label+"-gallery.png")
+                      page.screenshot(path=str(out),animations="disabled")
+                      assert out.stat().st_size>15000,("Unpainted priced-card viewport",label,out.stat().st_size)
+                      print("PASS: real priced-card viewport",label,out.stat().st_size)
+                      context.close()
+              finally:
+                  browser.close()
+          print("PASS: desktop and phone render 10 curated sets and 24 priced, detailed visible gallery cards with no JS errors")
           PY
       - name: Attach real responsive screenshots for review
         if: always()
