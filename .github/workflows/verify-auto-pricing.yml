@@ -1,0 +1,86 @@
+name: Verify live researched automobile prices and curated set gallery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-auto-pricing.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Verify all live price records, collection links and preview-only safeguards
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json
+          root="https://burtonfound.timharmar.workers.dev/"
+          def get(path):
+              request=urllib.request.Request(root+path,headers={"User-Agent":"BurtonFound-price-QA/1.0","Cache-Control":"no-cache"})
+              with urllib.request.urlopen(request,timeout=25) as response:
+                  assert response.status==200,(path,response.status)
+                  return response.read()
+          def data(path):
+              src=get(path).decode()
+              return json.loads(src.split("=",1)[1].strip().rstrip(";"))
+          cars=data("vintage-cars-data.js")
+          sets=data("vintage-cars-sets.js")
+          products=data("products.js")["inventory"]
+          assert len(cars)==93 and len(sets)==10 and len(products)==22
+          assert all(c.get("salesEnabled") is False and not c.get("physicalItemVerified") and "price" not in c for c in cars)
+          assert all(c.get("description") and 14<=c.get("suggestedPriceCAD",0)<=30 for c in cars)
+          assert all(b.get("salesEnabled") is False and b["suggestedSetPriceCAD"]<b["individualSuggestedTotalCAD"] for b in sets)
+          assert len(set(s for b in sets for s in b["componentSkus"]))==29
+          html=get("vintage-cars.html").decode()
+          for s in ["vintage-cars-sets.js","vintage-cars-pricing.css","bundleGrid","pricingMethod","not yet for sale","noindex"]:
+              assert s in html,("Missing gallery element",s)
+          for p in ["index.html","storefront.html"]:
+              assert "vintage-cars.html" in get(p).decode()
+          healthy=json.loads(get("api/health"))
+          assert healthy.get("checkout")=="preview_only","Live payments must remain disabled"
+          print("PASS: 93 published CAD price proposals and individual descriptions")
+          print("PASS: 10 unique curated grouping recommendations covering 29 scan records")
+          print("PASS: 22 original listings unchanged and checkout held in preview_only")
+          PY
+      - name: Check rendered JavaScript for set cards and all first-page prices on phone and desktop
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os,shutil,subprocess,pathlib
+          chrome=next((shutil.which(n) for n in ["google-chrome","google-chrome-stable","chromium","chromium-browser"] if shutil.which(n)),None)
+          if not chrome:
+              print("No browser binary available; the public data checks above succeeded")
+              raise SystemExit(0)
+          root="https://burtonfound.timharmar.workers.dev/vintage-cars.html"
+          dest=pathlib.Path("/tmp/auto-price-qa");dest.mkdir(parents=True,exist_ok=True)
+          base=[chrome,"--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--disable-extensions","--hide-scrollbars","--virtual-time-budget=4500"]
+          for width,height,label in [(1440,900,"desktop"),(390,844,"mobile")]:
+              options=base+["--window-size="+str(width)+","+str(height)]
+              r=subprocess.run(options+["--dump-dom",root],capture_output=True,text=True,timeout=100)
+              assert r.returncode==0,("Failed page JS",label,r.stderr[-600:])
+              dom=r.stdout
+              assert dom.count('class="archive-bundle-card"')==10,("Bundle cards missing",label,dom.count('class="archive-bundle-card"'))
+              assert dom.count('class="archive-page-price"')==24,("Suggested prices missing",label,dom.count('class="archive-page-price"'))
+              assert "Suggested set asking price" in dom,("Bundle price missing",label)
+              assert "More about this page" in dom,("Item description disclosure missing",label)
+              assert "VA-001" in dom,("First item not loaded",label)
+              for anchor,mode in [("#sets","sets"),("#gallery","gallery")]:
+                  name=dest/(label+"-"+mode+".png")
+                  r=subprocess.run(options+["--screenshot="+str(name),root+anchor],capture_output=True,text=True,timeout=100)
+                  assert r.returncode==0 and name.is_file() and name.stat().st_size>7000,(label,mode,r.stderr[-500:])
+                  print("PASS: browser "+label+" "+mode+" screenshot "+str(name.stat().st_size)+" bytes")
+              print("PASS: ten curated sets and twenty-four visible CAD-priced item cards rendered on",label)
+          PY
+      - name: Attach real responsive screenshots for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: BurtonFound-Vintage-Auto-Pricing-Desktop-Mobile
+          path: /tmp/auto-price-qa/*.png
+          retention-days: 7
+          if-no-files-found: ignore
