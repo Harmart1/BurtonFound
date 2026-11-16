@@ -1,0 +1,172 @@
+{
+  "preparedDate": "2026-11-16",
+  "initialScans": 93,
+  "distinctDesigns": 80,
+  "redundantPublicScanListingsRemoved": 13,
+  "method": "Automated ORB feature matching with human verification of original contact sheet; conservatively retain different images even if slogans overlap",
+  "criticalCorrections": [
+    "VA-003 and VA-066 are two different seven-passenger Lincoln pictures; both retained; VA-075 matches VA-066",
+    "VA-027 Nash Weather Eye and VA-037 Nash Look Out It's Catching are different advertising images; both retained"
+  ],
+  "financialSafeguard": "All 80 records and proposed sets remain non-purchasable; no Supabase inventory units created; the 22 existing shop listings unchanged.",
+  "selectedSourceApproach": "Retain the clearest or least obstructed photo of the same printed ad, not a hypothetical independent physical original.",
+  "preservedFiles": "All 93 original source WebP scans and first-pass polished images remain in the repository. No image assets deleted.",
+  "aliases": [
+    {
+      "removedSku": "VA-007",
+      "keptSku": "VA-006",
+      "removedDesignTitle": "Dodge Eight — Bought My First Dodge Nearly Twenty Years Ago",
+      "chosenDesignTitle": "Dodge Eight — Bought My First Dodge Nearly Twenty Years Ago",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 569,
+        "phashDistance": 10,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-009",
+      "keptSku": "VA-049",
+      "removedDesignTitle": "DeSoto — Pick Your DeSoto, Pick Your Price",
+      "chosenDesignTitle": "1958 DeSoto — Pick Your DeSoto, Pick Your Price",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 427,
+        "phashDistance": 14,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-043",
+      "keptSku": "VA-049",
+      "removedDesignTitle": "1958 DeSoto — Pick Your DeSoto, Pick Your Price",
+      "chosenDesignTitle": "1958 DeSoto — Pick Your DeSoto, Pick Your Price",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 358,
+        "phashDistance": 12,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-050",
+      "keptSku": "VA-044",
+      "removedDesignTitle": "Plymouth — New Wagons with Wonderful Ways",
+      "chosenDesignTitle": "Plymouth — New Wagons with Wonderful Ways",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 560,
+        "phashDistance": 8,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-015",
+      "keptSku": "VA-079",
+      "removedDesignTitle": "1959 Chrysler — Sweet Temptation",
+      "chosenDesignTitle": "1959 Chrysler — Sweet Temptation",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 400,
+        "phashDistance": 20,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-019",
+      "keptSku": "VA-028",
+      "removedDesignTitle": "Ford Thunderbird — Poolside Automobile Photograph",
+      "chosenDesignTitle": "Ford Thunderbird — Poolside Automobile Photograph",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 269,
+        "phashDistance": 20,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-021",
+      "keptSku": "VA-069",
+      "removedDesignTitle": "Cadillac — Unique Acclaim, Even for a Cadillac",
+      "chosenDesignTitle": "Cadillac — Unique Acclaim, Even for a Cadillac",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 292,
+        "phashDistance": 22,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-008",
+      "keptSku": "VA-022",
+      "removedDesignTitle": "Oldsmobile Rocket 88 — All-New Super 88",
+      "chosenDesignTitle": "Oldsmobile Rocket 88 — Super 88",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 311,
+        "phashDistance": 20,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-042",
+      "keptSku": "VA-041",
+      "removedDesignTitle": "Ford V-8 — Only V-8 in the Low-Price Field",
+      "chosenDesignTitle": "Ford V-8 — Only V-8 in the Low-Price Field",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 370,
+        "phashDistance": 26,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-088",
+      "keptSku": "VA-040",
+      "removedDesignTitle": "Plymouth — Building a Canal, Good Engineering Counts",
+      "chosenDesignTitle": "Plymouth — Building a Canal, Good Engineering Counts",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 276,
+        "phashDistance": 14,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-059",
+      "keptSku": "VA-060",
+      "removedDesignTitle": "Lincoln Continental — Six Thousand Two Hundred Seventy Dollars",
+      "chosenDesignTitle": "Lincoln Continental — Six Thousand Two Hundred Seventy Dollars",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 203,
+        "phashDistance": 24,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-075",
+      "keptSku": "VA-066",
+      "removedDesignTitle": "Lincoln — The Seven-Passenger Sedan",
+      "chosenDesignTitle": "Lincoln — The Seven-Passenger Sedan",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 236,
+        "phashDistance": 22,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    },
+    {
+      "removedSku": "VA-073",
+      "keptSku": "VA-072",
+      "removedDesignTitle": "1959 Thunderbird — The Car Everyone Would Love to Own",
+      "chosenDesignTitle": "1959 Thunderbird — The Car Everyone Would Love to Own",
+      "duplicateEvidence": {
+        "matchingFeatureInliers": 673,
+        "phashDistance": 16,
+        "likelySameDesign": true
+      },
+      "status": "Removed redundant public page-scan listing only; photographic source and original draft retained in repository history; physical-copy count unknown"
+    }
+  ]
+}
