@@ -191,6 +191,8 @@ async function refreshPublishedEditorial(){
     for(const name of ['title','description','theme','componentSkus','suggestedSetPriceCAD'])if(Object.hasOwn(d,name))set[name]=d[name];
     const components=(set.componentSkus||[]).map(sku=>items.find(x=>x.sku===sku)).filter(Boolean);
     if(components.length<2||components.length!==(set.componentSkus||[]).length){set.componentSkus=[];continue}
+    const totalValue=Math.round(components.reduce((n,x)=>n+(Number(x.suggestedPriceCAD)||0),0)*100)/100;
+    if(Number(set.suggestedSetPriceCAD)>=totalValue||Number(set.suggestedSetPriceCAD)<1){set.componentSkus=[];continue}
     set.componentCount=components.length;set.previewImages=components.map(x=>x.image);
     set.individualSuggestedTotalCAD=Math.round(components.reduce((n,x)=>n+(Number(x.suggestedPriceCAD)||0),0)*100)/100;
     set.potentialSavingsCAD=Math.round((set.individualSuggestedTotalCAD-set.suggestedSetPriceCAD)*100)/100;
