@@ -33,7 +33,56 @@
         }
       }}
     }catch(e){checkoutReady=false;checkoutMode='preview_only';console.info('Live commerce unavailable; preview browsing remains enabled.');}
+    await loadPublishedCms();
     setPreview();renderProducts();renderCart();
+  }
+
+  /* Published editorial overrides. CMS-only products always remain non-sale previews.
+     Backend bf_products stock and price are authoritative for existing purchasable SKUs. */
+  let cmsAnnouncement=null;
+  async function loadPublishedCms(){
+    try{
+      const response=await fetch('/api/cms/published',{cache:'no-store'});
+      if(!response.ok)return;
+      const body=await response.json();
+      if(!Array.isArray(body.entries))return;
+      for(const entry of body.entries){
+        const d=entry.data||{};
+        if(entry.kind==='product'){
+          let p=bySku.get(entry.key);
+          if(!p){
+            p={sku:entry.key,type:'original',title:'',shortDescription:'',images:[],image:'',
+              price:0,collection:'collectibles',catalogIds:[],year:null,theme:'New catalogue preview',
+              stockState:'unavailable',cmsOnly:true,condition:'Not yet verified',status:'preview'};
+            items.push(p);bySku.set(entry.key,p);
+          }
+          if(typeof d.title==='string')p.title=d.title;
+          if(typeof d.shortDescription==='string')p.shortDescription=d.shortDescription;
+          if(typeof d.description==='string')p.cmsLongDescription=d.description;
+          if(typeof d.image==='string'&&d.image){p.image=d.image;p.images=[d.image]}
+          if(typeof d.condition==='string')p.condition=d.condition;
+          if(typeof d.year==='number'||d.year===null)p.year=d.year;
+          if(p.cmsOnly&&typeof d.collection==='string')p.collection=d.collection;
+          if(typeof d.priceCAD==='number'&&!inventoryConnected)p.price=d.priceCAD;
+          if(p.cmsOnly)p.stockState='unavailable';
+        }else if(entry.kind==='page'&&entry.key==='home'){
+          const h=document.querySelector('.lead-intro h1'),p=document.querySelector('.lead-intro > p');
+          if(h&&d.headline)h.textContent=d.headline;
+          if(p&&d.body)p.textContent=d.body;
+        }else if(entry.kind==='page'&&entry.key==='announcement'){
+          if(!cmsAnnouncement){
+            cmsAnnouncement=document.createElement('aside');
+            cmsAnnouncement.className='cms-announcement';
+            cmsAnnouncement.setAttribute('role','note');
+            document.querySelector('main')?.prepend(cmsAnnouncement);
+          }
+          cmsAnnouncement.replaceChildren();
+          const strong=document.createElement('strong');strong.textContent=d.headline||'Store update';
+          const span=document.createElement('span');span.textContent=d.body||'';
+          cmsAnnouncement.append(strong,span);
+        }
+      }
+    }catch(e){console.info('Editorial updates unavailable; showing saved catalogue.')}
   }
   const dateText=p=>p.collection==='hollywood'?(p.dateLabel||'Printing date unverified'):String(p.year||'Date unverified');
   const itemHasDecade=(p,d)=>d==='all'||(p.type==='bundle'?(p.catalogIds||[]).some(id=>Math.floor(Number(byArchive.get(id)?.year||0)/10)*10===Number(d)):Math.floor(Number(p.year||0)/10)*10===Number(d));
@@ -50,15 +99,15 @@
       let watched=!!window.BURTON_ACCOUNT?.isWatching?.(p.sku);
       let cat=p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD · '+(p.issue&&p.issue!=='Unknown'&&p.issue!=='Publication unconfirmed'?p.issue:'PRINT DATE UNVERIFIED'):`${p.year} · VINTAGE ADVERTISING`;
       return `<article class="product-card" data-sku="${safe(p.sku)}">
-        <button class="product-media" type="button" data-view="${safe(p.sku)}" aria-label="View ${safe(p.title)} details"><span class="media-kicker">${safe(p.stockState==='unavailable'?'SOLD OR RESERVED':badge)}</span><img src="${safe(p.image)}" alt="${safe(p.shortDescription)}" loading="lazy" decoding="async" width="800" height="900"><span class="media-view" aria-hidden="true">↗</span></button><button class="product-watch ${watched?'watch-active':''}" type="button" data-watch="${safe(p.sku)}" aria-pressed="${watched}" aria-label="${watched?'Remove from':'Add to'} watchlist: ${safe(p.title)}" title="${watched?'Remove from watchlist':'Watch this find'}">${watched?'♥':'♡'}</button>
-        <div class="product-info"><p class="product-meta">${safe(cat)}</p><h3 class="product-title">${safe(p.title)}</h3><p class="product-desc">${safe(p.shortDescription)}.</p>${p.collection==='hollywood'?`<p class="card-provenance">${safe(p.sku==='OH-006'?'Complete issue assumed · interior page shown':'Physical print date unverified')}</p>`:''}<div class="product-price-row"><div class="product-price">${money(p.price)} <small>CAD</small></div><button class="add-small" type="button" data-add="${safe(p.sku)}" ${bag.includes(p.sku)||p.stockState==='unavailable'?'disabled':''}>${p.stockState==='unavailable'?'UNAVAILABLE':bag.includes(p.sku)?'IN YOUR BAG':'ADD TO BAG'}</button></div></div></article>`;
+        <button class="product-media" type="button" data-view="${safe(p.sku)}" aria-label="View ${safe(p.title)} details"><span class="media-kicker">${safe(p.cmsOnly?'COMING SOON · PREVIEW':p.stockState==='unavailable'?'SOLD OR RESERVED':badge)}</span><img src="${safe(p.image)}" alt="${safe(p.shortDescription)}" loading="lazy" decoding="async" width="800" height="900"><span class="media-view" aria-hidden="true">↗</span></button><button class="product-watch ${watched?'watch-active':''}" type="button" data-watch="${safe(p.sku)}" aria-pressed="${watched}" aria-label="${watched?'Remove from':'Add to'} watchlist: ${safe(p.title)}" title="${watched?'Remove from watchlist':'Watch this find'}">${watched?'♥':'♡'}</button>
+        <div class="product-info"><p class="product-meta">${safe(cat)}</p><h3 class="product-title">${safe(p.title)}</h3><p class="product-desc">${safe(p.shortDescription)}.</p>${p.collection==='hollywood'?`<p class="card-provenance">${safe(p.sku==='OH-006'?'Complete issue assumed · interior page shown':'Physical print date unverified')}</p>`:''}<div class="product-price-row"><div class="product-price">${p.cmsOnly&&!p.price?'Price on request':money(p.price)+' CAD'}</div><button class="add-small" type="button" data-add="${safe(p.sku)}" ${bag.includes(p.sku)||p.stockState==='unavailable'?'disabled':''}>${p.cmsOnly?'PREVIEW ONLY':p.stockState==='unavailable'?'UNAVAILABLE':bag.includes(p.sku)?'IN YOUR BAG':'ADD TO BAG'}</button></div></div></article>`;
     }).join('');
     $('noResults').hidden=!!list.length;
     const empty=$('emptyShopCopy');if(empty)empty.textContent=currentCollection==='books'?'The vintage books department is being catalogued. No books are listed for purchase yet. Browse existing finds or save your interest in your collector profile.':currentCollection==='collectibles'?'The collectibles department is being curated. No objects are listed for purchase yet. Browse the current archive or save your interest in your collector profile.':'No treasures match that search.';
     $('catalogCount').textContent=`${list.length} of ${items.length} listings · CAD`; 
     $('shopStatus').textContent=(currentDecade!=='all'||currentFilter!=='all'||currentCollection!=='all'||search)?`Showing ${list.length} matching ${list.length===1?'find':'finds'}${currentDecade!=='all'?' from the '+currentDecade+'s':''}. Clear filters to see everything.`:'Actual paper items photographed. Read each product’s condition and provenance before purchasing.';
   }
-  function addItem(sku){if(!bySku.has(sku))return;if(bySku.get(sku)?.stockState==='unavailable'){toast('This item is sold or temporarily reserved.');return;}if(bag.includes(sku)){toast('Already in your paper bag.');return;}bag.push(sku);saveBag();renderProducts();renderCart();toast('A good find! Added to your paper bag.');}
+  function addItem(sku){if(!bySku.has(sku))return;if(bySku.get(sku)?.stockState==='unavailable'||bySku.get(sku)?.cmsOnly){toast('This item is sold or temporarily reserved.');return;}if(bag.includes(sku)){toast('Already in your paper bag.');return;}bag.push(sku);saveBag();renderProducts();renderCart();toast('A good find! Added to your paper bag.');}
   function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();}
   function openCart(){renderCart();$('scrim').hidden=false;$('cartDrawer').classList.add('open');$('cartDrawer').setAttribute('aria-hidden','false');document.body.classList.add('no-scroll');$('cartClose').focus();}
   function closeCart(){$('scrim').hidden=true;$('cartDrawer').classList.remove('open');$('cartDrawer').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll');$('cartOpen').focus();}
