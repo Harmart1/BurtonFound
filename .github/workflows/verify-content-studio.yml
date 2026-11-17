@@ -115,6 +115,10 @@ jobs:
                       page.locator('.catalog-item[data-key="VA-001"]').click()
                       assert page.locator('#entryForm').is_visible()
                       assert page.locator('[name="summary"]').is_visible()
+                      page.locator('#imagePreview').wait_for(state='visible',timeout=10000)
+                      page.wait_for_function("document.querySelector('#imagePreview').naturalWidth > 100",timeout=15000)
+                      page.wait_for_function("document.querySelector('.catalog-item img')?.naturalWidth > 50",timeout=15000)
+                      print('PASS: '+label+' existing product photographs load inside the private editor')
                       assert page.locator('#publishEntry').is_hidden(),"No publish button until draft exists"
                       page.locator('[name="summary"]').fill('Editor preview of an authentic scanned Nash print advertisement.')
                       page.locator('#saveDraft').click()
