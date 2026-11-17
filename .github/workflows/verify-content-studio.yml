@@ -1,0 +1,92 @@
+name: Verify private Content Studio on live Cloudflare Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-content-studio.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Test public content, protected endpoints and disabled commerce
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error,json
+          root="https://burtonfound.timharmar.workers.dev"
+          def request(method,path,body=None,headers=None):
+              h={"User-Agent":"BurtonFound-cms-QA/1.0","Cache-Control":"no-cache",**(headers or {})}
+              data=json.dumps(body).encode() if body is not None else None
+              if data is not None:h["Content-Type"]="application/json"
+              r=urllib.request.Request(root+path,method=method,headers=h,data=data)
+              try:
+                  with urllib.request.urlopen(r,timeout=30) as response:
+                      return response.status,response.read()
+              except urllib.error.HTTPError as e:
+                  return e.code,e.read()
+          for path in ["/admin/studio.html","/admin/studio.js","/admin/studio.css","/api/cms/published"]:
+              status,raw=request("GET",path)
+              assert status==200,(path,status,raw[:200])
+          code,raw=request("GET","/api/cms/published")
+          doc=json.loads(raw)
+          assert doc.get("entries")==[],("New CMS should have no published editorial edits yet",doc)
+          studio=request("GET","/api/cms/studio")
+          assert studio[0]==403,"Unauthenticated visitor must not read staff drafts"
+          for path in ["/api/cms/manage","/api/cms/team","/api/cms/media"]:
+              code,_=request("POST",path,{},{"Origin":root})
+              assert code==403,("Unauthenticated write must be denied",path,code)
+          code,health=request("GET","/api/health")
+          assert code==200 and json.loads(health).get("checkout")=="preview_only"
+          code,html=request("GET","/admin/studio.html")
+          for field in [b'id="entryForm"',b'id="publishEntry"',b'id="teamForm"',b'id="photoUpload"',b'id="loginPanel"']:
+              assert field in html,("Missing field",field)
+          print("PASS: live Content Studio HTML, CSS, JS and published API accessible")
+          print("PASS: staff-only endpoints reject unsigned access to drafts, publishing, team and uploads")
+          print("PASS: empty published changes; checkout remains preview_only")
+          PY
+      - name: Install browser test harness
+        run: python3 -m pip install --disable-pip-version-check playwright==1.56.0
+      - name: Test responsive anonymous locked state and capture screenshots
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import shutil,pathlib
+          from playwright.sync_api import sync_playwright
+          chrome=next((shutil.which(n) for n in ["google-chrome","google-chrome-stable","chromium","chromium-browser"] if shutil.which(n)),None)
+          assert chrome,"Browser not available on runner"
+          root="https://burtonfound.timharmar.workers.dev/admin/studio.html"
+          output=pathlib.Path("/tmp/bf-cms-qa");output.mkdir(exist_ok=True)
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=chrome,headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
+              try:
+                  for w,h,label in [(1440,900,"desktop"),(390,844,"mobile")]:
+                      ctx=browser.new_context(viewport={"width":w,"height":h},device_scale_factor=1,reduced_motion="reduce")
+                      page=ctx.new_page();errors=[]
+                      page.on("pageerror",lambda err:errors.append(str(err)))
+                      page.goto(root,wait_until="domcontentloaded",timeout=60000)
+                      page.locator("#loginPanel").wait_for(state="visible",timeout=25000)
+                      assert page.locator("#studio").is_hidden(),label+" private editor leaked"
+                      assert page.locator("#loginPanel a[href='../account.html']").count()==1
+                      assert not errors,(label,errors)
+                      path=output/(label+"-staff-studio.png")
+                      page.screenshot(path=str(path),animations="disabled")
+                      assert path.stat().st_size>10000,(label,path.stat().st_size)
+                      print("PASS: "+label+" studio is readable and locked until authorized sign-in")
+                      ctx.close()
+              finally:browser.close()
+          PY
+      - name: Attach responsive staff studio previews
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: BurtonFound-Private-Studio-Desktop-Mobile
+          path: /tmp/bf-cms-qa/*.png
+          if-no-files-found: ignore
+          retention-days: 7
