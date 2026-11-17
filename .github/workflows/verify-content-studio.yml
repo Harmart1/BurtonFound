@@ -118,6 +118,7 @@ jobs:
                       assert page.locator('#publishEntry').is_hidden(),"No publish button until draft exists"
                       page.locator('[name="summary"]').fill('Editor preview of an authentic scanned Nash print advertisement.')
                       page.locator('#saveDraft').click()
+                      page.locator('#publishEntry').wait_for(state='visible',timeout=15000)
                       assert page.locator('#publishEntry').is_visible(),("Manager publish button missing after saving draft",label)
                       assert page.locator('#entryState').inner_text().startswith("Draft")
                       assert not errors,(label,errors)
