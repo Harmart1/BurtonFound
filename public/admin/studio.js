@@ -26,6 +26,7 @@ let actor=null,current=null,busy=false;
 const money=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(Number(n)||0);
 const escaping=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const id=(kind,key)=>kind+':'+key;
+const previewSrc=value=>String(value||'').startsWith('assets/images/')?'../'+value:String(value||'');
 const sameData=(a,b)=>JSON.stringify(Object.fromEntries(Object.entries(a||{}).sort(([x],[y])=>x.localeCompare(y))))===JSON.stringify(Object.fromEntries(Object.entries(b||{}).sort(([x],[y])=>x.localeCompare(y))));
 function message(text,variant=''){const v=$('message');v.textContent=text;v.className='message '+variant;}
 function pretty(s){return String(s||'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
@@ -58,7 +59,7 @@ function renderList(){
   button.dataset.kind=x.kind;button.dataset.key=x.key;
   button.setAttribute('aria-current',String(current?.kind===x.kind&&current?.key===x.key));
   if(x.image||d.image){
-   const img=document.createElement('img');img.src=d.image||x.image;img.alt='';img.loading='lazy';button.appendChild(img);
+   const img=document.createElement('img');img.src=previewSrc(d.image||x.image);img.alt='';img.loading='lazy';button.appendChild(img);
   }
   const details=document.createElement('span');
   const title=document.createElement('strong');title.textContent=d.title||d.headline||x.title||x.key;
@@ -134,7 +135,7 @@ function getData(){
 function renderImage(){
  const img=$('imagePreview'),url=$('imageUrl').value.trim();
  if(!url){img.hidden=true;img.removeAttribute('src');$('imagePlaceholder').hidden=false;return}
- img.hidden=false;img.src=url;img.onerror=()=>{img.hidden=true;$('imagePlaceholder').hidden=false};
+ img.hidden=false;img.src=previewSrc(url);img.onerror=()=>{img.hidden=true;$('imagePlaceholder').hidden=false};
  $('imagePlaceholder').hidden=true;
 }
 async function refresh(){
