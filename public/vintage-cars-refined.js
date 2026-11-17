@@ -39,6 +39,7 @@ function makeElement(tag,className,content){
 }
 function renderCuratedSets(){
  const grid=document.getElementById('bundleGrid');if(!grid)return;
+ grid.replaceChildren();
  const lookup=new Map(items.map(x=>[x.sku,x]));
  for(const [setIndex,set] of proposedSets.entries()){
   if(!Array.isArray(set.componentSkus)||set.salesEnabled!==false)continue;
@@ -79,8 +80,8 @@ function renderCuratedSets(){
   card.append(gallery,copy);grid.appendChild(card);
  }
  const expand=document.getElementById('showAllSets');
- if(expand){expand.hidden=proposedSets.length<=6;expand.addEventListener('click',()=>{const open=expand.getAttribute('aria-expanded')==='true';for(const card of grid.querySelectorAll('[data-collapsed]'))card.hidden=open;expand.setAttribute('aria-expanded',String(!open));expand.textContent=open?'Show all '+proposedSets.length+' curated set ideas':'Show fewer curated sets';if(open)grid.scrollIntoView({block:'start',behavior:'instant'});});}
- grid.addEventListener('click',event=>{
+ if(expand){expand.hidden=proposedSets.length<=6;if(expand.dataset.bound!=='true'){expand.dataset.bound='true';expand.addEventListener('click',()=>{const open=expand.getAttribute('aria-expanded')==='true';for(const card of grid.querySelectorAll('[data-collapsed]'))card.hidden=open;expand.setAttribute('aria-expanded',String(!open));expand.textContent=open?'Show all '+proposedSets.length+' curated set ideas':'Show fewer curated sets';if(open)grid.scrollIntoView({block:'start',behavior:'instant'});});}}
+ if(grid.dataset.bound!=='true'){grid.dataset.bound='true';grid.addEventListener('click',event=>{
   const button=event.target.closest('button[data-set-sku]');
   if(!button)return;
   const set=proposedSets.find(x=>x.sku===button.dataset.setSku);
@@ -89,7 +90,7 @@ function renderCuratedSets(){
   search.value='';brand.value='';era.value='all';sort.value='catalogue';
   shown=24;update();
   document.getElementById('gallery').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
- });
+ });}
 }
 
 function filterData(){
@@ -170,6 +171,50 @@ document.getElementById('prevImage').addEventListener('click',()=>{if(dialogInde
 document.getElementById('nextImage').addEventListener('click',()=>{if(dialogIndex<visibleItems.length-1){dialogIndex++;updateDialog()}});
 dialog.addEventListener('keydown',e=>{if(e.key==='ArrowRight'&&dialogIndex<visibleItems.length-1){e.preventDefault();dialogIndex++;updateDialog()}else if(e.key==='ArrowLeft'&&dialogIndex>0){e.preventDefault();dialogIndex--;updateDialog()}});
 dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
+
+/* Live published content from the private CMS. The service returns vetted copy only.
+   All automobile scans and all curated sets remain non-purchasable. */
+async function refreshPublishedEditorial(){
+ try{
+  const res=await fetch('/api/cms/published',{cache:'no-store'});if(!res.ok)return;
+  const packet=await res.json();if(!Array.isArray(packet.entries))return;
+  for(const entry of packet.entries){
+   const d=entry.data||{};
+   if(entry.kind==='automobile'){
+    let item=items.find(x=>x.sku===entry.key);
+    if(!item){item={sku:entry.key,duplicateGroup:null,condition:'Not physically examined',physicalItemVerified:false,salesEnabled:false,originalImage:d.image||'',legacyScanAliases:[]};items.push(item)}
+    for(const name of ['title','summary','description','brand','image','year','suggestedPriceCAD'])if(Object.hasOwn(d,name))item[name]=d[name];
+    item.salesEnabled=false;item.physicalItemVerified=false;
+   }else if(entry.kind==='set'){
+    let set=proposedSets.find(x=>x.sku===entry.key);
+    if(!set){set={sku:entry.key,salesEnabled:false,physicalItemsVerified:false};proposedSets.push(set)}
+    for(const name of ['title','description','theme','componentSkus','suggestedSetPriceCAD'])if(Object.hasOwn(d,name))set[name]=d[name];
+    const components=(set.componentSkus||[]).map(sku=>items.find(x=>x.sku===sku)).filter(Boolean);
+    if(components.length<2||components.length!==(set.componentSkus||[]).length){set.componentSkus=[];continue}
+    set.componentCount=components.length;set.previewImages=components.map(x=>x.image);
+    set.individualSuggestedTotalCAD=Math.round(components.reduce((n,x)=>n+(Number(x.suggestedPriceCAD)||0),0)*100)/100;
+    set.potentialSavingsCAD=Math.round((set.individualSuggestedTotalCAD-set.suggestedSetPriceCAD)*100)/100;
+    set.salesEnabled=false;set.physicalItemsVerified=false;
+   }else if(entry.kind==='page'&&entry.key==='vintage'){
+    const heading=document.querySelector('.archive-masthead-copy h1'),intro=document.querySelector('.archive-lede');
+    if(heading&&d.headline)heading.textContent=d.headline;
+    if(intro&&d.body)intro.textContent=d.body;
+   }else if(entry.kind==='page'&&entry.key==='announcement'){
+    let note=document.getElementById('cmsVintageNotice');
+    if(!note){note=document.createElement('div');note.id='cmsVintageNotice';note.className='archive-active-set';document.querySelector('main')?.prepend(note)}
+    note.textContent=(d.headline||'Store news')+' · '+(d.body||'');
+   }
+  }
+  brand.replaceChildren();
+  const empty=document.createElement('option');empty.value='';empty.textContent='All makes';brand.appendChild(empty);
+  for(const make of [...new Set(items.map(x=>x.brand).filter(Boolean))].sort((a,b)=>a.localeCompare(b))){
+   const option=document.createElement('option');option.value=make;option.textContent=make;brand.appendChild(option);
+  }
+  renderCuratedSets();update();
+ }catch(e){console.info('Published catalogue adjustments are temporarily unavailable.')}
+}
+
 renderCuratedSets();
 update();
+refreshPublishedEditorial();
 })();
