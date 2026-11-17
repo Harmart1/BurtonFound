@@ -200,3 +200,9 @@ html[data-theme="dark"] .editorial-archive-band{background:var(--bf-surface)!imp
  .category-grid :is(.category-feature,.category-future){min-height:230px}
 }
 @media(prefers-reduced-motion:reduce){.collection-lead .spotlight{transition:none}}
+
+/* Published staff-managed announcements, using the established store palette. */
+.cms-announcement{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+ padding:12px clamp(17px,4vw,60px);text-align:center;background:var(--bf-strong,#254435);
+ color:var(--bf-strong-text,#fffdfa);font-size:.88rem;line-height:1.5}
+.cms-announcement strong{font-weight:800}.cms-announcement span{font-weight:450}
