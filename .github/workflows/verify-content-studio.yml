@@ -82,6 +82,52 @@ jobs:
                       ctx.close()
               finally:browser.close()
           PY
+      - name: Exercise desktop and mobile editor controls in a mocked, non-privileged session
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import pathlib,shutil,json
+          from playwright.sync_api import sync_playwright
+          chrome=next((shutil.which(n) for n in ["google-chrome","google-chrome-stable","chromium","chromium-browser"] if shutil.which(n)),None)
+          assert chrome
+          url="https://burtonfound.timharmar.workers.dev/admin/studio.html"
+          output=pathlib.Path("/tmp/bf-cms-qa");output.mkdir(exist_ok=True)
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=chrome,headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
+              try:
+                  for w,h,label in [(1440,900,"desktop"),(390,844,"mobile")]:
+                      ctx=browser.new_context(viewport={"width":w,"height":h},device_scale_factor=1,reduced_motion="reduce")
+                      page=ctx.new_page();errors=[]
+                      page.on("pageerror",lambda e:errors.append(str(e)))
+                      page.route("**/account-core.js",lambda route:route.fulfill(status=200,content_type="application/javascript",body="window.BURTON_ACCOUNT={ready:async()=>true,authToken:async()=> 'mock-browser-test-token'};"))
+                      page.route("**/api/cms/studio",lambda route:route.fulfill(status=200,content_type="application/json",body=json.dumps({"actor":{"role":"manager","email":"demo@example.invalid"},"entries":[],"members":None})))
+                      def content_action(route):
+                          body=json.loads(route.request.post_data)
+                          item={"kind":body["kind"],"key":body["key"],"revision":1 if body["action"]=="save" else 2,"draft":body.get("data",{"title":"Mock"}),"published":None,"isPublished":False,"updatedAt":None,"publishedAt":None,"updatedBy":None}
+                          route.fulfill(status=200,content_type="application/json",body=json.dumps({"ok":True,"entry":item,"notice":"Mock action passed; live backend unchanged"}))
+                      page.route("**/api/cms/manage",content_action)
+                      page.goto(url,wait_until="domcontentloaded",timeout=60000)
+                      page.locator("#studio").wait_for(state="visible",timeout=20000)
+                      assert page.locator("#loginPanel").is_hidden()
+                      assert page.locator(".catalog-item").count()>100,("Base catalogue was not populated",label)
+                      page.locator("#kindFilter").select_option("automobile")
+                      assert page.locator(".catalog-item").count()>=80,("Automobile archive not available in editor",label)
+                      page.locator('.catalog-item[data-key="VA-001"]').click()
+                      assert page.locator('#entryForm').is_visible()
+                      assert page.locator('[name="summary"]').is_visible()
+                      assert page.locator('#publishEntry').is_hidden(),"No publish button until draft exists"
+                      page.locator('[name="summary"]').fill('Editor preview of an authentic scanned Nash print advertisement.')
+                      page.locator('#saveDraft').click()
+                      assert page.locator('#publishEntry').is_visible(),("Manager publish button missing after saving draft",label)
+                      assert page.locator('#entryState').inner_text().startswith("Draft")
+                      assert not errors,(label,errors)
+                      screenshot=output/(label+"-editor-demo.png")
+                      page.screenshot(path=str(screenshot),animations="disabled",full_page=False)
+                      assert screenshot.stat().st_size>15000
+                      print("PASS: "+label+" mock manager can browse 80 ads, edit copy, save a draft, and see gated Publish; no live writes")
+                      ctx.close()
+              finally:browser.close()
+          PY
       - name: Attach responsive staff studio previews
         uses: actions/upload-artifact@v4
         if: always()
