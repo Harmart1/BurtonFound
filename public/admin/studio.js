@@ -26,6 +26,7 @@ let actor=null,current=null,busy=false;
 const money=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(Number(n)||0);
 const escaping=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const id=(kind,key)=>kind+':'+key;
+const sameData=(a,b)=>JSON.stringify(Object.fromEntries(Object.entries(a||{}).sort(([x],[y])=>x.localeCompare(y))))===JSON.stringify(Object.fromEntries(Object.entries(b||{}).sort(([x],[y])=>x.localeCompare(y))));
 function message(text,variant=''){const v=$('message');v.textContent=text;v.className='message '+variant;}
 function pretty(s){return String(s||'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
 async function call(url,opts={}){
@@ -63,14 +64,14 @@ function renderList(){
   const title=document.createElement('strong');title.textContent=d.title||d.headline||x.title||x.key;
   const ref=document.createElement('small');ref.textContent=x.key+' · '+types[x.kind];
   const state=document.createElement('small');state.className='state';
-  state.textContent=e?(e.isPublished?(JSON.stringify(e.draft)===JSON.stringify(e.published)?'Published':'Published · draft updated'):'Draft only'):'Original content';
+  state.textContent=e?(e.isPublished?(sameData(e.draft,e.published)?'Published':'Published · draft updated'):'Draft only'):'Original content';
   details.append(title,ref,state);button.appendChild(details);root.appendChild(button);
  }
  if(!items.length){const p=document.createElement('p');p.className='fine';p.style.padding='14px';p.textContent='No matching content. Clear the search or add a new item.';root.appendChild(p)}
  $('countShop').textContent=allItems().filter(x=>x.kind==='product').length;
  $('countAuto').textContent=allItems().filter(x=>x.kind==='automobile').length;
  $('countSets').textContent=allItems().filter(x=>x.kind==='set').length;
- $('countDrafts').textContent=[...entries.values()].filter(x=>!x.isPublished||JSON.stringify(x.draft)!==JSON.stringify(x.published)).length;
+ $('countDrafts').textContent=[...entries.values()].filter(x=>!x.isPublished||!sameData(x.draft,x.published)).length;
 }
 function visibility(){
  const kind=$('entryKind').value;
@@ -164,7 +165,7 @@ async function publish(action){
  if(!current||busy)return;
  const kind=current.kind,key=current.key,entry=entries.get(id(kind,key));
  if(!entry){message('Save the draft first.','error');return}
- const changed=JSON.stringify(entry.draft)!==JSON.stringify(getData())&&action==='publish';
+ const changed=!sameData(entry.draft,getData())&&action==='publish';
  if(changed){message('Save your latest changes as a draft before publishing.','error');return}
  if(action==='unpublish'&&!confirm('Remove this published override from the storefront? The source item remains in the original catalogue.'))return;
  if(kind==='product'&&action==='publish'&&entry.draft?.priceCAD){
