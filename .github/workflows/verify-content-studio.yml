@@ -141,3 +141,5 @@ jobs:
           path: /tmp/bf-cms-qa/*.png
           if-no-files-found: ignore
           retention-days: 7
+
+# Reverify after corrected studio image paths were deployed to Cloudflare on 2026-11-17.
