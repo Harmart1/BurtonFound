@@ -15,6 +15,11 @@ import {onRequestGet as fulfillmentHistory} from '../functions/api/admin/fulfill
 import {onRequestPost as adminFulfill} from '../functions/api/admin/fulfill.js';
 import {onRequestPost as reconcileHold} from '../functions/api/admin/reconcile-hold.js';
 import {onRequestPost as reviewShipping} from '../functions/api/admin/review-shipping.js';
+import {onRequestGet as cmsPublished} from '../functions/api/cms/published.js';
+import {onRequestGet as cmsStudio} from '../functions/api/cms/studio.js';
+import {onRequestPost as cmsManage} from '../functions/api/cms/manage.js';
+import {onRequestPost as cmsTeam} from '../functions/api/cms/team.js';
+import {onRequestPost as cmsMedia} from '../functions/api/cms/media.js';
 
 const routes = {
   '/api/health': {GET: health},
@@ -32,7 +37,12 @@ const routes = {
   '/api/admin/fulfillment-history': {GET: fulfillmentHistory},
   '/api/admin/fulfill': {POST: adminFulfill},
   '/api/admin/reconcile-hold': {POST: reconcileHold},
-  '/api/admin/review-shipping': {POST: reviewShipping}
+  '/api/admin/review-shipping': {POST: reviewShipping},
+  '/api/cms/published': {GET: cmsPublished},
+  '/api/cms/studio': {GET: cmsStudio},
+  '/api/cms/manage': {POST: cmsManage},
+  '/api/cms/team': {POST: cmsTeam},
+  '/api/cms/media': {POST: cmsMedia}
 };
 
 const response = (message,status,headers={})=>new Response(JSON.stringify({error:message}),{
