@@ -11,3 +11,5 @@ Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside ho
 16 Nov 2026: deploy evidence-based 80 distinct Vintage Automobiles designs, 13 redundant scan listing removals, 80 enhanced source-faithful photos, 18 non-overlapping suggested-price collections, 80 provisional CAD individual prices, no purchasable inventory; preserve original files and existing 22 store products.
 
 2026-11-17: deploy private Burton & Found Content Studio (owner/editor/manager roles, versioned drafts, controlled publishing, product and automobile edits, public published content overlay, 5MB product photo uploads). No payment, carrier or tax authorization changes.
+
+2026-11-17: fix CMS studio /admin/ photograph preview paths; no catalogue, pricing or checkout changes. Deploy corrected private editor.
