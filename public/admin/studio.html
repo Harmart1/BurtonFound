@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+ <script src="../theme-init.js"></script>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="robots" content="noindex,nofollow">
+ <meta name="theme-color" content="#203a2f">
+ <title>Content & Team Studio | Burton &amp; Found</title>
+ <link rel="icon" href="../assets/brand/favicon.svg">
+ <link rel="stylesheet" href="studio.css">
+ <script defer src="../config.js"></script>
+ <script defer src="../products.js"></script>
+ <script defer src="../vintage-cars-data.js"></script>
+ <script defer src="../vintage-cars-sets.js"></script>
+ <script defer src="../account-core.js"></script>
+ <script defer src="studio.js"></script>
+</head>
+<body>
+ <a class="skip" href="#main">Skip to main content</a>
+ <header class="site-top">
+  <a class="brand" href="../index.html"><img src="../assets/brand/burton-found-mark.svg" alt="" width="38" height="38"> Burton <em>&amp;</em> Found <small>STUDIO</small></a>
+  <nav aria-label="Administrative navigation">
+   <a href="../index.html" target="_blank" rel="noopener">View website ↗</a>
+   <a href="orders.html">Orders</a>
+   <a href="../account.html">My account</a>
+  </nav>
+  <button id="themeToggle" type="button" class="theme-toggle" aria-pressed="false">Dark mode</button>
+ </header>
+ <main id="main">
+  <section class="intro">
+   <div><p class="eyebrow">PRIVATE CONTENT WORKSPACE</p><h1>Make the collection <em>yours</em></h1><p>Manage advertisements, photographs, descriptions, suggested prices and curated sets. Create a draft, review the preview, then publish when ready.</p></div>
+   <div class="intro-right"><span id="roleBadge" class="role-badge">Verifying staff access</span><p id="editorEmail"></p></div>
+  </section>
+  <div id="message" class="message" role="status" aria-live="polite">Checking your account and team permissions…</div>
+  <section id="loginPanel" class="login-panel" hidden>
+    <h2>Sign in to edit Burton &amp; Found</h2>
+    <p>This studio is private. Use your own confirmed store account; no one needs the owner's GitHub or Stripe password.</p>
+    <a class="primary" href="../account.html">Sign in or create an account ↗</a>
+    <p class="fine">A confirmed account must be granted Editor or Manager access by an authorized site owner. The owner must first activate their own administrator access.</p>
+  </section>
+  <section id="studio" hidden>
+   <div class="stats" aria-label="Workspace summary">
+    <article><small>Current shop products</small><strong id="countShop">22</strong><span>Existing original listings</span></article>
+    <article><small>Automobile designs</small><strong id="countAuto">80</strong><span>New designs stay preview-only</span></article>
+    <article><small>Curated sets</small><strong id="countSets">18</strong><span>Suggested groupings</span></article>
+    <article><small>Unpublished changes</small><strong id="countDrafts">0</strong><span>Not visible on the storefront</span></article>
+   </div>
+   <div class="workspace">
+    <aside class="catalog-pane" aria-label="Choose content to edit">
+     <div class="catalog-heading"><div><p class="eyebrow">YOUR CATALOGUE</p><h2>Browse content</h2></div><button id="newEntry" type="button" class="subtle">+ Add</button></div>
+     <label class="field">Search titles or SKUs<input id="search" type="search" placeholder="e.g., Cadillac, Coca-Cola" autocomplete="off"></label>
+     <label class="field">Content type<select id="kindFilter"><option value="all">All content</option><option value="product">Store products</option><option value="automobile">Automobile ads</option><option value="set">Curated sets</option><option value="page">Site text</option></select></label>
+     <div class="catalog-scroll" id="catalogue" aria-label="Editable records"></div>
+     <p class="fine">Existing photographs and records remain in GitHub. Studio edits create versioned overrides, not changes to original images.</p>
+    </aside>
+    <section class="edit-pane" aria-labelledby="editHeading">
+     <div class="edit-heading"><div><p class="eyebrow">CONTENT EDITOR</p><h2 id="editHeading">Choose an item</h2><p id="editHelp" class="muted">Select a record on the left, or create a new preview listing.</p></div><div class="editor-pill" id="entryState">No selection</div></div>
+     <form id="entryForm" hidden>
+      <div class="key-row">
+       <label class="field">Content type<select name="kind" id="entryKind" required><option value="product">Store product</option><option value="automobile">Automobile advertisement</option><option value="set">Curated set</option><option value="page">Website text</option></select></label>
+       <label class="field">Reference / SKU<input name="key" id="entryKey" maxlength="80" required pattern="[A-Za-z0-9][A-Za-z0-9._-]{1,79}" placeholder="CMS-NEW-001"></label>
+      </div>
+      <div class="fields">
+       <label class="field" data-kinds="product automobile set">Title<input id="titleField" name="title" maxlength="140" placeholder="A descriptive catalogue title"></label>
+       <label class="field" data-kinds="product">Short product description<textarea id="shortField" name="shortDescription" rows="2" maxlength="340" placeholder="One or two sentences that appear on the product card"></textarea></label>
+       <label class="field" data-kinds="automobile">Gallery summary<textarea name="summary" rows="2" maxlength="400" placeholder="Describe what the photograph actually shows"></textarea></label>
+       <label class="field" data-kinds="product automobile set">Detailed description<textarea name="description" rows="5" maxlength="2400" placeholder="Accurate, readable description without unsupported condition claims"></textarea></label>
+       <label class="field" data-kinds="product">Collection<select name="collection"><option value="coca-cola">Coca-Cola</option><option value="hollywood">Old Hollywood</option><option value="books">Vintage Books</option><option value="collectibles">Other Collectibles</option></select></label>
+       <label class="field" data-kinds="automobile">Car make<input name="brand" maxlength="90" placeholder="e.g. Cadillac"></label>
+       <label class="field" data-kinds="set">Set theme<input name="theme" maxlength="140" placeholder="e.g. 1950s American motoring"></label>
+       <label class="field" data-kinds="set">Included page SKUs <span class="hint">Separate with commas</span><textarea name="componentSkus" rows="2" placeholder="VA-001, VA-002, VA-031"></textarea></label>
+       <label class="field" data-kinds="product automobile">Year (if verified)<input name="year" type="number" min="1870" max="2100" placeholder="Leave blank if unknown"></label>
+       <label class="field" data-kinds="product">Condition (if inspected)<input name="condition" maxlength="240" placeholder="Condition not verified"></label>
+       <label class="field" data-kinds="product">Catalogue price in CAD <span class="hint">Existing product prices sync to the checkout database only on manager publishing</span><input name="priceCAD" type="number" min="1" max="100000" step=".01" placeholder="29.95"></label>
+       <label class="field" data-kinds="automobile">Suggested CAD asking price <span class="hint">Preview only; does not enable sales</span><input name="suggestedPriceCAD" type="number" min="1" max="100000" step=".01" placeholder="19.95"></label>
+       <label class="field" data-kinds="set">Suggested set price in CAD <span class="hint">Preview only; no stock is reserved</span><input name="suggestedSetPriceCAD" type="number" min="1" max="100000" step=".01" placeholder="44.95"></label>
+       <label class="field" data-kinds="page">Section headline<input name="headline" maxlength="180" placeholder="Homepage or archive heading"></label>
+       <label class="field" data-kinds="page">Section supporting text<textarea name="body" rows="5" maxlength="900" placeholder="Short welcome or store announcement"></textarea></label>
+       <div class="photo-field" data-kinds="product automobile">
+        <label class="field">Product photograph URL<input name="image" id="imageUrl" placeholder="Select a current photo or upload a new one"></label>
+        <div class="photo-layout"><div class="image-frame"><img id="imagePreview" alt="Selected product photograph preview" hidden><p id="imagePlaceholder">No photograph selected</p></div>
+        <div><label for="photoUpload" class="upload-label">Upload photograph (JPG, PNG or WebP, max 5 MB)</label><input id="photoUpload" type="file" accept="image/jpeg,image/png,image/webp"><button id="uploadButton" class="subtle" type="button">Upload selected image</button><p class="fine">Uploaded media gets a public image URL. Avoid personal documents. Original images from the archive are not overwritten.</p></div></div>
+       </div>
+      </div>
+      <div class="warning" id="reviewWarning">An editor's draft is private until a Manager or Owner publishes it. New products and automobile scans remain preview-only and cannot be purchased.</div>
+      <div class="actions">
+       <button id="saveDraft" type="submit" class="primary">Save draft</button>
+       <button id="publishEntry" class="secondary" type="button" hidden>Publish to website</button>
+       <button id="hideEntry" class="subtle" type="button" hidden>Unpublish</button>
+       <button id="refreshEntry" class="subtle" type="button">Discard unsaved changes</button>
+      </div>
+      <p class="fine">Changes are version-controlled and recorded with the editor who saved them. Pricing changes for existing sale products update the authoritative stock database only at the manager's publish step.</p>
+     </form>
+     <div id="editorEmpty" class="empty-editor"><span aria-hidden="true">✦</span><p>Choose an item to edit its text, prices or photographs. You can also add a new product or curate a new set.</p></div>
+    </section>
+   </div>
+   <section class="team-panel" id="teamPanel" hidden aria-labelledby="teamTitle">
+    <div><p class="eyebrow">OWNER ACCESS CONTROL</p><h2 id="teamTitle">Your team</h2><p>Authorize another person by their own confirmed store-account email. Editors save drafts; Managers can publish. Only an existing verified Owner can grant or revoke staff access.</p></div>
+    <form id="teamForm" class="team-form">
+     <label class="field">Confirmed account email<input name="email" type="email" required placeholder="colleague@example.com" autocomplete="email"></label>
+     <label class="field">Permission level<select name="role"><option value="editor">Editor — prepare drafts</option><option value="manager">Manager — edit and publish</option></select></label>
+     <button class="primary" type="submit">Grant access</button>
+     <button class="subtle" id="revokeMember" type="button">Revoke by email</button>
+    </form>
+    <p class="fine">The colleague must create and verify their account through <a href="../account.html" target="_blank" rel="noopener">Burton &amp; Found sign-in</a> first. Access is not granted merely by typing an email into this form.</p>
+    <p id="teamSummary" class="fine"></p>
+   </section>
+  </section>
+ </main>
+ <footer>Burton &amp; Found · Staff-only editorial studio · No access to Stripe keys or payment configuration</footer>
+</body>
+</html>
