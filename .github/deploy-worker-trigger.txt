@@ -13,3 +13,5 @@ Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside ho
 2026-11-17: deploy private Burton & Found Content Studio (owner/editor/manager roles, versioned drafts, controlled publishing, product and automobile edits, public published content overlay, 5MB product photo uploads). No payment, carrier or tax authorization changes.
 
 2026-11-17: fix CMS studio /admin/ photograph preview paths; no catalogue, pricing or checkout changes. Deploy corrected private editor.
+
+2026-11-17: publish Old Hollywood 73-photo image gallery with 71 provisional CAD prices, individual descriptions, two duplicate holds and no added checkout inventory. Validation passed; all payment, tax and carrier flags remain disabled.
