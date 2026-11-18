@@ -1,0 +1,28 @@
+/* Draft Old Hollywood catalogue cards within the main Burton & Found shop.
+   Card previews never imply verified physical inventory or enabled checkout. */
+.product-card.bf-new-hollywood-card{border-color:var(--bf-line,#c4c7bc);background:var(--bf-surface,#fffdfa)}
+.product-card.bf-new-hollywood-card .product-media{background:var(--bf-photo,#eae6dc)}
+.product-card.bf-new-hollywood-card .media-kicker{background:#254639;color:#fffdf7;max-width:95%;white-space:normal;line-height:1.4}
+.bf-new-hollywood-card .product-desc{overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.bf-hollywood-unverified{font-size:.78rem;line-height:1.45;color:var(--bf-muted,#4b5b51);margin:8px 0;font-weight:550}
+.bf-new-hollywood-card .product-price-row{align-items:center;gap:9px}
+.bf-new-hollywood-card .product-price.bf-preview-asking{font-family:inherit;font-size:.87rem;font-weight:750;line-height:1.45;color:var(--bf-text,#25372f);max-width:62%}
+.bf-new-hollywood-card .add-small.bf-preview-details-button{padding:10px 12px;white-space:nowrap;min-height:44px;background:var(--bf-strong,#26483a);color:var(--bf-strong-text,#fffaf0);border:1px solid currentColor}
+.bf-new-hollywood-card .bf-preview-details-button:hover{filter:brightness(1.12)}
+.bf-new-hollywood-card.bf-alternate-scan .media-kicker{background:#5b533d}
+.bf-new-hollywood-card.bf-alternate-scan .bf-preview-asking{font-style:italic}
+.bf-preview-set-members{border-top:1px solid var(--bf-line,#c6c7bc);padding-top:20px}
+.bf-preview-set-members h3{font-family:Georgia,serif;font-size:1.35rem;margin:0 0 15px}
+.bf-preview-member-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bf-preview-member-grid a{border:1px solid var(--bf-line,#c6c7bc);border-radius:8px;padding:7px;display:flex;align-items:center;gap:10px;min-width:0;background:var(--bf-surface,#fffdfa)}
+.bf-preview-member-grid a img{width:63px;height:80px;object-fit:contain;flex:0 0 auto;background:var(--bf-photo,#e9e4d8)}
+.bf-preview-member-grid a span{font-size:.85rem;line-height:1.3;min-width:0;overflow-wrap:anywhere}
+.bf-preview-member-grid a small{display:block;color:var(--bf-muted,#59695f);margin-top:4px;font-size:.74rem}
+.bf-preview-member-grid a:hover,.bf-preview-member-grid a:focus-visible{border-color:var(--bf-strong,#26483a);text-decoration:underline;outline-offset:2px}
+.bf-preview-archive-link,.bf-preview-set-members p a{color:var(--bf-accent,#774f3d);font-weight:750;text-decoration:underline;text-underline-offset:3px}
+.bf-preview-purchase-notice{padding:12px 14px;border-left:4px solid var(--bf-accent,#996745);background:var(--bf-surface,#fffdfa);color:var(--bf-text,#25372f);font-size:.95rem;font-weight:650}
+html[data-theme="dark"] .bf-new-hollywood-card .media-kicker{background:#d4bf93;color:#1c2d23}
+html[data-theme="dark"] .bf-new-hollywood-card.bf-alternate-scan .media-kicker{background:#b9a677;color:#1c2d23}
+html[data-theme="dark"] .bf-preview-archive-link,html[data-theme="dark"] .bf-preview-set-members p a{color:#e6ca93}
+@media(max-width:650px){.bf-preview-member-grid{grid-template-columns:1fr}.bf-new-hollywood-card .product-price.bf-preview-asking{max-width:65%;font-size:.85rem}}
+@media(prefers-reduced-motion:reduce){.bf-new-hollywood-card *{scroll-behavior:auto}}
