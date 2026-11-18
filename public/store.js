@@ -202,6 +202,8 @@
     try {const linked=new URLSearchParams(window.location.search).get('item');if(linked&&bySku.has(linked))openDetails(linked);} catch {}
     function selectFilter(type){currentFilter=type;document.querySelectorAll('.tab').forEach(b=>{const selected=b.dataset.filter===type;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected));});}
     function selectCollection(name,listingType='all'){currentCollection=name;currentDecade='all';$('decadeFilter').value='all';$('collectionFilter').value=name;selectFilter(listingType);renderProducts();}
+    // Shareable link: ?collection=hollywood#shop opens all Hollywood shop and preview cards.
+    try {if(new URLSearchParams(window.location.search).get('collection')==='hollywood')selectCollection('hollywood');}catch{}
     document.querySelectorAll('.tab').forEach(button=>button.addEventListener('click',()=>{selectFilter(button.dataset.filter);renderProducts();}));
     $('collectionFilter').addEventListener('change',e=>{currentCollection=e.target.value;renderProducts();});
     document.querySelectorAll('[data-shop-hollywood]').forEach(el=>el.addEventListener('click',()=>selectCollection('hollywood')));
