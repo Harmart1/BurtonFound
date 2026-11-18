@@ -17,9 +17,9 @@ const card=p=>{
   const note=p.type==='bundle'?(p.catalogIds?.length||0)+' included pieces':p.collection==='hollywood'?'Printed-paper collectible':'Original magazine advertising';
   return '<a class="pr-product" href="index.html?item='+encodeURIComponent(p.sku)+'#shop" aria-label="View '+safe(p.title)+' in the shop, '+money(p.price)+' Canadian">'+
     '<span class="pr-product-photo"><img src="'+safe(p.image)+'" alt="'+safe(p.title)+' vintage paper artwork" loading="lazy" decoding="async" width="500" height="625"></span>'+
-    '<span class="pr-product-info"><span class="pr-product-kicker">'+type+'</span>'+
+    '<div class="pr-product-info"><span class="pr-product-kicker">'+type+'</span>'+
     '<h3>'+safe(p.title)+'</h3><p>'+safe(p.shortDescription||note)+'</p>'+
-    '<span class="pr-product-bottom"><strong class="pr-product-price">'+money(p.price)+' <small>CAD</small></strong><span class="pr-product-view">View product ↗</span></span></span></a>';
+    '<div class="pr-product-bottom"><strong class="pr-product-price">'+money(p.price)+' <small>CAD</small></strong><span class="pr-product-view">View product ↗</span></div></div></a>';
 };
 function render(collection){
   const chosen=(featureSku[collection]||featureSku.hollywood).map(s=>bySku.get(s)).filter(Boolean);
