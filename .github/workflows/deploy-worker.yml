@@ -155,3 +155,46 @@ jobs:
             sleep 5
           done
           curl --fail --silent --show-error --max-time 15 "$base/api/public-account-config" | python3 -c 'import json,sys; data=json.load(sys.stdin); assert isinstance(data.get("configured"),bool); print("Public account endpoint responsive")'
+
+      - name: Verify updated preview and capture desktop/mobile screenshots
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://burtonfound.timharmar.workers.dev"
+          python3 - <<'PY'
+          import urllib.request
+          for path,phrase in [
+             ('/preview.html','prFeaturedGrid'),
+             ('/preview-launch.js','OH-NEW-003-01'),
+             ('/preview-launch.css','pr-products'),
+             ('/old-hollywood-new.html','Old Hollywood'),
+             ('/assets/images/old-hollywood/ohnew-003-01.webp',None)
+          ]:
+            with urllib.request.urlopen('https://burtonfound.timharmar.workers.dev'+path,timeout=20) as response:
+              body=response.read()
+              assert response.status==200,(path,response.status)
+              if phrase:assert phrase.encode() in body,path
+              if path.endswith('.webp'):assert body[:4]==b'RIFF' and body[8:12]==b'WEBP',path
+            print('PASS preview asset:',path)
+          PY
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [[ -z "$browser" ]]; then
+            echo "Browser unavailable; HTTP and inventory preflight passed."
+            exit 0
+          fi
+          mkdir -p /tmp/burtonfound-preview
+          for spec in '1440 900 desktop' '390 844 mobile'; do
+            read -r w h name <<< "$spec"
+            "$browser" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars --virtual-time-budget=4500 --window-size="$w,$h" --screenshot="/tmp/burtonfound-preview/$name.png" "$base/preview.html" >/dev/null 2>&1
+            test -s "/tmp/burtonfound-preview/$name.png"
+            echo "PASS rendered preview: $name ($w x $h)"
+          done
+      - name: Attach desktop and mobile preview screenshots
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: burtonfound-updated-preview
+          path: /tmp/burtonfound-preview/*.png
+          if-no-files-found: ignore
+          retention-days: 14
