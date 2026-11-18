@@ -1,0 +1,1 @@
+window.BURTON_NEW_HOLLYWOOD_IMAGES_READY = false;
