@@ -1,31 +1,35 @@
-/* Burton & Found · individually curated Old Hollywood archive and provisional CAD suggestions. */
-(()=>{'use strict';
-const catalog=window.BURTON_HOLLYWOOD_DRAFT_CATALOG;
-const cards=document.getElementById('cards'),search=document.getElementById('search'),type=document.getElementById('category'),group=document.getElementById('group'),sort=document.getElementById('sort'),count=document.getElementById('count');
-const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=x=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(x);
-if(!catalog||!Array.isArray(catalog.entries)){cards.textContent='The preview catalogue could not be loaded. Please reload the page.';return;}
-const sourceNames=new Map(catalog.groups.map(x=>[x.id,x.name]));
-for(const g of catalog.groups){const el=document.createElement('option');el.value=g.id;el.textContent=g.name;group.appendChild(el);}
-const photosReady=window.BURTON_NEW_HOLLYWOOD_IMAGES_READY===true;
-const itemFromLink=new URLSearchParams(location.search).get('item');
-if(itemFromLink&&/^OHN-\d{3}-\d{2}$/.test(itemFromLink))search.value=itemFromLink;
-
-function render(){
- const q=search.value.trim().toLocaleLowerCase('en'),cat=type.value,g=group.value,s=sort.value;
- let list=catalog.entries.filter(x=>(cat==='all'||x.type===cat)&&(g==='all'||x.group===g)&&[x.title,x.description,x.id,sourceNames.get(x.group),x.type].join(' ').toLocaleLowerCase('en').includes(q));
- if(s==='title')list=[...list].sort((a,b)=>a.title.localeCompare(b.title));
- if(s==='price-low')list=[...list].sort((a,b)=>(a.suggestedCad??Infinity)-(b.suggestedCad??Infinity));
- if(s==='price-high')list=[...list].sort((a,b)=>(b.suggestedCad??-Infinity)-(a.suggestedCad??-Infinity));
- const priced=list.filter(x=>Number.isFinite(x.suggestedCad)).length;
- count.textContent=list.length+' scans · '+priced+' with draft CAD prices';
- cards.innerHTML=list.map(x=>{
- const name=esc(x.title),id=esc(x.id),photo=esc(x.image),price=Number.isFinite(x.suggestedCad)?'<span class="suggested">'+money(x.suggestedCad)+'</span><div class="price-label">Suggested asking price · CAD</div>':'<div class="price-label"><strong>Price withheld</strong> · possible duplicate scan</div>';
- const image=photosReady?'<a class="card-picture" href="'+photo+'" target="_blank" rel="noopener" aria-label="Open image for '+name+'"><img src="'+photo+'" alt="'+name+' — photograph of the source paper scan" loading="lazy" decoding="async"></a>':'<div class="visual" role="img" aria-label="Scanned photograph pending publication">Archival image under review</div>';
- return '<article class="card">'+image+'<div class="body"><div class="item-id">'+id+' · '+esc(x.type)+'</div><h2>'+name+'</h2><p>'+esc(x.description)+'</p><div class="meta">Source: '+esc(sourceNames.get(x.group))+' · Page '+x.page+'</div><div>'+price+'</div><div class="draftnote">Photographed paper, not a digital print listing. Physical inventory, age, paper, size and condition to be verified.</div><div class="cardfooter"><span class="pill">'+(x.suggestedCad===null?'Duplicate review':'Not yet available to buy')+'</span>'+(photosReady?'<a class="preview-link" href="'+photo+'" target="_blank" rel="noopener">View actual scan</a>':'')+'</div></div></article>';
- }).join('')||'<p>No matching archive scans. Try another search or filter.</p>';
-}
-for(const el of [search,type,group,sort])el.addEventListener(el===search?'input':'change',render);
-document.getElementById('theme').addEventListener('click',()=>document.body.classList.toggle('dark'));
-render();
+/* Burton & Found: public preview gallery for owner-supplied scanned paper.
+ * This is NOT checkout inventory. Figures are suggested asking prices only.
+ */
+(()=>{
+  'use strict';
+  const items=Array.isArray(window.BURTON_NEW_HOLLYWOOD_ITEMS)?window.BURTON_NEW_HOLLYWOOD_ITEMS:[];
+  const ready=window.BURTON_NEW_HOLLYWOOD_IMAGES_READY===true;
+  const $=id=>document.getElementById(id);
+  const root=$('cards'),query=$('search'),category=$('category'),group=$('group'),sort=$('sort'),count=$('count');
+  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money=x=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(x);
+  const sources=['Modern Screen magazine pages','Dorothy Sebastian & contemporaries','Priscilla Lane & contemporaries','Robert Montgomery & contemporaries','Ruth Chatterton & magazine finds','What Happened / vintage film-paper','Hollywood film ads and portraits','Rock, Pretty Baby & mixed ephemera','Rock, Pretty Baby supplemental pages'];
+  const isPrice=x=>typeof x.suggestedPriceCad==='number'&&Number.isFinite(x.suggestedPriceCad);
+  function render(){
+    const term=query.value.trim().toLocaleLowerCase('en-CA');
+    const c=category.value,g=group.value,order=sort.value;
+    const data=items.filter(x=>{
+      if(c!=='all'&&x.category!==c)return false;
+      if(g!=='all'&&String(x.sourceGroup)!==g)return false;
+      return !term||[x.title,x.description,x.category,x.sku,sources[x.sourceGroup-1]].join(' ').toLocaleLowerCase('en-CA').includes(term);
+    });
+    if(order==='price-asc')data.sort((a,b)=>(a.suggestedPriceCad??Infinity)-(b.suggestedPriceCad??Infinity));
+    else if(order==='price-desc')data.sort((a,b)=>(b.suggestedPriceCad??-1)-(a.suggestedPriceCad??-1));
+    else if(order==='title')data.sort((a,b)=>a.title.localeCompare(b.title,'en-CA'));
+    count.textContent=`${data.length} of ${items.length} scans · ${data.filter(isPrice).length} have suggested prices`;
+    root.innerHTML=data.map(item=>{
+      const img=ready?`<a href="${esc(item.image)}" target="_blank" rel="noopener" aria-label="View full scan of ${esc(item.title)}"><img src="${esc(item.image)}" width="520" height="680" alt="Actual scanned paper: ${esc(item.title)}" loading="lazy" decoding="async" style="width:100%;height:260px;object-fit:contain"></a>`:'<div class="reel" aria-hidden="true">✦</div><small>Actual scan in preparation</small>';
+      const price=isPrice(item)?`<span class="review-price">Recommended ${money(item.suggestedPriceCad)} CAD</span>`:'<span class="pill">Alternate scan · no separate price</span>';
+      return `<article class="card" aria-labelledby="title-${esc(item.sku)}"><div class="visual" style="padding:8px">${img}</div><div class="body"><div class="cat">${esc(item.category)}</div><h2 id="title-${esc(item.sku)}">${esc(item.title)}</h2><p>${esc(item.description)}</p><div class="meta">${esc(sources[item.sourceGroup-1])}<span class="sku">${esc(item.sku)}</span></div><div class="price-row">${price}</div><div class="cardfooter">Physical stock, date, format and condition not yet verified · Not available for checkout</div></div></article>`;
+    }).join('')||'<p role="status">No matching scans. Try a different category or search term.</p>';
+  }
+  for(const element of [query,category,group,sort])element.addEventListener(element===query?'input':'change',render);
+  $('theme').addEventListener('click',()=>{const dark=document.body.classList.toggle('dark');$('theme').setAttribute('aria-pressed',String(dark));});
+  render();
 })();
