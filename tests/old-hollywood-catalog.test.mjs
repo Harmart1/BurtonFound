@@ -27,6 +27,7 @@ test('Old Hollywood intake includes 73 real image scans, 71 review prices, 9 gro
  assert.ok(html.includes('old-hollywood-catalog.js'));
  assert.ok(html.includes('id="cards"'));
  for(const p of ['public/old-hollywood-catalog.js','public/old-hollywood-intake.js'])execFileSync(process.execPath,['--check',file(p)]);
- const main=JSON.parse(readFileSync(file('public/products.js'),'utf8').split('=')[1].trim().replace(/;$/,''));
+ const productSource=readFileSync(file('public/products.js'),'utf8');
+ const main=JSON.parse(productSource.slice(productSource.indexOf('=')+1).trim().replace(/;$/,''));
  assert.equal(main.inventory.length,22,'live checkout inventory must not be changed by archive');
 });
