@@ -21,3 +21,5 @@ Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside ho
 2026-11-17: publish all 73 newly imported Old Hollywood WebP source scans and individual draft listing details and 71 recommended CAD prices in the browse-only gallery; preserve existing 22 sale products, all checkout approvals disabled and duplicate review flags. Site and storefront navigation link to the gallery.
 
 2026-11-17 final Old Hollywood release: validation passed for 73 uploaded scans, 71 individually recommended CAD prices, search and category filters, description consistency checks, and no new sale inventory. Redeploy test-safe Cloudflare Worker from verified main.
+
+2026-11-17 (Old Hollywood gallery reconciliation): 73 scan assets, 71 recommended CAD prices and individual copy verified in GitHub; source/category filters and ?item=OHN-... featured deep links repaired; two duplicate views held, sales inventory unchanged, all checkout/tax/carrier controls disabled. Request existing test-safe Worker deployment.
