@@ -162,21 +162,22 @@ jobs:
         run: |
           set -euo pipefail
           base="https://burtonfound.timharmar.workers.dev"
+          # Use the same curl path that already passed the live API smoke test.
+          # Python urllib receives a Cloudflare bot-policy 403 for public static assets.
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview.html" -o /tmp/bf-preview.html
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview-launch.js" -o /tmp/bf-preview.js
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview-launch.css" -o /tmp/bf-preview.css
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/old-hollywood-new.html" -o /tmp/bf-hollywood.html
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/assets/images/old-hollywood/ohnew-003-01.webp" -o /tmp/bf-photo.webp
+          grep -q 'prFeaturedGrid' /tmp/bf-preview.html
+          grep -q 'OH-NEW-003-01' /tmp/bf-preview.js
+          grep -q 'pr-products' /tmp/bf-preview.css
+          grep -q 'Old Hollywood' /tmp/bf-hollywood.html
           python3 - <<'PY'
-          import urllib.request
-          for path,phrase in [
-             ('/preview.html','prFeaturedGrid'),
-             ('/preview-launch.js','OH-NEW-003-01'),
-             ('/preview-launch.css','pr-products'),
-             ('/old-hollywood-new.html','Old Hollywood'),
-             ('/assets/images/old-hollywood/ohnew-003-01.webp',None)
-          ]:
-            with urllib.request.urlopen('https://burtonfound.timharmar.workers.dev'+path,timeout=20) as response:
-              body=response.read()
-              assert response.status==200,(path,response.status)
-              if phrase:assert phrase.encode() in body,path
-              if path.endswith('.webp'):assert body[:4]==b'RIFF' and body[8:12]==b'WEBP',path
-            print('PASS preview asset:',path)
+          from pathlib import Path
+          data=Path('/tmp/bf-photo.webp').read_bytes()
+          assert data[:4]==b'RIFF' and data[8:12]==b'WEBP', 'Preview photo is not valid WebP'
+          print('PASS: published preview HTML, scripts, styles, archive and photograph')
           PY
           browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           if [[ -z "$browser" ]]; then
