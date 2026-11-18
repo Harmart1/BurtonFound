@@ -1,0 +1,79 @@
+name: Import Old Hollywood scan previews (archive only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'imports/BurtonFound-Old-Hollywood-Image-Upload.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: burtonfound-hollywood-scan-import
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify payments remain disabled
+        run: |
+          node -e 'const c=require("./wrangler.jsonc");for(const k of ["LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED","TAX_CONFIGURATION_APPROVED","CARRIER_QUOTES_ENABLED"]){if(c.vars[k]!=="false")throw Error(k+" is enabled")}'
+      - name: Validate and install only approved scan WebP files
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,re,collections,sys
+          p=Path('imports/BurtonFound-Old-Hollywood-Image-Upload.zip')
+          if not p.exists():sys.exit('Image ZIP not uploaded at expected path.')
+          if p.stat().st_size>10000000:sys.exit('ZIP over 10 MB limit.')
+          expected={1:9,2:6,3:9,4:10,5:10,6:9,7:8,8:10,9:2}
+          pattern=re.compile(r'public/assets/images/old-hollywood/ohnew-(\d{3})-(\d{2})\.webp')
+          with zipfile.ZipFile(p) as z:
+            files=z.infolist();actual=collections.defaultdict(set)
+            if len(files)!=73:sys.exit('Expected exactly 73 WebP scans.')
+            if sum(f.file_size for f in files)>12000000:sys.exit('Extracted scan assets too large.')
+            for info in files:
+              m=pattern.fullmatch(info.filename)
+              if not m:sys.exit('Unexpected ZIP path: '+info.filename)
+              i,n=map(int,m.groups())
+              if i not in expected or n<1 or n>expected[i] or n in actual[i]:sys.exit('Invalid/duplicate scan number.')
+              if info.file_size>350000:sys.exit('Unexpected large scan.')
+              if info.external_attr >>16 & 0o170000 == 0o120000:sys.exit('No symbolic links allowed')
+              raw=z.read(info)
+              if not (raw.startswith(b'RIFF') and raw[8:12]==b'WEBP'):sys.exit('Non-WebP asset rejected.')
+              actual[i].add(n)
+              dst=Path(info.filename);dst.parent.mkdir(parents=True,exist_ok=True);dst.write_bytes(raw)
+            if any(actual[i]!=set(range(1,n+1)) for i,n in expected.items()):sys.exit('Missing scan pages.')
+          Path('public/old-hollywood-images-ready.js').write_text('window.BURTON_NEW_HOLLYWOOD_IMAGES_READY = true;\n',encoding='utf-8')
+          print('Imported 73 actual image scans. No products or prices changed.')
+          PY
+      - name: Validate storefront build
+        run: |
+          npm run check:deploy
+          npm test
+      - name: Commit only archive images and flag; remove import ZIP
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/images/old-hollywood/ public/old-hollywood-images-ready.js
+          git rm -- imports/BurtonFound-Old-Hollywood-Image-Upload.zip
+          git commit -m "Install 73 Old Hollywood preview scans (no sale inventory)"
+          git push origin HEAD:main
+      - name: Request existing test-safe Cloudflare deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy-worker.yml --repo "${{ github.repository }}" --ref main
+          echo "73 Old Hollywood scan previews installed; checkout remains unchanged." >> "$GITHUB_STEP_SUMMARY"
