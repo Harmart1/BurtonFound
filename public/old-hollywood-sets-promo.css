@@ -1,0 +1,31 @@
+/* Four curated Old Hollywood preview sets on both storefront variants. */
+.ohsets-promo{padding:clamp(32px,5vw,60px) 24px;background:#f5f0e6;color:#203b32}
+.ohsets-wrap{max-width:1180px;margin:0 auto}
+.ohsets-heading{display:flex;align-items:end;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-bottom:24px}
+.ohsets-label{font-size:.77rem;letter-spacing:.14em;text-transform:uppercase;font-weight:750;color:#527064;margin:0 0 10px}
+.ohsets-heading h2{font-family:Georgia,serif;font-size:clamp(1.9rem,3.4vw,3.1rem);font-weight:normal;line-height:1.1;margin:0 0 11px}
+.ohsets-heading p{max-width:700px;font-size:.98rem;color:#495f53;line-height:1.6;margin:0}
+.ohsets-all{border:1px solid currentColor;border-radius:6px;padding:12px 16px;font-size:.9rem;font-weight:750;text-decoration:none;display:inline-block}
+.ohsets-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.ohsets-card{background:#fffcf6;border:1px solid #cfc6b5;border-radius:9px;overflow:hidden}
+.ohsets-card a{display:flex;flex-direction:column;text-decoration:none;color:inherit;height:100%}
+.ohsets-card-images{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#e5dfd4;aspect-ratio:1.25}
+.ohsets-card img{width:100%;height:100%;min-width:0;object-fit:contain;display:block;background:#e9e4da}
+.ohsets-card-copy{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ohsets-card-meta{font-size:.76rem;color:#536658;text-transform:uppercase;letter-spacing:.07em;font-weight:750}
+.ohsets-card h3{font-family:Georgia,serif;font-size:1.2rem;line-height:1.2;font-weight:650;margin:0}
+.ohsets-card-price{font-family:Georgia,serif;font-size:1.36rem;font-weight:750;margin-top:auto}
+.ohsets-card-price small{display:block;font:600 .75rem/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;color:#5c685e}
+.ohsets-card-cta{font-size:.85rem;font-weight:750;color:#31594c;text-decoration:underline;text-underline-offset:3px}
+.ohsets-card a:hover h3{text-decoration:underline;text-underline-offset:3px}
+.ohsets-card a:focus-visible,.ohsets-all:focus-visible{outline:3px solid #a87534;outline-offset:2px}
+.ohsets-caution{margin:22px 0 0;font-size:.85rem;color:#4e5f54;line-height:1.55;max-width:1000px}
+html[data-theme="dark"] .ohsets-promo{background:#19271f;color:#f4eee3}
+html[data-theme="dark"] .ohsets-heading p,html[data-theme="dark"] .ohsets-caution{color:#cbd7ca}
+html[data-theme="dark"] .ohsets-label{color:#d1bf9d}
+html[data-theme="dark"] .ohsets-card{background:#2f4035;border-color:#627567}
+html[data-theme="dark"] .ohsets-card-meta,html[data-theme="dark"] .ohsets-card-price small{color:#d1d9ce}
+html[data-theme="dark"] .ohsets-card-cta{color:#e6cea5}
+html[data-theme="dark"] .ohsets-card img,html[data-theme="dark"] .ohsets-card-images{background:#1e2b25}
+@media(max-width:900px){.ohsets-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.ohsets-promo{padding-left:16px;padding-right:16px}.ohsets-grid{gap:12px}.ohsets-card-copy{padding:12px}.ohsets-card h3{font-size:1.04rem}.ohsets-card-images{aspect-ratio:1}.ohsets-card-price{font-size:1.2rem}}
