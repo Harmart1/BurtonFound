@@ -13,21 +13,21 @@
   let selectedProduct=null,selectedImage=0;
   let bag=[];
   try {bag=JSON.parse(localStorage.getItem('burton_found_bag')||'[]');if(!Array.isArray(bag))bag=[];}catch{bag=[];}
-  bag=[...new Set(bag.filter(s=>bySku.has(s)))];
+  bag=[...new Set(bag.filter(s=>bySku.has(s)&&!bySku.get(s)?.cmsOnly))];
   const saveBag=(fromAccount=false)=>{shippingRequestId++;activeShippingQuote=null;liveOptions=[];const e=document.getElementById('shippingResults');if(e)e.textContent='Bag changed · Compare rates again for an accurate estimate';const t=document.getElementById('shippingEstimateTotal');if(t)t.hidden=true;try{localStorage.setItem('burton_found_bag',JSON.stringify(bag));}catch{}if(!fromAccount)window.BURTON_ACCOUNT?.saveActiveBag?.(bag);};
-  window.BURTON_STORE_API={getBag:()=>[...bag],setBag:(next)=>{bag=[...new Set((next||[]).filter(id=>bySku.has(id)))];saveBag(true);renderProducts();renderCart();}};
+  window.BURTON_STORE_API={getBag:()=>[...bag],setBag:(next)=>{bag=[...new Set((next||[]).filter(id=>bySku.has(id)&&!bySku.get(id)?.cmsOnly))];saveBag(true);renderProducts();renderCart();}};
   let toastTimer;
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
   let checkoutReady=false,checkoutMode='preview_only',inventoryConnected=false,shippingMode='flat_rate',allowedShippingCountries=['CA'];
   let activeShippingQuote=null,liveOptions=[],shippingRequestId=0;
-  const isCheckoutReady=()=>checkoutReady&&bag.length&&bag.every(id=>bySku.get(id)?.stockState!=='unavailable');
+  const isCheckoutReady=()=>checkoutReady&&bag.length&&bag.every(id=>!bySku.get(id)?.cmsOnly&&bySku.get(id)?.stockState!=='unavailable');
   async function loadLiveStatus(){
     try {
       const health=await fetch('/api/health',{cache:'no-store'});
       if(health.ok){const v=await health.json();checkoutMode=v.checkout||'preview_only';shippingMode=v.shippingMode||'flat_rate';checkoutReady=['test_mode','live_mode','configured'].includes(checkoutMode);allowedShippingCountries=Array.isArray(v.shippingCountries)?v.shippingCountries:['CA'];const menu=$('shipCountry');if(menu){for(const opt of menu.options){opt.disabled=!allowedShippingCountries.includes(opt.value);}if(!allowedShippingCountries.includes(menu.value)){menu.value=allowedShippingCountries.find(c=>[...menu.options].some(o=>o.value===c))||'CA';}}}else{checkoutReady=false;checkoutMode='preview_only';}
       const res=await fetch('/api/catalog',{cache:'no-store'});
       if(res.ok){const v=await res.json();if(v.configured&&Array.isArray(v.items)){
-        inventoryConnected=true;for(const row of v.items){const p=bySku.get(row.sku);if(!p)continue;
+        inventoryConnected=true;for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly)continue;
           if(Number.isInteger(row.price_cents))p.price=row.price_cents/100;
           p.stockState=row.available?'available':'unavailable';
         }
@@ -94,7 +94,6 @@
     if(currentSort==='high')list.sort((a,b)=>b.price-a.price);
     if(currentSort==='oldest')list.sort((a,b)=>(a.year||9999)-(b.year||9999));
     if(currentSort==='newest')list.sort((a,b)=>(b.year||0)-(a.year||0));
-    const hollywoodDrafts=window.BF_HOLLYWOOD_SHOP?.renderCards({collection:currentCollection,type:currentFilter,decade:currentDecade,search,sort:currentSort})||{html:'',count:0};
     $('productGrid').innerHTML=list.map(p=>{
       let badge=p.type==='bundle'?`${p.catalogIds.length} PIECES · ONE SET`:p.collection==='hollywood'?'CLASSIC FILM EPHEMERA':'VINTAGE COCA-COLA AD';
       let watched=!!window.BURTON_ACCOUNT?.isWatching?.(p.sku);
@@ -102,13 +101,13 @@
       return `<article class="product-card" data-sku="${safe(p.sku)}">
         <button class="product-media" type="button" data-view="${safe(p.sku)}" aria-label="View ${safe(p.title)} details"><span class="media-kicker">${safe(p.cmsOnly?'COMING SOON · PREVIEW':p.stockState==='unavailable'?'SOLD OR RESERVED':badge)}</span><img src="${safe(p.image)}" alt="${safe(p.shortDescription)}" loading="lazy" decoding="async" width="800" height="900"><span class="media-view" aria-hidden="true">↗</span></button><button class="product-watch ${watched?'watch-active':''}" type="button" data-watch="${safe(p.sku)}" aria-pressed="${watched}" aria-label="${watched?'Remove from':'Add to'} watchlist: ${safe(p.title)}" title="${watched?'Remove from watchlist':'Watch this find'}">${watched?'♥':'♡'}</button>
         <div class="product-info"><p class="product-meta">${safe(cat)}</p><h3 class="product-title">${safe(p.title)}</h3><p class="product-desc">${safe(p.shortDescription)}.</p>${p.collection==='hollywood'?`<p class="card-provenance">${safe(p.sku==='OH-006'?'Complete issue assumed · interior page shown':'Physical print date unverified')}</p>`:''}<div class="product-price-row"><div class="product-price">${p.cmsOnly&&!p.price?'Price on request':money(p.price)+' CAD'}</div><button class="add-small" type="button" data-add="${safe(p.sku)}" ${bag.includes(p.sku)||p.stockState==='unavailable'?'disabled':''}>${p.cmsOnly?'PREVIEW ONLY':p.stockState==='unavailable'?'UNAVAILABLE':bag.includes(p.sku)?'IN YOUR BAG':'ADD TO BAG'}</button></div></div></article>`;
-    }).join('')+hollywoodDrafts.html;
-    $('noResults').hidden=!(list.length+hollywoodDrafts.count);
+    }).join('');
+    $('noResults').hidden=!!list.length;
     const empty=$('emptyShopCopy');if(empty)empty.textContent=currentCollection==='books'?'The vintage books department is being catalogued. No books are listed for purchase yet. Browse existing finds or save your interest in your collector profile.':currentCollection==='collectibles'?'The collectibles department is being curated. No objects are listed for purchase yet. Browse the current archive or save your interest in your collector profile.':'No treasures match that search.';
-    $('catalogCount').textContent=(list.length+hollywoodDrafts.count)+' displayed · '+list.length+' existing listings · '+hollywoodDrafts.count+' Old Hollywood previews';
-    $('shopStatus').textContent=(currentDecade!=='all'||currentFilter!=='all'||currentCollection!=='all'||search)?'Showing '+(list.length+hollywoodDrafts.count)+' results: '+list.length+' existing shop listings and '+hollywoodDrafts.count+' Old Hollywood previews.':'Browse existing shop listings plus Old Hollywood scans and proposed sets. The newly added Hollywood previews show draft prices but cannot be bought yet.';
+    $('catalogCount').textContent=list.length+' of '+items.length+' catalogue products · CAD';
+    $('shopStatus').textContent=(currentDecade!=='all'||currentFilter!=='all'||currentCollection!=='all'||search)?'Showing '+list.length+' matching catalogue products. Old Hollywood print dates remain unverified.':'Browse the complete Old Hollywood and vintage advertising catalogue. Items awaiting physical verification are clearly marked.';
   }
-  function addItem(sku){if(!bySku.has(sku))return;if(bySku.get(sku)?.stockState==='unavailable'||bySku.get(sku)?.cmsOnly){toast('This item is sold or temporarily reserved.');return;}if(bag.includes(sku)){toast('Already in your paper bag.');return;}bag.push(sku);saveBag();renderProducts();renderCart();toast('A good find! Added to your paper bag.');}
+  function addItem(sku){if(!bySku.has(sku))return;if(bySku.get(sku)?.cmsOnly){toast('This catalogue item is awaiting physical inventory verification. You can save it to your watchlist.');return;}if(bySku.get(sku)?.stockState==='unavailable'){toast('This item is sold or temporarily reserved.');return;}if(bag.includes(sku)){toast('Already in your paper bag.');return;}bag.push(sku);saveBag();renderProducts();renderCart();toast('A good find! Added to your paper bag.');}
   function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();}
   function openCart(){renderCart();$('scrim').hidden=false;$('cartDrawer').classList.add('open');$('cartDrawer').setAttribute('aria-hidden','false');document.body.classList.add('no-scroll');$('cartClose').focus();}
   function closeCart(){$('scrim').hidden=true;$('cartDrawer').classList.remove('open');$('cartDrawer').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll');$('cartOpen').focus();}
@@ -215,7 +214,7 @@
     $('catalogSearch').addEventListener('input',e=>{search=e.target.value.trim().toLowerCase();renderProducts();});
     $('clearSearch').addEventListener('click',()=>{search='';currentDecade='all';currentCollection='all';$('collectionFilter').value='all';$('decadeFilter').value='all';$('catalogSearch').value='';selectFilter('all');renderProducts();});
     $('searchOpen').addEventListener('click',()=>{$('shop').scrollIntoView({behavior:'auto'});$('catalogSearch').focus({preventScroll:true});});
-    $('productGrid').addEventListener('click',e=>{const preview=e.target.closest('[data-preview-view]');if(preview){window.BF_HOLLYWOOD_SHOP?.openDetails(preview.dataset.previewView);return;}const watched=e.target.closest('[data-watch]');if(watched){window.BURTON_ACCOUNT?.toggleWatch?.(watched.dataset.watch);return;}const btn=e.target.closest('[data-view],[data-add]');if(!btn)return;if(btn.dataset.view)openDetails(btn.dataset.view);else addItem(btn.dataset.add);});
+    $('productGrid').addEventListener('click',e=>{const watched=e.target.closest('[data-watch]');if(watched){window.BURTON_ACCOUNT?.toggleWatch?.(watched.dataset.watch);return;}const btn=e.target.closest('[data-view],[data-add]');if(!btn)return;if(btn.dataset.view)openDetails(btn.dataset.view);else addItem(btn.dataset.add);});
     $('archiveGrid').addEventListener('click',e=>{const btn=e.target.closest('[data-archive]');if(!btn)return;const a=btn.dataset.archive;const p=items.find(p=>p.catalogIds.includes(a));if(p)openDetails(p.sku,a);});
     $('archiveToggle').addEventListener('click',e=>{let open=$('archiveGrid').hidden;$('archiveGrid').hidden=!open;e.currentTarget.setAttribute('aria-expanded',String(open));e.currentTarget.innerHTML=open?'Hide the full archive <span aria-hidden="true">↑</span>':`View all ${archive.length} archive entries <span aria-hidden="true">↓</span>`;});
     $('cartOpen').addEventListener('click',openCart);
