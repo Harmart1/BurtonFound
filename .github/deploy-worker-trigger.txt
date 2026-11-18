@@ -17,3 +17,5 @@ Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside ho
 2026-11-17: publish Old Hollywood 73-photo image gallery with 71 provisional CAD prices, individual descriptions, two duplicate holds and no added checkout inventory. Validation passed; all payment, tax and carrier flags remain disabled.
 
 2026-11-17: update Old Hollywood homepage and storefront with four actual photographed preview cards and suggested CAD asking prices, item-deep-linked to all 73 archive entries. 71 provisional prices, two duplicate holds, and no checkout inventory changes; publish on existing test-safe Cloudflare Worker.
+
+2026-11-17: publish all 73 newly imported Old Hollywood WebP source scans and individual draft listing details and 71 recommended CAD prices in the browse-only gallery; preserve existing 22 sale products, all checkout approvals disabled and duplicate review flags. Site and storefront navigation link to the gallery.
