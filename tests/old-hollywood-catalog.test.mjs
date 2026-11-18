@@ -19,7 +19,7 @@ test('Old Hollywood gallery presents 73 scanned previews with 71 proposed prices
   assert.ok(x.title.length>10,x.sku);
   assert.ok(x.description.length>45,x.sku);
   assert.equal(x.inventoryStatus,'unverified',x.sku);
-  assert.ok(/^assets\\/images\\/old-hollywood\\/ohnew-\\d{3}-\\d{2}\\.webp$/.test(x.image),x.sku);
+  assert.match(x.image, /^assets[/]images[/]old-hollywood[/]ohnew-[0-9]{3}-[0-9]{2}[.]webp$/, x.sku);
   assert.ok(existsSync(file('public/'+x.image)),x.image);
   if(x.suggestedPriceCad!=null){
    assert.ok(x.suggestedPriceCad>=14&&x.suggestedPriceCad<=35,x.sku);
