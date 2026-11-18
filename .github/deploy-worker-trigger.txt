@@ -23,3 +23,5 @@ Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside ho
 2026-11-17 final Old Hollywood release: validation passed for 73 uploaded scans, 71 individually recommended CAD prices, search and category filters, description consistency checks, and no new sale inventory. Redeploy test-safe Cloudflare Worker from verified main.
 
 2026-11-17 (Old Hollywood gallery reconciliation): 73 scan assets, 71 recommended CAD prices and individual copy verified in GitHub; source/category filters and ?item=OHN-... featured deep links repaired; two duplicate views held, sales inventory unchanged, all checkout/tax/carrier controls disabled. Request existing test-safe Worker deployment.
+
+2026-11-17 curated Old Hollywood release: feature 11 themed non-overlapping editorial sets composed of 58 existing Hollywood scan records, each with actual photo montage, title, description, contents, 12%-15% provisional bundle pricing, 13 remaining individual suggested-price scans and 2 alternate scan candidates. Link sets from homepage and storefront and individual records. All 22 existing purchasable products and checkout/tax/carrier safety gates unchanged.
