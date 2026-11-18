@@ -9,7 +9,9 @@
   const keyWatch='bf_guest_watches',keyBags='bf_guest_saved_bags',keyCart='burton_found_bag';
   const items=window.BURTON_DATA?.inventory||[];
   const known=new Set(items.map(p=>p.sku));
-  const sanitizeSkus=arr=>[...new Set(Array.isArray(arr)?arr.filter(s=>typeof s==='string'&&known.has(s)):[])].slice(0,60);
+  const eligibleForBag=new Set(items.filter(p=>!p.cmsOnly).map(p=>p.sku));
+  const sanitizeSkus=arr=>[...new Set(Array.isArray(arr)?arr.filter(s=>typeof s==='string'&&known.has(s)):[])].slice(0,150);
+  const sanitizeBagSkus=arr=>sanitizeSkus(arr).filter(s=>eligibleForBag.has(s)).slice(0,60);
   const read=(key,fallback)=>{try{const value=JSON.parse(localStorage.getItem(key)||'null');return value??fallback;}catch{return fallback}};
   const write=(key,v)=>{try{localStorage.setItem(key,JSON.stringify(v));}catch{}};
   const emit=(name,detail={})=>document.dispatchEvent(new CustomEvent('bf:'+name,{detail}));
@@ -18,16 +20,16 @@
   const fail=message=>{throw new Error(message)};
   const demandAuth=()=>{if(!client||!user)fail('Sign in to save this information to your account.');};
   const check=({error,data})=>{if(error)throw error;return data;};
-  const getLocalBag=()=>sanitizeSkus(read(keyCart,[]));
+  const getLocalBag=()=>sanitizeBagSkus(read(keyCart,[]));
   const syncShopBag=next=>{
-    const s=sanitizeSkus(next);
+    const s=sanitizeBagSkus(next);
     if(window.BURTON_STORE_API?.setBag)window.BURTON_STORE_API.setBag(s);
     else write(keyCart,s);
     emit('bag-sync',{bag:s});
   };
   function tell(){emit('account-change',{signedIn:!!user,configured:readyToConnect});emit('watch-change',{count:watches.size});emit('auth-change',{signedIn:!!user});}
   function localWatches(){watches=new Set(sanitizeSkus(read(keyWatch,[])));}
-  function guestCarts(){const arr=read(keyBags,[]);return Array.isArray(arr)?arr.map(x=>({id:x.id,title:String(x.title||'Saved bag'),item_skus:sanitizeSkus(x.item_skus),created_at:x.created_at})).slice(0,20):[];}
+  function guestCarts(){const arr=read(keyBags,[]);return Array.isArray(arr)?arr.map(x=>({id:x.id,title:String(x.title||'Saved bag'),item_skus:sanitizeBagSkus(x.item_skus),created_at:x.created_at})).slice(0,20):[];}
   async function loadUser(sessionUser){
     const seq=++authSequence;
     if(!sessionUser){
@@ -50,7 +52,7 @@
       const imported=newWatches.filter(s=>!(watchRes.data||[]).some(x=>x.sku===s));
       if(imported.length)check(await client.from('collector_watchlist').upsert(imported.map(sku=>({user_id:user.id,sku})),{onConflict:'user_id,sku'}));
       watches=new Set(newWatches);localStorage.removeItem(keyWatch);
-      const cart=sanitizeSkus([...(cartRes.data?.item_skus||[]),...getLocalBag()]);
+      const cart=sanitizeBagSkus([...(cartRes.data?.item_skus||[]),...getLocalBag()]);
       syncShopBag(cart);await saveActiveBagNow(cart);
       const localSaved=guestCarts();
       if(localSaved.length){
@@ -160,10 +162,10 @@
     catch(e){if(previously)watches.add(sku);else watches.delete(sku);emit('watch-change',{count:watches.size});emit('account-error',{message:'Could not save watchlist: '+e.message});}
     return watches.has(sku);
   }
-  async function saveActiveBagNow(skus){if(!user||!client)return;check(await client.from('collector_active_carts').upsert({user_id:user.id,item_skus:sanitizeSkus(skus)},{onConflict:'user_id'}));}
+  async function saveActiveBagNow(skus){if(!user||!client)return;check(await client.from('collector_active_carts').upsert({user_id:user.id,item_skus:sanitizeBagSkus(skus)},{onConflict:'user_id'}));}
   function saveActiveBag(skus){if(!user||!client)return;clearTimeout(cartTimer);cartTimer=setTimeout(()=>saveActiveBagNow(skus).catch(e=>emit('account-error',{message:'Could not sync shopping bag: '+e.message})),350);}
   async function saveNamedBag(name,skus){
-    const title=String(name||'Saved paper bag').trim().slice(0,60)||'Saved paper bag',item_skus=sanitizeSkus(skus);
+    const title=String(name||'Saved paper bag').trim().slice(0,60)||'Saved paper bag',item_skus=sanitizeBagSkus(skus);
     if(!item_skus.length)fail('Add at least one item to your bag before saving.');
     if(user&&client){const result=check(await client.from('collector_saved_carts').insert({user_id:user.id,title,item_skus}).select().single());saved=[result,...saved];emit('account-change');return result;}
     const local=guestCarts();const value={id:'guest-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),title,item_skus,created_at:new Date().toISOString()};
@@ -174,7 +176,7 @@
     else write(keyBags,guestCarts().filter(x=>x.id!==id));
     emit('account-change');
   }
-  function restoreBag(item_skus){syncShopBag(sanitizeSkus(item_skus));saveActiveBag(item_skus);}
+  function restoreBag(item_skus){const safe=sanitizeBagSkus(item_skus);syncShopBag(safe);saveActiveBag(safe);}
   async function exportData(){demandAuth();
     const packet={exported_at:new Date().toISOString(),email:user.email,profile,addresses,watchlist:[...watches],saved_carts:saved,active_cart:getLocalBag()};
     return new Blob([JSON.stringify(packet,null,2)],{type:'application/json'});
