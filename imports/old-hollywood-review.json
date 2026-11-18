@@ -1,0 +1,81 @@
+{
+  "brand": "Burton & Found",
+  "collection": "old-hollywood",
+  "source": "Owner-supplied Drive folder, reviewed 17 November 2026",
+  "state": "preview_only",
+  "notes": "Archive intake only. Pages are not verified unique physical pieces. Do not add to bf_products, bf_units, products.js or checkout until separately priced and verified.",
+  "groups": [
+    {
+      "sku": "OH-NEW-001",
+      "title": "Modern Screen — vintage magazine pages",
+      "source": "MODERN SCREEN'S",
+      "pages": 9,
+      "category": "Fan magazines",
+      "note": "Scanned vintage film-magazine pages and studio publicity. A second PDF copy was excluded from this collection intake."
+    },
+    {
+      "sku": "OH-NEW-002",
+      "title": "Dorothy — vintage Hollywood portraits and clippings",
+      "source": "Dorothy",
+      "pages": 6,
+      "category": "Studio portraits",
+      "note": "Mixed portrait and film-publicity scans; printed dates, issue and original dimensions still require verification."
+    },
+    {
+      "sku": "OH-NEW-003",
+      "title": "Priscilla Lane — Warner Bros.–First National",
+      "source": "PRISCILLA LANE",
+      "pages": 9,
+      "category": "Studio portraits",
+      "note": "Portrait and related magazine/publicity scans. Verify each page and whether individual pieces are physically separate."
+    },
+    {
+      "sku": "OH-NEW-004",
+      "title": "Robert Montgomery — Metro-Goldwyn-Mayer",
+      "source": "ROBERT MONTGOMERY",
+      "pages": 10,
+      "category": "Studio portraits",
+      "note": "Portrait and promotional film-paper scans including the named MGM star."
+    },
+    {
+      "sku": "OH-NEW-005",
+      "title": "Ruth Chatterton — studio-era publicity",
+      "source": "CHATTERTON",
+      "pages": 10,
+      "category": "Studio portraits",
+      "note": "Mixed classic-Hollywood photography and film-advertising scans; Ruth Chatterton appears in the source material."
+    },
+    {
+      "sku": "OH-NEW-006",
+      "title": "What Happened — vintage film paper",
+      "source": "WHAT HAPPENED",
+      "pages": 9,
+      "category": "Film advertising",
+      "note": "Mixed publicity and vintage magazine scans; the source title alone does not establish the film, publisher or date."
+    },
+    {
+      "sku": "OH-NEW-007",
+      "title": "Here's Proof He — film advertising and clippings",
+      "source": "HERE'S PROOF",
+      "pages": 8,
+      "category": "Film advertising",
+      "note": "Includes advertising copy and assorted classic film-era prints; item boundaries are unverified."
+    },
+    {
+      "sku": "OH-NEW-008",
+      "title": "Rock, Pretty Baby / Hot Rod — film-era advertising",
+      "source": "NOCK PRETTY BABY HOT ROD",
+      "pages": 10,
+      "category": "Film advertising",
+      "note": "Film advertising, studio portraits and related printed ephemera from the source scan."
+    },
+    {
+      "sku": "OH-NEW-009",
+      "title": "Rock, Pretty Baby / Hot Rod — supplementary scans",
+      "source": "WROCK PRETTY BABY",
+      "pages": 2,
+      "category": "Film advertising",
+      "note": "Two additional scans; likely overlaps with the longer advertising group, so not treated as a separate saleable physical item."
+    }
+  ]
+}
