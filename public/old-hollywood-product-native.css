@@ -1,0 +1,19 @@
+/* Integrated Old Hollywood products use standard Burton & Found card/detail styling.
+   This sheet only clarifies the review status and lays out actual scans in set details. */
+.product-card:has(.media-kicker) .product-media img{object-fit:contain}
+.product-card .product-desc{overflow-wrap:anywhere}
+.product-card .card-provenance{line-height:1.45}
+.product-card .product-price{overflow-wrap:break-word}
+.product-card button.add-small:disabled{cursor:not-allowed}
+.bf-native-hollywood-members{margin:22px 0;border-top:1px solid var(--bf-line,#c6c7bc);padding-top:18px}
+.bf-native-hollywood-members h3{font-family:Georgia,serif;font-size:1.37rem;margin:0 0 9px}
+.bf-native-hollywood-members p{font-size:.91rem;line-height:1.5;color:var(--bf-muted,#516253)}
+.bf-native-members-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:13px}
+.bf-native-members-grid a{border:1px solid var(--bf-line,#c6c7bc);border-radius:8px;background:var(--bf-surface,#fffdfa);display:flex;align-items:center;gap:11px;min-width:0;padding:8px;color:var(--bf-text,#203730);text-decoration:none}
+.bf-native-members-grid a:hover,.bf-native-members-grid a:focus-visible{border-color:var(--bf-strong,#26483a);text-decoration:underline;text-underline-offset:3px}
+.bf-native-members-grid img{width:68px;height:88px;object-fit:contain;background:var(--bf-photo,#eee8dc);flex:0 0 68px}
+.bf-native-members-grid span{line-height:1.35;overflow-wrap:anywhere;font-size:.88rem}
+.bf-native-members-grid small{display:block;color:var(--bf-muted,#536359);font-size:.78rem;margin-top:5px}
+.bf-native-set-link{font-weight:750;text-decoration:underline;text-underline-offset:3px;color:var(--bf-accent,#784a36)}
+html[data-theme="dark"] .bf-native-set-link{color:#f0d2a8}
+@media(max-width:650px){.bf-native-members-grid{grid-template-columns:1fr}.bf-native-members-grid a{min-height:82px}}
