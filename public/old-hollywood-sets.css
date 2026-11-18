@@ -41,3 +41,6 @@ body.dark .bf-set-status{background:#414734;color:#f4e5bd}
 body.dark .bf-set-mosaic,body.dark .bf-set-mosaic a,body.dark .bf-set-mosaic img,body.dark .bf-set-items li img{background:#1a2621}
 @media(max-width:720px){.bf-sets-grid{grid-template-columns:1fr}.bf-set-content{padding:18px}.bf-set-mosaic{aspect-ratio:1.5}.bf-sets-controls select{width:100%}}
 @media(prefers-reduced-motion:reduce){.bf-set-mosaic img{transition:none}}
+
+.bf-item-set-link{font-size:.85rem;font-weight:750;color:var(--accent);text-decoration:underline;text-underline-offset:3px;display:inline-block;margin:3px 0}
+.bf-item-set-link:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
