@@ -5,6 +5,8 @@
   'use strict';
   const items=Array.isArray(window.BURTON_NEW_HOLLYWOOD_ITEMS)?window.BURTON_NEW_HOLLYWOOD_ITEMS:[];
   const ready=window.BURTON_NEW_HOLLYWOOD_IMAGES_READY===true;
+  const setMembership=new Map();
+  for(const set of (window.BURTON_HOLLYWOOD_CURATED_SETS?.sets||[]))for(const sku of set.memberSkus)setMembership.set(sku,set);
   const $=id=>document.getElementById(id);
   const root=$('cards'),query=$('search'),category=$('category'),group=$('group'),sort=$('sort'),count=$('count');
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -28,7 +30,9 @@
     root.innerHTML=data.map(item=>{
       const img=ready?`<a href="${esc(item.image)}" target="_blank" rel="noopener" aria-label="View full scan of ${esc(item.title)}"><img src="${esc(item.image)}" width="520" height="680" alt="Actual scanned paper: ${esc(item.title)}" loading="lazy" decoding="async" style="width:100%;height:260px;object-fit:contain"></a>`:'<div class="reel" aria-hidden="true">✦</div><small>Actual scan in preparation</small>';
       const price=isPrice(item)?`<span class="review-price">Recommended ${money(item.suggestedPriceCad)} CAD</span>`:'<span class="pill">Alternate scan · no separate price</span>';
-      return `<article class="card" id="${esc(item.sku)}" aria-labelledby="title-${esc(item.sku)}"><div class="visual" style="padding:8px">${img}</div><div class="body"><div class="cat">${esc(item.category)}</div><h2 id="title-${esc(item.sku)}">${esc(item.title)}</h2><p>${esc(item.description)}</p><div class="meta">${esc(sources[item.sourceGroup-1])}<span class="sku">${esc(item.sku)}</span></div><div class="price-row">${price}</div><div class="cardfooter">Physical stock, date, format and condition not yet verified · Not available for checkout</div></div></article>`;
+      const set=setMembership.get(item.sku);
+      const setLink=set?`<a class="bf-item-set-link" href="#set-${esc(set.slug)}">Part of curated set: ${esc(set.title)}</a>`:'';
+      return `<article class="card" id="${esc(item.sku)}" aria-labelledby="title-${esc(item.sku)}"><div class="visual" style="padding:8px">${img}</div><div class="body"><div class="cat">${esc(item.category)}</div><h2 id="title-${esc(item.sku)}">${esc(item.title)}</h2><p>${esc(item.description)}</p><div class="meta">${esc(sources[item.sourceGroup-1])}<span class="sku">${esc(item.sku)}</span></div><div class="price-row">${price}</div>${setLink}<div class="cardfooter">Physical stock, date, format and condition not yet verified · Not available for checkout</div></div></article>`;
     }).join('')||'<p role="status">No matching scans. Try a different category or search term.</p>';
   }
   for(const element of [query,category,group,sort])element.addEventListener(element===query?'input':'change',render);
