@@ -8,6 +8,9 @@ if(!catalog||!Array.isArray(catalog.entries)){cards.textContent='The preview cat
 const sourceNames=new Map(catalog.groups.map(x=>[x.id,x.name]));
 for(const g of catalog.groups){const el=document.createElement('option');el.value=g.id;el.textContent=g.name;group.appendChild(el);}
 const photosReady=window.BURTON_NEW_HOLLYWOOD_IMAGES_READY===true;
+const itemFromLink=new URLSearchParams(location.search).get('item');
+if(itemFromLink&&/^OHN-\d{3}-\d{2}$/.test(itemFromLink))search.value=itemFromLink;
+
 function render(){
  const q=search.value.trim().toLocaleLowerCase('en'),cat=type.value,g=group.value,s=sort.value;
  let list=catalog.entries.filter(x=>(cat==='all'||x.type===cat)&&(g==='all'||x.group===g)&&[x.title,x.description,x.id,sourceNames.get(x.group),x.type].join(' ').toLocaleLowerCase('en').includes(q));
