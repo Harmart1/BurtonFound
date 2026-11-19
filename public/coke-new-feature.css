@@ -1,0 +1,24 @@
+/* Three original Coca-Cola finds and one curated set, owner supplied Nov 2026. */
+.bf-coke-feature{background:var(--bf-surface,#f8f4e9);color:var(--bf-text,#20372e);padding:clamp(38px,6vw,75px) clamp(17px,4vw,48px)}
+.bf-coke-feature-inner{max-width:1200px;margin-inline:auto}
+.bf-coke-feature-head{display:flex;justify-content:space-between;align-items:end;gap:22px;flex-wrap:wrap;margin-bottom:23px}
+.bf-coke-feature-kicker{font:800 .76rem/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--bf-accent,#a85d48);text-transform:uppercase;letter-spacing:.12em;margin:0 0 9px}
+.bf-coke-feature h2{font:normal clamp(2rem,3.2vw,3rem)/1.14 Georgia,serif;margin:0 0 10px;letter-spacing:-.035em}
+.bf-coke-feature-head p:last-child{font:.96rem/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--bf-muted,#506258);margin:0;max-width:68ch}
+.bf-coke-feature-action{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 15px;border:1px solid var(--bf-text,#20372e);border-radius:6px;color:var(--bf-text,#20372e);font:750 .85rem/1.4 system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+.bf-coke-feature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.bf-coke-feature-card{display:flex;flex-direction:column;border:1px solid var(--bf-line,#ccd0c4);border-radius:9px;background:var(--bf-bg,#fff);color:var(--bf-text,#20372e);overflow:hidden;text-decoration:none;min-width:0}
+.bf-coke-feature-card:hover,.bf-coke-feature-card:focus-visible{border-color:var(--bf-accent,#a85d48)}
+.bf-coke-feature-card:focus-visible{outline:3px solid var(--bf-accent,#a85d48);outline-offset:3px}
+.bf-coke-feature-photo{aspect-ratio:4/4.7;background:var(--bf-photo,#eee8d9);padding:11px;display:block;overflow:hidden}
+.bf-coke-feature-photo img{width:100%;height:100%;object-fit:contain}
+.bf-coke-feature-info{padding:17px;display:flex;flex-direction:column;gap:8px;flex:1}
+.bf-coke-feature-tag{font:800 .68rem/1.4 system-ui,sans-serif;color:var(--bf-accent,#a85d48);text-transform:uppercase;letter-spacing:.09em}
+.bf-coke-feature-card h3{font:normal clamp(1.13rem,1.5vw,1.55rem)/1.25 Georgia,serif;margin:0}
+.bf-coke-feature-card p{font:.82rem/1.5 system-ui,sans-serif;color:var(--bf-muted,#506258);margin:0}
+.bf-coke-feature-price{margin-top:auto;border-top:1px solid var(--bf-line,#ccd0c4);padding-top:11px;display:flex;justify-content:space-between;align-items:center;gap:6px;font:750 .87rem/1.3 system-ui,sans-serif;flex-wrap:wrap}
+.bf-coke-feature-price strong{font:700 1.18rem/1.3 Georgia,serif}
+.bf-coke-feature-note{font:.8rem/1.6 system-ui,sans-serif;color:var(--bf-muted,#506258);margin:15px 0 0}
+html[data-theme="dark"] .bf-coke-feature{background:var(--bf-surface,#25372c)}
+@media(max-width:900px){.bf-coke-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.bf-coke-feature-grid{gap:9px}.bf-coke-feature-info{padding:11px;gap:6px}.bf-coke-feature-card h3{font-size:1.05rem}.bf-coke-feature-card p{font-size:.74rem}.bf-coke-feature-photo{aspect-ratio:4/4.6;padding:6px}.bf-coke-feature-action{white-space:normal}.bf-coke-feature-price{font-size:.75rem}}
