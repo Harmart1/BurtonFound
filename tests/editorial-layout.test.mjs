@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
-test('Three visually equal collection spotlights appear on the homepage without unverified sales',()=>{
+test('Four visual collection choices appear on the homepage without misrepresenting archive items as stock',()=>{
  const html=read('public/index.html');
- for(const cls of ['spotlight-coke','spotlight-hollywood','spotlight-cars'])assert.match(html,new RegExp('class="spotlight '+cls+'"'));
- assert.equal((html.match(/class="spotlight spotlight-/g)||[]).length,3);
+ for(const cls of ['spotlight-coke','spotlight-hollywood','spotlight-sets','spotlight-cars'])assert.match(html,new RegExp('class="spotlight '+cls+'"'));
+ assert.equal((html.match(/class="spotlight spotlight-/g)||[]).length,4);
  assert.match(html,/href="vintage-cars\.html"/);
- assert.match(html,/80 DISTINCT AD DESIGNS/);
+ assert.match(html,/AUTOMOTIVE ARCHIVE/);
+ assert.match(html,/Archive viewing only/);
+ assert.match(html,/data-shop-hollywood-sets/);
  assert.doesNotMatch(html,/class="vintage-cars-promo"/);
  assert.match(html,/editorial-refresh\.css/);
  assert.match(html,/noindex, nofollow/);
