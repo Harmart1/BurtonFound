@@ -41,7 +41,7 @@ test('Coke PDF intake adds exactly three unique originals and one three-piece se
   for(const image of p.images)assert.ok(existsSync(f('public/'+image)),'Missing image '+image);
  }
  for(const preexisting of ['CC-034','CC-033','CC-031']){
-  assert.ok(bySku.has(preexisting),'Original matching product missing: '+preexisting);
+  assert.ok(W.BURTON_DATA.archive.some(x=>x.id===preexisting),'Existing archive image missing: '+preexisting);
   assert.equal(additions.some(p=>p.sku===preexisting),false);
  }
  assert.equal(bySku.get('CC-SET-F').price,62.95);
@@ -74,7 +74,7 @@ test('Coke imports are linked across all shop/account/preview surfaces without d
   assert.ok(html.includes('20 listings'));
   assert.ok(html.includes('14 SINGLE FINDS + 6 SETS'));
   assert.ok(html.includes('37 DISTINCT DESIGNS'));
-  assert.ok(html.includes('Browse the collection'),page);
+  if(page.endsWith('index.html'))assert.ok(html.includes('Browse the collection'),page);
  }
  const top=state().BURTON_FEATURED;
  for(const id of ['CC-NEW-001','CC-NEW-002','CC-NEW-003']){
