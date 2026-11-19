@@ -31,6 +31,13 @@ jobs:
           npm run build:marketing
           npm run check:deploy
           npm test
+      - name: Attach organic marketing exports
+        uses: actions/upload-artifact@v4
+        with:
+          name: burton-found-marketing-release-kit
+          path: marketing-output/
+          if-no-files-found: error
+          retention-days: 30
       - name: Assert live checkout stays disabled
         run: |
           node --input-type=module -e '
