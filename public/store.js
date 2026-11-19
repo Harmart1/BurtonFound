@@ -86,7 +86,7 @@
   }
   const dateText=p=>p.collection==='hollywood'?(p.dateLabel||'Printing date unverified'):String(p.year||'Date unverified');
   const itemHasDecade=(p,d)=>d==='all'||(!p.cmsOnly&&(p.type==='bundle'?(p.catalogIds||[]).some(id=>Math.floor(Number(byArchive.get(id)?.year||0)/10)*10===Number(d)):Math.floor(Number(p.year||0)/10)*10===Number(d)));
-  function setPreview(){const el=$('setupNotice');const testing=checkoutMode==='test_mode';el.hidden=(!C.showPreviewNotice&&checkoutMode!=='test_mode')||(checkoutReady&&!testing);el.textContent=testing?'STRIPE TEST MODE · Demonstration checkout only · No real money is charged. Use Stripe test card details, never a real card.':'Online card payments are not yet enabled. Add listed items to your bag to prepare a purchase enquiry.';}
+  function setPreview(){const el=$('setupNotice');const testing=checkoutMode==='test_mode';el.hidden=(!C.showPreviewNotice&&checkoutMode!=='test_mode')||(checkoutReady&&!testing);el.textContent=testing?'STRIPE TEST MODE · Demonstration checkout only · No real money is charged. Use Stripe test card details, never a real card.':'Card checkout is currently unavailable · Save items to your bag or request a purchase enquiry.';}
   function renderProducts(){
     let list=items.filter(p=>(currentFilter==='all'||p.type===currentFilter)&&(currentCollection==='all'||p.collection===currentCollection)&&itemHasDecade(p,currentDecade)&&(!search||[p.title,p.year,p.sku,p.shortDescription,p.theme,(p.catalogIds||[]).join(' ')].join(' ').toLowerCase().includes(search)));
     if(currentSort==='featured'){
