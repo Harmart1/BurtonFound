@@ -104,6 +104,11 @@ function filterData(){
     if(period==='undated'&&x.year!==null)return false;
     return true;
   });
+  if(sort.value==='catalogue'&&!activeSet){
+    const priority=window.BURTON_FEATURED?.vintageCars||[];
+    const rank=new Map(priority.map((sku,i)=>[sku,i]));
+    list.sort((a,b)=>(rank.get(a.sku)??999)-(rank.get(b.sku)??999));
+  }
   if(sort.value==='make')list.sort((a,b)=>a.brand.localeCompare(b.brand)||a.sku.localeCompare(b.sku));
   else if(sort.value==='oldest')list.sort((a,b)=>(a.year??9999)-(b.year??9999)||a.sku.localeCompare(b.sku));
   else if(sort.value==='newest')list.sort((a,b)=>(b.year??0)-(a.year??0)||a.sku.localeCompare(b.sku));
