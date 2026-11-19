@@ -90,7 +90,6 @@
   content:"✓";
   font-weight:900;
   color:var(--bf-accent);
-  aria-hidden:true
 }
 .collection-lead .editorial-collection-title{
   margin:0 0 13px!important;
