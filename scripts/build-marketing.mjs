@@ -132,7 +132,7 @@ for(const g of guides){
  urls.push(g.path);
 }
 // Public read-only JSON Feed for future authorized Pinterest/social syndication.
-const feedItems=available.map(p=>({
+const feedItems=items.filter(p=>p.stockState!=='unavailable'&&p.status!=='unavailable').map(p=>({
  id:abs(urlOf(p)),url:abs(urlOf(p)),title:p.title,
  summary:short(p.shortDescription,320),image:abs(p.image),
  tags:[p.collection,p.type],_burton:{sku:p.sku,asking_price_cad:p.price}
