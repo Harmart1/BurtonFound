@@ -11,7 +11,9 @@
 .bf-coke-feature-card:hover,.bf-coke-feature-card:focus-visible{border-color:var(--bf-accent,#a85d48)}
 .bf-coke-feature-card:focus-visible{outline:3px solid var(--bf-accent,#a85d48);outline-offset:3px}
 .bf-coke-feature-photo{aspect-ratio:4/4.7;background:var(--bf-photo,#eee8d9);padding:11px;display:block;overflow:hidden}
- .bf-coke-set-mosaic{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;align-items:center}\n.bf-coke-set-mosaic img{min-width:0}\n.bf-coke-feature-photo img{width:100%;height:100%;object-fit:contain}
+ .bf-coke-set-mosaic{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;align-items:center}
+.bf-coke-set-mosaic img{min-width:0}
+.bf-coke-feature-photo img{width:100%;height:100%;object-fit:contain}
 .bf-coke-feature-info{padding:17px;display:flex;flex-direction:column;gap:8px;flex:1}
 .bf-coke-feature-tag{font:800 .68rem/1.4 system-ui,sans-serif;color:var(--bf-accent,#a85d48);text-transform:uppercase;letter-spacing:.09em}
 .bf-coke-feature-card h3{font:normal clamp(1.13rem,1.5vw,1.55rem)/1.25 Georgia,serif;margin:0}
