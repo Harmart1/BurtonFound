@@ -156,7 +156,7 @@ jobs:
           done
           curl --fail --silent --show-error --max-time 15 "$base/api/public-account-config" | python3 -c 'import json,sys; data=json.load(sys.stdin); assert isinstance(data.get("configured"),bool); print("Public account endpoint responsive")'
 
-      - name: Verify updated preview and capture desktop/mobile screenshots
+      - name: Verify visitor homepage and capture desktop/mobile screenshots
         if: success()
         shell: bash
         run: |
@@ -165,6 +165,8 @@ jobs:
           # Use the same curl path that already passed the live API smoke test.
           # Python urllib receives a Cloudflare bot-policy 403 for public static assets.
           curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview.html" -o /tmp/bf-preview.html
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/" -o /tmp/bf-homepage.html
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/homepage-collections.css" -o /tmp/bf-homepage.css
           curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview-launch.js" -o /tmp/bf-preview.js
           curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview-launch.css" -o /tmp/bf-preview.css
           curl --fail --silent --show-error --max-time 20 --retry 2 "$base/old-hollywood-new.html" -o /tmp/bf-hollywood.html
@@ -175,6 +177,8 @@ jobs:
           from pathlib import Path
           checks=[
             ('/tmp/bf-preview.html',b'prFeaturedGrid'),
+            ('/tmp/bf-homepage.html',b'Browse the collection'),
+            ('/tmp/bf-homepage.css',b'spotlight-grid'),
             ('/tmp/bf-preview.js',b'OH-NEW-003-01'),
             ('/tmp/bf-preview.css',b'pr-products'),
             ('/tmp/bf-hollywood.html',b'Old Hollywood')
@@ -197,15 +201,15 @@ jobs:
           mkdir -p /tmp/burtonfound-preview
           for spec in '1440 900 desktop' '390 844 mobile'; do
             read -r w h name <<< "$spec"
-            "$browser" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars --virtual-time-budget=4500 --window-size="$w,$h" --screenshot="/tmp/burtonfound-preview/$name.png" "$base/preview.html" >/dev/null 2>&1
+            "$browser" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars --virtual-time-budget=4500 --window-size="$w,$h" --screenshot="/tmp/burtonfound-preview/$name.png" "$base/" >/dev/null 2>&1
             test -s "/tmp/burtonfound-preview/$name.png"
             echo "PASS rendered preview: $name ($w x $h)"
           done
-      - name: Attach desktop and mobile preview screenshots
+      - name: Attach desktop and mobile homepage screenshots
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: burtonfound-updated-preview
+          name: burtonfound-homepage-2026-11-19
           path: /tmp/burtonfound-preview/*.png
           if-no-files-found: ignore
           retention-days: 14
