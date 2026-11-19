@@ -21,3 +21,6 @@ Burton_And_Found_*_Preview.html
 
 # Generated editorial exports (never deploy as public static assets)
 marketing-output/
+
+# Ephemeral read-only inventory snapshot for weekly marketing drafts
+marketing-stock-snapshot.json
