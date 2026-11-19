@@ -18,3 +18,6 @@ __pycache__/
 *.pyc
 Burton_And_Found_Review_Preview.html
 Burton_And_Found_*_Preview.html
+
+# Generated editorial exports (never deploy as public static assets)
+marketing-output/
