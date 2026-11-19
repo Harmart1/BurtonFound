@@ -6,10 +6,10 @@ const box=document.getElementById('prFeaturedGrid'),tabs=[...document.querySelec
 if(!box||!tabs.length||!status)return;
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n);
-const featureSku={
-  'hollywood':['OH-NEW-003-01','OH-NEW-004-01','OH-NEW-007-01','OH-NEW-009-01'],
-  'sets':['OHS-001','OHS-003','OHS-007','OHS-008'],
-  'coca-cola':['CC-010','CC-023','CC-034','CC-006']
+const featureSku=window.BURTON_FEATURED?.preview||{
+  hollywood:['OH-003','OH-NEW-004-10','OH-NEW-002-05','OH-NEW-007-01'],
+  sets:['OHS-003','OHS-011','OHS-001','OHS-007'],
+  'coca-cola':['CC-010','CC-023','CC-034','CC-027']
 };
 const bySku=new Map(items.map(p=>[p.sku,p]));
 const card=p=>{
