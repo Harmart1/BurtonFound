@@ -27,7 +27,7 @@ window.BURTON_FEATURED=Object.freeze({
       'OH-NEW-004-09','OH-NEW-003-02','OH-NEW-006-04','OHS-003',
       'OH-NEW-008-04','OH-NEW-001-02','OH-001','OHS-011',
       'OH-NEW-008-10','OH-NEW-004-01','OHS-001','OHS-007',
-      'OH-NEW-001-09','OH-NEW-003-05','OH-NEW-006-08','OH-NEW-007-06',
+      'OH-NEW-001-09','OH-NEW-003-04','OH-NEW-006-08','OH-NEW-007-06',
       'OH-NEW-001-05','OH-NEW-003-01','OHS-005','OHS-002','OH-004'
     ],
     'hollywood:original':[
@@ -56,6 +56,19 @@ window.BURTON_FEATURED=Object.freeze({
     hollywood:['OH-003','OH-NEW-004-10','OH-NEW-002-05','OH-NEW-007-01'],
     sets:['OHS-003','OHS-011','OHS-001','OHS-007'],
     'coca-cola':['CC-010','CC-023','CC-034','CC-027']
+  },
+  setCovers:{
+    'OHS-001':'OH-NEW-002-05',
+    'OHS-002':'OH-NEW-001-05',
+    'OHS-003':'OH-NEW-004-10',
+    'OHS-004':'OH-NEW-006-08',
+    'OHS-005':'OH-NEW-001-02',
+    'OHS-006':'OH-NEW-006-09',
+    'OHS-007':'OH-NEW-007-01',
+    'OHS-008':'OH-NEW-009-01',
+    'OHS-009':'OH-NEW-005-06',
+    'OHS-010':'OH-NEW-008-04',
+    'OHS-011':'OH-NEW-004-09'
   },
   vintageCars:['VA-049','VA-022','VA-016','VA-002','VA-074','VA-001','VA-093','VA-035','VA-080','VA-060']
 });
