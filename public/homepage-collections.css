@@ -1,0 +1,319 @@
+/* Burton & Found — visitor-first storefront homepage | 2026-11-19
+   Compact introduction, complete category visibility, photo-led cards,
+   touch-friendly controls. Loaded last so legacy page components remain intact.
+ */
+.market-hero.collection-lead{
+  display:block!important;
+  max-width:1480px;
+  margin-inline:auto;
+  padding:clamp(24px,3.5vw,48px) clamp(18px,4.5vw,65px) clamp(28px,4vw,54px)!important;
+  background:var(--bf-bg)!important;
+  overflow:visible;
+}
+.collection-lead .lead-intro{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr)!important;
+  align-items:end;
+  gap:clamp(15px,3vw,46px);
+  margin-bottom:17px!important;
+}
+.collection-lead .lead-kicker{
+  max-width:42ch;
+  color:var(--bf-accent)!important;
+  font-size:.76rem!important;
+  font-weight:800!important;
+  letter-spacing:.09em!important;
+  line-height:1.5;
+}
+.collection-lead .lead-intro h1{
+  font:normal clamp(2.85rem,5.4vw,5.45rem)/1.04 Georgia,serif!important;
+  color:var(--bf-text)!important;
+  letter-spacing:-.047em!important;
+  max-width:12ch;
+  margin:8px 0 0!important;
+  text-wrap:balance;
+}
+.collection-lead .lead-intro h1 em{color:var(--bf-accent)!important}
+.collection-lead .lead-intro>p{
+  max-width:52ch;
+  font:400 clamp(.98rem,1.25vw,1.13rem)/1.57 system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  color:var(--bf-muted)!important;
+  margin:0!important
+}
+.collection-lead .editorial-intro-actions{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px 21px;
+  margin:0 0 13px!important
+}
+.collection-lead .editorial-cta{
+  display:inline-flex;
+  width:auto;
+  min-height:49px;
+  padding:12px 22px;
+  gap:25px;
+  border-radius:6px;
+  background:var(--bf-strong)!important;
+  color:var(--bf-strong-text)!important;
+  border:1px solid var(--bf-strong)!important;
+  font-size:.94rem;
+  font-weight:800;
+  text-decoration:none
+}
+.collection-lead .editorial-cta:hover{
+  filter:brightness(1.09);
+}
+.collection-lead .editorial-secondary{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  color:var(--bf-accent)!important;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  font-size:.9rem;
+  font-weight:750
+}
+.home-assurances{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 18px;
+  padding:0 0 23px;
+  border-bottom:1px solid var(--bf-line);
+  margin-bottom:21px;
+  color:var(--bf-muted);
+  font:.78rem/1.5 system-ui,-apple-system,"Segoe UI",sans-serif
+}
+.home-assurances span{display:inline-flex;align-items:center;gap:7px}
+.home-assurances span:before{
+  content:"✓";
+  font-weight:900;
+  color:var(--bf-accent);
+  aria-hidden:true
+}
+.collection-lead .editorial-collection-title{
+  margin:0 0 13px!important;
+  color:var(--bf-text);
+  font-size:.8rem!important;
+  font-weight:800;
+  letter-spacing:.07em
+}
+.collection-lead .editorial-collection-title span:last-child{
+  color:var(--bf-muted);
+  font-size:.8rem;
+  font-weight:550;
+  letter-spacing:normal
+}
+.collection-lead .spotlight-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  align-items:stretch;
+  gap:clamp(10px,1.25vw,18px)!important
+}
+.collection-lead .spotlight,
+.collection-lead .spotlight:last-child{
+  display:flex!important;
+  flex-direction:column;
+  min-width:0;
+  grid-column:auto!important;
+  grid-template-columns:none!important;
+  grid-template-rows:none!important;
+  overflow:hidden;
+  border:1px solid var(--bf-line)!important;
+  background:var(--bf-surface)!important;
+  color:var(--bf-text)!important;
+  border-radius:9px!important;
+  text-decoration:none;
+  box-shadow:none!important;
+  transition:border-color .16s,transform .16s
+}
+.collection-lead .spotlight:hover{
+  border-color:var(--bf-accent)!important;
+  transform:translateY(-2px)
+}
+.collection-lead .spotlight:focus-visible{
+  outline:3px solid var(--bf-accent);
+  outline-offset:3px
+}
+.collection-lead .spotlight-photo,
+.collection-lead .spotlight:last-child .spotlight-photo{
+  display:flex!important;
+  flex:none!important;
+  width:100%!important;
+  height:auto!important;
+  aspect-ratio:1.35;
+  min-height:0!important;
+  border:0!important;
+  border-bottom:1px solid var(--bf-line)!important;
+  padding:clamp(8px,1.15vw,16px)!important;
+  background:var(--bf-photo)!important;
+  align-items:center;
+  justify-content:center
+}
+.collection-lead .spotlight-photo img{
+  display:block;
+  width:100%;
+  height:100%!important;
+  object-fit:contain;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  box-shadow:none!important
+}
+.collection-lead .spotlight-info,
+.collection-lead .spotlight:last-child .spotlight-info{
+  display:flex!important;
+  flex:1;
+  flex-direction:column;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+  gap:7px!important;
+  min-height:0!important;
+  padding:clamp(13px,1.4vw,21px)!important;
+  background:var(--bf-surface)!important;
+  color:var(--bf-text)!important
+}
+.collection-lead .spotlight-count{
+  font:.7rem/1.25 system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  font-weight:800!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase;
+  color:var(--bf-accent)!important
+}
+.collection-lead .spotlight h2{
+  font:normal clamp(1.25rem,1.7vw,1.7rem)/1.15 Georgia,serif!important;
+  letter-spacing:-.025em;
+  color:var(--bf-text)!important;
+  margin:0!important
+}
+.collection-lead .spotlight-info p{
+  font:.86rem/1.47 system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  color:var(--bf-muted)!important;
+  margin:0
+}
+.collection-lead .spotlight-action{
+  display:inline-flex!important;
+  align-items:center;
+  font-size:.83rem!important;
+  font-weight:800!important;
+  line-height:1.4;
+  min-height:42px;
+  margin-top:auto!important;
+  padding:8px 0 0!important;
+  color:var(--bf-accent)!important
+}
+.home-upcoming{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px 17px;
+  margin-top:17px;
+  padding-top:12px;
+  color:var(--bf-muted);
+  border-top:1px solid var(--bf-line);
+  font:.83rem/1.5 system-ui,-apple-system,"Segoe UI",sans-serif
+}
+.home-upcoming .home-upcoming-label{
+  font-weight:800;
+  color:var(--bf-text)
+}
+.home-upcoming a{
+  color:var(--bf-accent)!important;
+  font-weight:700;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  min-height:36px;
+  display:inline-flex;
+  align-items:center
+}
+.home-upcoming a:focus-visible{outline:3px solid var(--bf-accent);outline-offset:2px}
+.setup-note{
+  line-height:1.45!important;
+  font-size:.77rem!important;
+  font-weight:650!important;
+  padding:7px 15px!important;
+  min-height:0;
+}
+html[data-theme="dark"] .market-hero.collection-lead{background:var(--bf-bg)!important}
+html[data-theme="dark"] .collection-lead .spotlight,
+html[data-theme="dark"] .collection-lead .spotlight-info{background:var(--bf-surface)!important}
+html[data-theme="dark"] .home-assurances{color:var(--bf-muted)}
+@media(max-width:1050px){
+  .collection-lead .spotlight-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .collection-lead .spotlight-photo{aspect-ratio:1.7}
+}
+@media(max-width:720px){
+  .market-hero.collection-lead{padding:25px 18px 32px!important}
+  .collection-lead .lead-intro{grid-template-columns:1fr!important;gap:11px!important;margin-bottom:13px!important}
+  .collection-lead .lead-intro h1{font-size:clamp(2.65rem,8.4vw,3.75rem)!important;max-width:12ch}
+  .collection-lead .lead-intro>p{font-size:.98rem!important;line-height:1.5!important;max-width:55ch}
+  .collection-lead .editorial-intro-actions{margin-bottom:10px!important}
+  .home-assurances{padding-bottom:14px;margin-bottom:17px;gap:5px 15px}
+}
+@media(max-width:590px){
+  .market-hero.collection-lead{padding:21px 16px 26px!important}
+  .collection-lead .lead-kicker{font-size:.69rem!important;letter-spacing:.075em!important}
+  .collection-lead .lead-intro h1{font-size:clamp(2.46rem,10.5vw,3.25rem)!important;line-height:1.03!important;margin:5px 0 0!important}
+  .collection-lead .lead-intro>p{font-size:.93rem!important;line-height:1.5!important}
+  .collection-lead .editorial-intro-actions{gap:6px!important}
+  .collection-lead .editorial-cta{width:100%;justify-content:space-between;padding:12px 16px;min-height:47px}
+  .collection-lead .editorial-secondary{min-height:38px;font-size:.86rem}
+  .home-assurances{font-size:.7rem;gap:5px 12px;margin-bottom:14px;padding-bottom:13px}
+  .collection-lead .editorial-collection-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:10px!important}
+  .collection-lead .editorial-collection-title span:last-child{font-size:.74rem}
+  .collection-lead .spotlight-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  .collection-lead .spotlight,
+  .collection-lead .spotlight:last-child{
+    grid-column:auto!important;
+    display:flex!important;
+    flex-direction:column;
+    grid-template-columns:none!important;
+    grid-template-rows:none!important;
+    min-height:0!important;
+    border-radius:7px!important
+  }
+  .collection-lead .spotlight-photo,
+  .collection-lead .spotlight:last-child .spotlight-photo{
+    aspect-ratio:1.17;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:7px!important;
+    border:0!important;
+    border-bottom:1px solid var(--bf-line)!important;
+  }
+  .collection-lead .spotlight-info,
+  .collection-lead .spotlight:last-child .spotlight-info{
+    min-height:0!important;
+    padding:11px 10px 12px!important;
+    gap:4px!important
+  }
+  .collection-lead .spotlight-count{font-size:.61rem!important;line-height:1.25;letter-spacing:.045em!important}
+  .collection-lead .spotlight h2{font-size:clamp(1.01rem,4.25vw,1.3rem)!important;line-height:1.15!important;letter-spacing:-.026em}
+  .collection-lead .spotlight-info p{
+    font-size:.73rem!important;
+    line-height:1.35!important;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden
+  }
+  .collection-lead .spotlight-action{
+    font-size:.74rem!important;
+    min-height:36px;
+    padding-top:7px!important;
+    margin-top:auto!important
+  }
+  .home-upcoming{margin-top:13px;padding-top:10px;font-size:.75rem;gap:5px 13px}
+  .home-upcoming a{min-height:35px}
+}
+@media(max-width:355px){
+ .market-hero.collection-lead{padding-left:12px!important;padding-right:12px!important}
+ .collection-lead .spotlight-info,.collection-lead .spotlight:last-child .spotlight-info{padding:10px 8px!important}
+ .collection-lead .spotlight h2{font-size:.99rem!important}
+ .collection-lead .spotlight-info p{font-size:.71rem!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .collection-lead .spotlight{transition:none!important}
+  .collection-lead .spotlight:hover{transform:none!important}
+}
