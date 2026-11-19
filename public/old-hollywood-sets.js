@@ -12,6 +12,9 @@
   function render(){
     const selected=selector.value;
     const list=catalog.sets.filter(s=>selected==="all"||s.category===selected);
+    const priorities=window.BURTON_FEATURED?.orders?.['hollywood:bundle']||[];
+    const order=new Map(priorities.map((sku,index)=>[sku,index]));
+    list.sort((a,b)=>(order.get(a.id)??999)-(order.get(b.id)??999));
     count.textContent=list.length+" curated set"+(list.length===1?"":"s");
     grid.innerHTML=list.map(set=>{
       const members=set.memberSkus.map(sku=>bySku.get(sku)).filter(Boolean);
