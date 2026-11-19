@@ -55,7 +55,7 @@ test('interactive preview reads the same 108 real products, switches all three g
  assert.equal(all.length,108);
  const raw=all.filter(x=>x.collection==='hollywood');
  assert.equal(raw.length,88);
- assert.equal(all.filter(x=>x.collection==='coca-cola').length,16);
+ assert.equal(all.filter(x=>x.collection==='coca-cola').length,20);
  assert.equal((grid.innerHTML.match(/class="pr-product"/g)||[]).length,4);
  assert.ok(grid.innerHTML.includes('OH-003'));
  assert.ok(grid.innerHTML.includes('$39.95'));
