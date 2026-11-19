@@ -37,7 +37,7 @@ These are **suggested seller asking prices**, not completed-sales valuations. Pr
 - [1958 Brussels World’s Fair Coca-Cola ad (TIAS)](https://www.tias.com/item/1958-coca-cola-coke-at-the-brussels-worlds-fair-Vpft25aN1eDd) — description cites printed advertisement with dirt, stains and a crease
 - [1958 Brussels World’s Fair print (FlashbacksUSA)](https://www.flashbacksusa.com/product-page/1958-coca-cola-original-magazine-ad-brussels-belgium-world-s-fair-featured)
 - [1958 Brussels World’s Fair ad (Poshmark)](https://poshmark.com/listing/1958-Coke-Coca-Cola-Soda-Orig-Magazine-Ad-Brussels-Worlds-Fair-National-Geograp-6644df63528015132de6c5fd) — US$9 asking price at research date
-- [1959 Valentine's heart and lace design marketplace references](https://www.etsy.com/listing/1170268384/1964-coke-vintage-print-ad-thats-using)
+- [1959 Valentine's heart-and-lace Coca-Cola ad (Etsy)](https://www.etsy.com/listing/1170692018/1959-coke-vintage-print-ad-valentines)
 - [1961 "Float with Coke" advertisement (Etsy)](https://www.etsy.com/listing/1176394013/1961-coca-cola-ice-cream-float-vintage)
 - [1962 ice cream Coca-Cola float page (MaxSold)](https://maxsold.com/listing/4733378/1962-coca-cola-advertisement-magazine-page?hideclosed=0&item=null&keyword=&limit=72&sort=bid_count&view=grid) — a visually similar design; date must not be automatically applied to this physical item
 - [Vintage Coca-Cola magazine advertising marketplace overview (Etsy)](https://www.etsy.com/market/vintage_coca_cola_magazine_advertisements)
