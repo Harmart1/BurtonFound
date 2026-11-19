@@ -20,6 +20,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Check the public shop for sold or reserved items
+        shell: bash
+        run: |
+          if ! curl --fail --location --silent --show-error --retry 2 --max-time 25 \
+            "https://burtonfound.timharmar.workers.dev/api/catalog" \
+            --output marketing-stock-snapshot.json; then
+            rm -f marketing-stock-snapshot.json
+            echo "Stock service unavailable — marketing drafts will use catalogue data and require review."
+          fi
       - name: Generate marketing outputs
         run: npm run build:marketing
       - name: Verify link and content generation
