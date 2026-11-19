@@ -20,6 +20,20 @@ for(const file of ['products.js','old-hollywood-item-data.js','old-hollywood-set
 const stock=context.window.BURTON_DATA.inventory;
 if(stock.length!==131||new Set(stock.map(p=>p.sku)).size!==131)throw Error('Unexpected inventory; do not produce stale marketing links');
 const items=[...stock].filter(p=>!p.cmsOnly&&p.price>0);
+// Optionally use a fresh public stock snapshot in the weekly export.
+// No private credential is involved; the public stock endpoint contains SKU availability only.
+let liveStock=null;
+const snapshot=join(root,'marketing-stock-snapshot.json');
+if(existsSync(snapshot)){
+ try{
+  const raw=JSON.parse(readFileSync(snapshot,'utf8'));
+  if(raw?.configured===true&&Array.isArray(raw.items)&&raw.items.length){
+   liveStock=new Map(raw.items.filter(x=>typeof x.sku==='string'&&typeof x.available==='boolean').map(x=>[x.sku,x.available]));
+   if(liveStock.size<items.length*.8){console.warn('Incomplete stock snapshot; checking all draft links manually is recommended.');liveStock=null}
+  }
+ }catch{console.warn('Could not read public stock snapshot; generating drafts from catalogue state only.')}
+}
+const marketable=p=>p.stockState!=='unavailable'&&p.status!=='unavailable'&&(liveStock===null||liveStock.get(p.sku)===true);
 const clean=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 const text=s=>String(s??'').replace(/\s+/g,' ').trim();
 const short=(s,n)=>{const v=text(s);return v.length>n?v.slice(0,n-1).replace(/\s+\S*$/,'')+'…':v};
@@ -133,7 +147,7 @@ for(const g of guides){
  urls.push(g.path);
 }
 // Public read-only JSON Feed for future authorized Pinterest/social syndication.
-const feedItems=items.filter(p=>p.stockState!=='unavailable'&&p.status!=='unavailable').map(p=>({
+const feedItems=items.filter(marketable).map(p=>({
  id:abs(urlOf(p)),url:abs(urlOf(p)),title:p.title,
  summary:short(p.shortDescription,320),image:abs(p.image),
  tags:[p.collection,p.type],_burton:{sku:p.sku,asking_price_cad:p.price}
@@ -164,7 +178,7 @@ const rows=items.map(p=>[p.sku,p.title,p.collection,p.type,dollar(p.price),abs(u
 writeFileSync(join(out,'pinterest-and-social-catalog.csv'),['sku,title,collection,type,asking_cad,product_url,image_url,pin_description,image_alt',...rows].join('\n')+'\n');
 // Deterministic weekly rotation across real Coca-Cola singles, Old Hollywood pieces and sets.
 const weekNumber=Math.floor(Date.now()/(7*86400*1000));
-const available=items.filter(p=>p.stockState!=='unavailable'&&p.status!=='unavailable');
+const available=items.filter(marketable);
 const buckets={
  coke:available.filter(p=>p.collection==='coca-cola'&&p.type==='original'),
  hollywood:available.filter(p=>p.collection==='hollywood'&&p.type==='original'),
@@ -197,7 +211,7 @@ writeFileSync(join(out,'collector-newsletter-draft.md'),
  '# Subject: Three paper finds worth a closer look\n\nHello collectors,\n\nThis edition of Burton & Found highlights three vintage-paper finds:\n\n'+picks.slice(0,3).map(p=>'- '+p.title+' — '+dollar(p.price)+' CAD\n  '+abs(urlOf(p))).join('\n')+
  '\n\nA paper-collecting tip: always ask about the back of a vintage ad, the dimensions and any trimming before deciding to buy.\n\nBrowse the collection: '+base+'/collections/coca-cola.html?utm_source=newsletter&utm_medium=email&utm_campaign=collector_weekly\n\nThis is a DRAFT, not a sent email. Send only to subscribers with valid consent and include merchant identification and a working unsubscribe mechanism.\n');
 writeFileSync(join(out,'marketing-readiness.json'),JSON.stringify({
- timestamp:new Date().toISOString(),base,productPages:items.length,collectionPages:collection.length,guidePages:guides.length,indexable,weeklyRotation:weekNumber,weeklyDraftItems:picks.map(p=>p.sku),jsonFeedItems:feedItems.length,
+ timestamp:new Date().toISOString(),base,productPages:items.length,collectionPages:collection.length,guidePages:guides.length,indexable,weeklyRotation:weekNumber,weeklyDraftItems:picks.map(p=>p.sku),jsonFeedItems:feedItems.length,liveStockSnapshotUsed:liveStock!==null,
  checkoutApproved,merchantFeedCreated:false,productLinksCreated:true,socialPostsPublished:false,newsletterSent:false,
  nextSteps:['Approve search indexing after seller content review','Connect Google Search Console and submit sitemap','Connect Pinterest business account to import CSV or create Pins','Confirm live checkout and shipping before Merchant Center','Connect a consent-managed email platform before collecting newsletter subscribers']
 },null,2));
