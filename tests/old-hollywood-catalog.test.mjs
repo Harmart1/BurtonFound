@@ -132,7 +132,7 @@ test('Standard shop cards, watchlists, carts and detail galleries support all li
      previous=at;
    }
    if(!p.endsWith('account.html')){
-     assert.ok(h.includes('104 product listings'),p);
+     assert.ok(h.includes('108 product listings'),p);
      assert.ok(h.includes('old-hollywood-product-native.css'),p);
      assert.ok(h.includes('id="productGrid"'),p);
    }
