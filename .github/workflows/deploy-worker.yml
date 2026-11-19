@@ -28,6 +28,7 @@ jobs:
           node-version: '22'
       - name: Verify deployment and safety tests
         run: |
+          npm run build:marketing
           npm run check:deploy
           npm test
       - name: Assert live checkout stays disabled
