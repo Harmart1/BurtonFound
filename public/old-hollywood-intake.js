@@ -21,6 +21,12 @@
       if(g!=='all'&&String(x.sourceGroup)!==g)return false;
       return !term||[x.title,x.description,x.category,x.sku,sources[x.sourceGroup-1]].join(' ').toLocaleLowerCase('en-CA').includes(term);
     });
+    if(order==='featured'){
+      const best=window.BURTON_FEATURED?.orders?.['hollywood:original']||[];
+      const rank=new Map(best.map((sku,index)=>[sku,index]));
+      data.sort((a,b)=>Number(!isPrice(a))-Number(!isPrice(b))||
+        (rank.get(a.sku)??999)-(rank.get(b.sku)??999));
+    }
     if(order==='price-asc')data.sort((a,b)=>(a.suggestedPriceCad??Infinity)-(b.suggestedPriceCad??Infinity));
     else if(order==='price-desc')data.sort((a,b)=>(b.suggestedPriceCad??-1)-(a.suggestedPriceCad??-1));
     else if(order==='title')data.sort((a,b)=>a.title.localeCompare(b.title,'en-CA'));
