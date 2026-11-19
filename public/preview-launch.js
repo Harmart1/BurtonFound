@@ -29,5 +29,5 @@ function render(collection){
   status.textContent=chosen.length+' photographed product selections from '+(names[collection]||names.hollywood)+'. Prices in Canadian dollars. Each card opens its full listing in the shop.';
 }
 tabs.forEach(tab=>tab.addEventListener('click',()=>render(tab.dataset.prCollection)));
-render('hollywood');
+render('coca-cola');
 })();
