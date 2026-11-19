@@ -7,18 +7,18 @@
 window.BURTON_FEATURED=Object.freeze({
   orders:{
     'all:all':[
-      'CC-010','OH-003','CC-023','OH-NEW-004-10','OH-NEW-007-01','CC-034',
+      'CC-010','CC-NEW-001','OH-003','CC-023','OH-NEW-004-10','OH-NEW-007-01','CC-034',
       'OH-NEW-002-05','CC-027','OHS-003','SET-E','OH-NEW-008-04',
       'CC-020','OHS-011','OH-001','CC-008','OHS-007','SET-A',
       'OH-NEW-004-09','CC-006','OHS-001','OH-NEW-006-04','SET-B'
     ],
     'all:original':[
-      'CC-010','OH-003','CC-023','OH-NEW-004-10','OH-NEW-007-01',
+      'CC-010','CC-NEW-001','OH-003','CC-023','OH-NEW-004-10','OH-NEW-007-01',
       'CC-034','OH-NEW-002-05','CC-027','OH-NEW-004-09','CC-020',
       'OH-NEW-008-04','CC-008','OH-001','OH-NEW-003-02','CC-006'
     ],
     'all:bundle':[
-      'OHS-003','SET-E','OHS-011','SET-A','OHS-001','OHS-007',
+      'OHS-003','SET-E','CC-SET-F','OHS-011','SET-A','OHS-001','OHS-007',
       'SET-B','OHS-005','OHS-002','SET-D','OHS-008','SET-C',
       'OHS-004','OHS-006','OHS-009','OHS-010'
     ],
@@ -42,20 +42,20 @@ window.BURTON_FEATURED=Object.freeze({
       'OHS-002','OHS-008','OHS-004','OHS-006','OHS-010','OHS-009'
     ],
     'coca-cola:all':[
-      'CC-010','CC-023','CC-034','CC-027','CC-020','SET-E',
+      'CC-010','CC-NEW-001','CC-NEW-002','CC-NEW-003','CC-023','CC-034','CC-027','CC-020','SET-E',
       'CC-008','CC-006','SET-A','CC-018','CC-011',
       'SET-B','CC-005','CC-001','SET-D','SET-C'
     ],
     'coca-cola:original':[
-      'CC-010','CC-023','CC-034','CC-027','CC-020',
+      'CC-010','CC-NEW-001','CC-NEW-002','CC-NEW-003','CC-023','CC-034','CC-027','CC-020',
       'CC-008','CC-006','CC-018','CC-011','CC-005','CC-001'
     ],
-    'coca-cola:bundle':['SET-E','SET-A','SET-B','SET-D','SET-C']
+    'coca-cola:bundle':['CC-SET-F','SET-E','SET-A','SET-B','SET-D','SET-C']
   },
   preview:{
     hollywood:['OH-003','OH-NEW-004-10','OH-NEW-002-05','OH-NEW-007-01'],
     sets:['OHS-003','OHS-011','OHS-001','OHS-007'],
-    'coca-cola':['CC-010','CC-023','CC-034','CC-027']
+    'coca-cola':['CC-NEW-001','CC-NEW-002','CC-NEW-003','CC-SET-F']
   },
   setCovers:{
     'OHS-001':'OH-NEW-002-05',
