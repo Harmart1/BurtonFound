@@ -38,6 +38,7 @@ test('homepage collection cards are fully touch-friendly, two across on mobile a
  assert.ok(css.includes('.market-hero.collection-lead'));
  assert.ok(css.includes('grid-template-columns:repeat(4,minmax(0,1fr))'));
  assert.ok(css.includes('@media(max-width:590px)'));
+ assert.ok(css.includes('height:142px!important'),'mobile category photos should leave room for category headings');
  assert.ok(css.includes('grid-template-columns:repeat(2,minmax(0,1fr))'));
  assert.ok(css.includes('.collection-lead .spotlight:focus-visible'));
  assert.ok(css.includes('html[data-theme="dark"]'));
