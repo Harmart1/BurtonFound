@@ -88,6 +88,20 @@
     console.warn('Coca-Cola intake collision; leaving existing stock unchanged.');return;
  }
  D.inventory.push(...additions);
+ if(Array.isArray(D.archive)){
+   const archiveIds=new Set(D.archive.map(x=>x.id));
+   for(const p of pieces){
+     if(archiveIds.has(p.sku))continue;
+     D.archive.push({
+       id:p.sku,year:p.year,issue:'Publication / issue unverified',title:p.title,
+       description:p.shortDescription,theme:p.theme,collection:'coca-cola',
+       condition:'Vintage used paper — verify condition',conditionNotes:p.conditionNotes,
+       publicationConfidence:shared.publicationConfidence,
+       photo:p.image,valueMin:15,valueMax:28,
+       originalPhotoFile:'Coke.pdf · source page '+p.sourcePdfPage
+     });
+   }
+ }
  window.BURTON_NEW_COKE_INTEGRATION=Object.freeze({
    uniquePieces:3,curatedSets:1,duplicateImagesExcluded:4,nonCokePagesExcluded:1,
    listedProducts:4,inventorySharedAcrossSets:true
