@@ -273,9 +273,11 @@ html[data-theme="dark"] .home-assurances{color:var(--bf-muted)}
   }
   .collection-lead .spotlight-photo,
   .collection-lead .spotlight:last-child .spotlight-photo{
-    aspect-ratio:1.17;
+    aspect-ratio:auto!important;
     width:100%!important;
-    height:auto!important;
+    height:142px!important;
+    max-height:142px!important;
+    flex:0 0 142px!important;
     min-height:0!important;
     padding:7px!important;
     border:0!important;
