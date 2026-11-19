@@ -8,7 +8,7 @@ const f=p=>join(process.cwd(),p);
 const text=p=>readFileSync(f(p),'utf8');
 function state(){
  const context={window:{},console:{warn(){}},Intl};
- for(const p of ['products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js','old-hollywood-products.js','coke-new-products.js','featured-merchandising.js']){
+ for(const p of ['products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js','old-hollywood-products.js','coke-new-products.js','coke-archive-singles.js','featured-merchandising.js']){
   execFileSync(process.execPath,['--check',f('public/'+p)]);
   runInNewContext(text('public/'+p),context,{filename:p});
  }
@@ -16,10 +16,10 @@ function state(){
 }
 test('Coke PDF intake adds exactly three unique originals and one three-piece set',()=>{
  const W=state(),all=W.BURTON_DATA.inventory;
- assert.equal(all.length,108);
- assert.equal(new Set(all.map(p=>p.sku)).size,108);
+ assert.equal(all.length,131);
+ assert.equal(new Set(all.map(p=>p.sku)).size,131);
  const coke=all.filter(p=>p.collection==='coca-cola');
- assert.equal(coke.length,20);
+ assert.equal(coke.length,43);
  const additions=coke.filter(p=>p.sku.startsWith('CC-NEW-')||p.sku==='CC-SET-F');
  assert.equal(additions.length,4);
  assert.equal(additions.filter(p=>p.type==='original').length,3);
@@ -57,9 +57,10 @@ test('Coke PDF intake adds exactly three unique originals and one three-piece se
 test('Coke imports are linked across all shop/account/preview surfaces without deleting existing inventory',()=>{
  for(const file of ['public/index.html','public/storefront.html','public/account.html','public/preview.html']){
   const html=text(file);
-  const h='old-hollywood-products.js',c='coke-new-products.js';
+  const h='old-hollywood-products.js',c='coke-new-products.js',next='coke-archive-singles.js';
   assert.ok(html.includes('src="'+c+'"'),file);
   assert.ok(html.indexOf('src="'+h+'"')<html.indexOf('src="'+c+'"'),file);
+  assert.ok(html.indexOf('src="'+c+'"')<html.indexOf('src="'+next+'"'),file);
   if(file!=='public/preview.html')
    assert.ok(html.indexOf('src="'+c+'"')<html.indexOf('src="account-core.js"'),file);
   assert.ok(!html.includes('104 product listings'),file);
@@ -70,9 +71,9 @@ test('Coke imports are linked across all shop/account/preview surfaces without d
   for(const id of ['CC-NEW-001','CC-NEW-002','CC-NEW-003','CC-SET-F'])
    assert.ok(html.includes('item='+id+'#shop'),'New product missing home link '+id);
   assert.ok(html.includes('href="coke-new-feature.css"'));
-  assert.ok(html.includes('108 product listings'));
-  assert.ok(html.includes('20 listings'));
-  assert.ok(html.includes('14 SINGLE FINDS + 6 SETS'));
+  assert.ok(html.includes('131 product listings'));
+  assert.ok(html.includes('43 listings'));
+  assert.ok(html.includes('37 SINGLE FINDS + 6 SETS'));
   assert.ok(html.includes('37 DISTINCT DESIGNS'));
   if(page.endsWith('index.html'))assert.ok(html.includes('Browse the collection'),page);
  }
