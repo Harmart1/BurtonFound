@@ -217,6 +217,7 @@
     document.querySelectorAll('.tab').forEach(button=>button.addEventListener('click',()=>{selectFilter(button.dataset.filter);renderProducts();}));
     $('collectionFilter').addEventListener('change',e=>{currentCollection=e.target.value;renderProducts();});
     document.querySelectorAll('[data-shop-hollywood]').forEach(el=>el.addEventListener('click',()=>selectCollection('hollywood')));
+    document.querySelectorAll('[data-shop-hollywood-sets]').forEach(el=>el.addEventListener('click',()=>selectCollection('hollywood','bundle')));
     document.querySelectorAll('[data-shop-coke]').forEach(el=>el.addEventListener('click',()=>selectCollection('coca-cola')));
     document.querySelectorAll('[data-shop-bundles]').forEach(link=>link.addEventListener('click',()=>selectCollection('coca-cola','bundle')));
     $('catalogSort').addEventListener('change',e=>{currentSort=e.target.value;renderProducts();});
