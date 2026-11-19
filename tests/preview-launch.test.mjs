@@ -27,7 +27,7 @@ test('release preview features accurate catalogue counts, collection entry point
  for(const id of ['hollywood','sets','coca-cola'])
    assert.ok(html.includes('data-pr-collection="'+id+'"'));
  for(const ref of ['preview-launch.css','preview-launch.js','preview.js','products.js',
-   'old-hollywood-item-data.js','old-hollywood-sets-data.js','old-hollywood-products.js'])
+   'old-hollywood-item-data.js','old-hollywood-sets-data.js','old-hollywood-products.js','featured-merchandising.js'])
    assert.ok(html.includes('src="'+ref+'"')||html.includes('href="'+ref+'"'),ref);
  assert.ok(html.indexOf('src="old-hollywood-products.js"')<html.indexOf('src="preview-launch.js"'));
  assert.ok(html.includes('name="robots"'));
@@ -49,7 +49,7 @@ test('interactive preview reads the same 104 real products, switches all three g
  };
  const ctx={window:{},document,console:{warn(){}},Intl,encodeURIComponent};
  for(const f of ['products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js',
-   'old-hollywood-products.js','preview-launch.js'])
+   'old-hollywood-products.js','featured-merchandising.js','preview-launch.js'])
    runInNewContext(read('public/'+f),ctx,{filename:f});
  const all=ctx.window.BURTON_DATA.inventory;
  assert.equal(all.length,104);
@@ -57,13 +57,13 @@ test('interactive preview reads the same 104 real products, switches all three g
  assert.equal(raw.length,88);
  assert.equal(all.filter(x=>x.collection==='coca-cola').length,16);
  assert.equal((grid.innerHTML.match(/class="pr-product"/g)||[]).length,4);
- assert.ok(grid.innerHTML.includes('OH-NEW-003-01'));
- assert.ok(grid.innerHTML.includes('$32.95'));
+ assert.ok(grid.innerHTML.includes('OH-003'));
+ assert.ok(grid.innerHTML.includes('$39.95'));
  assert.equal(buttons[0].attrs['aria-pressed'],'true');
  buttons[1].events.click();
- assert.ok(grid.innerHTML.includes('OHS-001'));
- assert.ok(grid.innerHTML.includes('$149.95'));
- assert.ok(grid.innerHTML.includes('index.html?item=OHS-001#shop'));
+ assert.ok(grid.innerHTML.includes('OHS-003'));
+ assert.ok(grid.innerHTML.includes('$156.95'));
+ assert.ok(grid.innerHTML.includes('index.html?item=OHS-003#shop'));
  assert.equal(buttons[1].attrs['aria-pressed'],'true');
  buttons[2].events.click();
  assert.ok(grid.innerHTML.includes('CC-010'));
