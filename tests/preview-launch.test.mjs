@@ -15,8 +15,8 @@ test('release preview features accurate catalogue counts, collection entry point
  assert.equal(setup.vars.LIVE_PAYMENTS_APPROVED,'false');
  assert.equal(setup.vars.TAX_CONFIGURATION_APPROVED,'false');
  assert.ok(html.includes('108</strong>'));
- assert.ok(html.includes('88</strong>'));
- assert.ok(html.includes('11</strong>'));
+ assert.ok(html.includes('20</strong>'));
+ assert.ok(html.includes('17</strong>'));
  assert.ok(html.includes('Online card payment is not yet active'));
  assert.ok(html.includes('id="prFeaturedGrid"'));
  assert.ok(html.includes('id="prFeaturedStatus"'));
@@ -37,7 +37,7 @@ test('release preview features accurate catalogue counts, collection entry point
 });
 
 test('interactive preview reads the same 108 real products, switches all three groups, and links to real SKUs',()=>{
- const buttons=['hollywood','sets','coca-cola'].map(key=>({
+ const buttons=['coca-cola','hollywood','sets'].map(key=>({
    dataset:{prCollection:key},attrs:{},
    events:{},setAttribute(name,value){this.attrs[name]=value},
    addEventListener(name,callback){this.events[name]=callback}
@@ -57,19 +57,19 @@ test('interactive preview reads the same 108 real products, switches all three g
  assert.equal(raw.length,88);
  assert.equal(all.filter(x=>x.collection==='coca-cola').length,20);
  assert.equal((grid.innerHTML.match(/class="pr-product"/g)||[]).length,4);
- assert.ok(grid.innerHTML.includes('OH-003'));
- assert.ok(grid.innerHTML.includes('$39.95'));
+ assert.ok(grid.innerHTML.includes('CC-NEW-001'));
+ assert.ok(grid.innerHTML.includes('$24.95'));
  assert.equal(buttons[0].attrs['aria-pressed'],'true');
  buttons[1].events.click();
- assert.ok(grid.innerHTML.includes('OHS-003'));
- assert.ok(grid.innerHTML.includes('$156.95'));
- assert.ok(grid.innerHTML.includes('index.html?item=OHS-003#shop'));
+ assert.ok(grid.innerHTML.includes('OH-003'));
+ assert.ok(grid.innerHTML.includes('$39.95'));
+ assert.ok(grid.innerHTML.includes('index.html?item=OH-003#shop'));
  assert.equal(buttons[1].attrs['aria-pressed'],'true');
  buttons[2].events.click();
- assert.ok(grid.innerHTML.includes('CC-NEW-001'));
- assert.ok(grid.innerHTML.includes('index.html?item=CC-NEW-001#shop'));
+ assert.ok(grid.innerHTML.includes('OHS-003'));
+ assert.ok(grid.innerHTML.includes('index.html?item=OHS-003#shop'));
  assert.equal(buttons[2].attrs['aria-pressed'],'true');
- assert.match(status.textContent,/Coca-Cola vintage advertising/);
+ assert.match(status.textContent,/curated Hollywood sets/);
 });
 
 test('preview sharing goes to preview page and merchant feedback without email never falsely claims submission',()=>{
