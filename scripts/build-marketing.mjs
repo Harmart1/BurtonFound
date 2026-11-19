@@ -53,12 +53,16 @@ const head=(title,desc,path,photo='',type='website',ld=null)=>{
   (ld?'<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'</script>':'')+'</head>';
 };
 const header='<header class="mk-head"><div class="mk-wrap mk-head-inner"><a class="mk-logo" href="/">B<span>&amp;</span>F <small>Burton &amp; Found</small></a><nav aria-label="Explore the collections"><a href="/collections/coca-cola.html">Coca-Cola</a><a href="/collections/hollywood.html">Old Hollywood</a><a href="/collections/sets.html">Curated sets</a><a href="/guides/collecting-vintage-ads.html">Collector guides</a><a href="/#shop">Shop</a></nav></div></header>';
-const footer='<footer class="mk-foot"><div class="mk-wrap"><strong>Burton &amp; Found</strong><p>Thoughtfully catalogued vintage paper · Ontario, Canada · All prices CAD</p><p>Independent seller, not affiliated with Coca-Cola or any film studio. Printing dates, publication sources and physical condition are identified only where documented.</p><a href="/">Home</a> · <a href="/#shop">Main shop</a> · <a href="/guides/caring-for-vintage-paper.html">Caring for vintage paper</a></div></footer>';
+const footer='<footer class="mk-foot"><div class="mk-wrap"><strong>Burton &amp; Found</strong><p>Thoughtfully catalogued vintage paper · Ontario, Canada · All prices CAD</p><p>Explore historical advertising, movie portraits and themed collector sets. Brand names identify the featured vintage material.</p><a href="/">Home</a> · <a href="/#shop">Main shop</a> · <a href="/guides/caring-for-vintage-paper.html">Caring for vintage paper</a></div></footer>';
 const frame=(title,description,path,content,img='',kind='website',ld=null)=>head(title,description,path,img,kind,ld)+'<body><a class="mk-skip" href="#main">Skip to content</a>'+header+'<main class="mk-wrap" id="main">'+content+'</main>'+footer+'</body></html>';
-const card=p=>'<a class="mk-card" href="'+urlOf(p)+'"><span class="mk-photo"><img src="/'+clean(p.image)+'" alt="'+clean(p.title)+' — actual catalogued paper photograph" loading="lazy" decoding="async" width="380" height="480"></span><span class="mk-card-copy"><small>'+clean(p.type==='bundle'?'Curated collector set':p.collection==='hollywood'?'Old Hollywood':'Coca-Cola advertising')+'</small><strong>'+clean(p.title)+'</strong><span>'+dollar(p.price)+' CAD</span></span></a>';
+const card=p=>'<a class="mk-card" href="'+urlOf(p)+'"><span class="mk-photo"><img src="/'+clean(p.image)+'" alt="'+clean(p.title)+' — photographed catalogue item" loading="lazy" decoding="async" width="380" height="480"></span><span class="mk-card-copy"><small>'+clean(p.type==='bundle'?'Curated collector set':p.collection==='hollywood'?'Old Hollywood':'Coca-Cola advertising')+'</small><strong>'+clean(p.title)+'</strong><span>'+dollar(p.price)+' CAD</span></span></a>';
 const urls=['/'];
+const productLinks=Object.fromEntries(items.map(p=>[p.sku,urlOf(p)]));
+mk('product-links.js','/* Generated; map product SKUs to searchable permanent URLs. */\nwindow.BURTON_PRODUCT_LINKS = '+JSON.stringify(productLinks)+';\n');
+
 rmSync(join(publicRoot,'products'),{recursive:true,force:true});mkdirSync(join(publicRoot,'products'),{recursive:true});
 rmSync(join(publicRoot,'collections'),{recursive:true,force:true});mkdirSync(join(publicRoot,'collections'),{recursive:true});
+mkdirSync(join(publicRoot,'feeds'),{recursive:true});
 for(const p of items){
  const path=urlOf(p);
  const copy=text(p.cmsLongDescription||p.shortDescription);
@@ -85,7 +89,7 @@ for(const p of items){
 for(const c of collection){
  const selected=items.filter(p=>c.id==='sets'?p.type==='bundle':p.collection===c.id);
  const path=collectionUrl(c.id);
- const intro='<nav class="mk-crumb"><a href="/">Home</a> / Collections</nav><p class="mk-kicker">Browse by interest</p><h1>'+clean(c.title)+'</h1><p class="mk-lead">'+clean(c.description)+'</p><p class="mk-count">'+selected.length+' listed finds · CAD prices · photographed actual pieces</p>'+
+ const intro='<nav class="mk-crumb"><a href="/">Home</a> / Collections</nav><p class="mk-kicker">Browse by interest</p><h1>'+clean(c.title)+'</h1><p class="mk-lead">'+clean(c.description)+'</p><p class="mk-count">'+selected.length+' listed finds · CAD prices · photographed items</p>'+
  '<div class="mk-collection-nav">'+collection.map(x=>'<a href="'+collectionUrl(x.id)+'">'+clean(x.title)+'</a>').join('')+'</div>';
  const schema={'@context':'https://schema.org','@type':'CollectionPage',name:c.title,description:c.description,url:abs(path)};
  const grid='<section class="mk-grid" aria-label="Collection products">'+selected.map(card).join('')+'</section>';
@@ -127,6 +131,19 @@ for(const g of guides){
  mk(g.path.slice(1),frame(g.title,g.description,g.path,'<nav class="mk-crumb"><a href="/">Home</a> / Collector guides</nav><p class="mk-kicker">The collector desk</p><article class="mk-article"><h1>'+clean(g.title)+'</h1><p class="mk-lead">'+clean(g.description)+'</p>'+sections+related+'</article>','','article',ld));
  urls.push(g.path);
 }
+// Public read-only JSON Feed for future authorized Pinterest/social syndication.
+const feedItems=available.map(p=>({
+ id:abs(urlOf(p)),url:abs(urlOf(p)),title:p.title,
+ summary:short(p.shortDescription,320),image:abs(p.image),
+ tags:[p.collection,p.type],_burton:{sku:p.sku,asking_price_cad:p.price}
+}));
+mk('feeds/collectibles.json',JSON.stringify({
+ version:'https://jsonfeed.org/version/1.1',
+ title:'Burton & Found · Collectible Paper Catalogue',
+ home_page_url:base+'/',feed_url:abs('/feeds/collectibles.json'),
+ description:'Photographed vintage advertising and Old Hollywood printed-paper items',
+ items:feedItems
+},null,2)+'\n');
 mk('sitemap.xml','<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+urls.map(u=>'  <url><loc>'+clean(abs(u))+'</loc></url>').join('\n')+'\n</urlset>\n');
 mk('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\nDisallow: /checkout-success.html\nDisallow: /account.html\nDisallow: /preview.html\nSitemap: '+abs('/sitemap.xml')+'\n');
 if(indexable){
@@ -142,16 +159,44 @@ mkdirSync(out,{recursive:true});
 const csv=x=>'"'+String(x??'').replace(/"/g,'""').replace(/[\r\n]+/g,' ')+'"';
 const rows=items.map(p=>[p.sku,p.title,p.collection,p.type,dollar(p.price),abs(urlOf(p)),abs(p.image),
  short('Original vintage paper: '+p.shortDescription,410),
- 'Burton & Found · '+p.title+' · Vintage '+(p.collection==='hollywood'?'cinema':'advertising')+' · Actual item photo'].map(csv).join(','));
+ 'Burton & Found · '+p.title+' · Vintage '+(p.collection==='hollywood'?'cinema':'advertising')+' · Catalogue photograph'].map(csv).join(','));
 writeFileSync(join(out,'pinterest-and-social-catalog.csv'),['sku,title,collection,type,asking_cad,product_url,image_url,pin_description,image_alt',...rows].join('\n')+'\n');
-const picks=['CC-NEW-001','OH-003','CC-010','OHS-003','CC-NEW-003','OH-NEW-007-01','CC-NEW-002','CC-SET-F','OH-NEW-004-10','CC-023','OHS-001','CC-002','OH-NEW-008-04','SET-E'].map(s=>bySku.get(s)).filter(Boolean);
+// Deterministic weekly rotation across real Coca-Cola singles, Old Hollywood pieces and sets.
+const weekNumber=Math.floor(Date.now()/(7*86400*1000));
+const available=items.filter(p=>p.stockState!=='unavailable'&&p.status!=='unavailable');
+const buckets={
+ coke:available.filter(p=>p.collection==='coca-cola'&&p.type==='original'),
+ hollywood:available.filter(p=>p.collection==='hollywood'&&p.type==='original'),
+ sets:available.filter(p=>p.type==='bundle')
+};
+if(Object.values(buckets).some(x=>x.length<5))throw Error('Marketing rotation needs active inventory from each collection');
+const offsets={coke:weekNumber*3,hollywood:weekNumber*5,sets:weekNumber};
+const picks=[];
+const seen=new Set();
+for(let i=0;i<14;i++){
+ const key=i%7===6?'sets':i%2===0?'coke':'hollywood';
+ const list=buckets[key],seed=(offsets[key]+Math.floor(i/2))%list.length;
+ let candidate;
+ for(let shift=0;shift<list.length;shift++){const c=list[(seed+shift)%list.length];if(!seen.has(c.sku)){candidate=c;break}}
+ if(!candidate)throw Error('Not enough distinct products for 14-day organic plan');
+ picks.push(candidate);seen.add(candidate.sku);
+}
+const tagUrl=(p,source,slot)=>abs(urlOf(p))+'?utm_source='+source+'&utm_medium=organic&utm_campaign=collector_weekly&utm_content='+encodeURIComponent(p.sku.toLowerCase()+'-'+slot);
 writeFileSync(join(out,'14-day-social-calendar.md'),
- '# Burton & Found · 14 post ideas (editorial drafts)\n\nThese drafts are not scheduled or published. Check condition and claims; follow each community\'s promotion rules.\n\n'+picks.map((p,i)=>'### Day '+(i+1)+' — '+p.title+'\n\n'+short(p.shortDescription,230)+'\n\nExplore the actual photograph and CAD asking price: '+abs(urlOf(p))+'\n\nSuggested tags: #VintageAdvertising #BurtonAndFound '+(p.collection==='hollywood'?'#OldHollywood':'#CocaColaCollectibles')+'\n').join('\n'));
+ '# Burton & Found · 14 post ideas (editorial drafts)\n\nThese drafts are not scheduled or published. Check condition and claims; follow each community\'s promotion rules.\n\n'+picks.map((p,i)=>'### Day '+(i+1)+' — '+p.title+'\n\n'+short(p.shortDescription,230)+'\n\nView item photographs and CAD asking price: '+tagUrl(p,'pinterest','day'+(i+1))+'\n\nSuggested tags: #VintageAdvertising #BurtonAndFound '+(p.collection==='hollywood'?'#OldHollywood':'#CocaColaCollectibles')+'\n').join('\n'));
+writeFileSync(join(out,'weekly-social-queue.csv'),
+ ['day,sku,collection,product_title,image_url,product_url,caption,pinterest_link',
+ ...picks.map((p,i)=>[i+1,p.sku,p.collection,p.title,abs(p.image),abs(urlOf(p)),
+ short(p.shortDescription,220)+' View this find at Burton & Found.',
+ tagUrl(p,'pinterest','day'+(i+1))].map(csv).join(','))].join('\n')+'\n');
+writeFileSync(join(out,'marketing-utm-links.csv'),
+ ['sku,pinterest_url,facebook_url,instagram_bio_url',...items.map(p=>[p.sku,
+ tagUrl(p,'pinterest','catalog'),tagUrl(p,'facebook','organic'),tagUrl(p,'instagram','bio')].map(csv).join(','))].join('\n')+'\n');
 writeFileSync(join(out,'collector-newsletter-draft.md'),
  '# Subject: Three paper finds worth a closer look\n\nHello collectors,\n\nThis edition of Burton & Found highlights three vintage-paper finds:\n\n'+picks.slice(0,3).map(p=>'- '+p.title+' — '+dollar(p.price)+' CAD\n  '+abs(urlOf(p))).join('\n')+
- '\n\nA paper-collecting tip: always ask about the back of a vintage ad, the dimensions and any trimming before deciding to buy.\n\nBrowse the collection: '+base+'/collections/coca-cola.html\n\nThis is a DRAFT, not a sent email. Send only to subscribers with valid consent and include merchant identification and a working unsubscribe mechanism.\n');
+ '\n\nA paper-collecting tip: always ask about the back of a vintage ad, the dimensions and any trimming before deciding to buy.\n\nBrowse the collection: '+base+'/collections/coca-cola.html?utm_source=newsletter&utm_medium=email&utm_campaign=collector_weekly\n\nThis is a DRAFT, not a sent email. Send only to subscribers with valid consent and include merchant identification and a working unsubscribe mechanism.\n');
 writeFileSync(join(out,'marketing-readiness.json'),JSON.stringify({
- timestamp:new Date().toISOString(),base,productPages:items.length,collectionPages:collection.length,guidePages:guides.length,indexable,
+ timestamp:new Date().toISOString(),base,productPages:items.length,collectionPages:collection.length,guidePages:guides.length,indexable,weeklyRotation:weekNumber,weeklyDraftItems:picks.map(p=>p.sku),jsonFeedItems:feedItems.length,
  checkoutApproved,merchantFeedCreated:false,productLinksCreated:true,socialPostsPublished:false,newsletterSent:false,
  nextSteps:['Approve search indexing after seller content review','Connect Google Search Console and submit sitemap','Connect Pinterest business account to import CSV or create Pins','Confirm live checkout and shipping before Merchant Center','Connect a consent-managed email platform before collecting newsletter subscribers']
 },null,2));
