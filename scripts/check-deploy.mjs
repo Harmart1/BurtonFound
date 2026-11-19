@@ -23,7 +23,7 @@ for(const file of all.filter(x=>extname(x)==='.html')){
   let value=m[2];if(!value||/^(?:https?:|mailto:|tel:|data:|javascript:|#|\/\/)/i.test(value))continue;
   value=value.split(/[?#]/)[0];if(!value)continue;
   const target=value.startsWith('/')?resolve(site,value.slice(1)):resolve(dirname(file),value);
-  if(!target.startsWith(site+'/'))failures.push(`HTML reference escapes public/: ${relative(root,file)}: ${value}`);
+  if(target!==site&&!target.startsWith(site+'/'))failures.push(`HTML reference escapes public/: ${relative(root,file)}: ${value}`);
   else if(!existsSync(target))failures.push(`Missing reference ${relative(root,file)} -> ${value}`);
  }
 }
