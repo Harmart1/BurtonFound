@@ -20,6 +20,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Generate product SEO pages, collections and sitemap
+        run: npm run build:marketing
       - name: Check Cloudflare deployment structure
         run: npm run check:deploy
       - name: Run automated tests
