@@ -14,8 +14,8 @@ test('release preview features accurate catalogue counts, collection entry point
  assert.equal(setup.vars.LIVE_CHECKOUT_ENABLED,'false');
  assert.equal(setup.vars.LIVE_PAYMENTS_APPROVED,'false');
  assert.equal(setup.vars.TAX_CONFIGURATION_APPROVED,'false');
- assert.ok(html.includes('108</strong>'));
- assert.ok(html.includes('20</strong>'));
+ assert.ok(html.includes('131</strong>'));
+ assert.ok(html.includes('43</strong>'));
  assert.ok(html.includes('17</strong>'));
  assert.ok(html.includes('Online card payment is not yet active'));
  assert.ok(html.includes('id="prFeaturedGrid"'));
@@ -27,7 +27,7 @@ test('release preview features accurate catalogue counts, collection entry point
  for(const id of ['hollywood','sets','coca-cola'])
    assert.ok(html.includes('data-pr-collection="'+id+'"'));
  for(const ref of ['preview-launch.css','preview-launch.js','preview.js','products.js',
-   'old-hollywood-item-data.js','old-hollywood-sets-data.js','old-hollywood-products.js','coke-new-products.js','featured-merchandising.js'])
+   'old-hollywood-item-data.js','old-hollywood-sets-data.js','old-hollywood-products.js','coke-new-products.js','coke-archive-singles.js','featured-merchandising.js'])
    assert.ok(html.includes('src="'+ref+'"')||html.includes('href="'+ref+'"'),ref);
  assert.ok(html.indexOf('src="old-hollywood-products.js"')<html.indexOf('src="preview-launch.js"'));
  assert.ok(html.includes('name="robots"'));
@@ -49,13 +49,13 @@ test('interactive preview reads the same 108 real products, switches all three g
  };
  const ctx={window:{},document,console:{warn(){}},Intl,encodeURIComponent};
  for(const f of ['products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js',
-   'old-hollywood-products.js','coke-new-products.js','featured-merchandising.js','preview-launch.js'])
+   'old-hollywood-products.js','coke-new-products.js','coke-archive-singles.js','featured-merchandising.js','preview-launch.js'])
    runInNewContext(read('public/'+f),ctx,{filename:f});
  const all=ctx.window.BURTON_DATA.inventory;
- assert.equal(all.length,108);
+ assert.equal(all.length,131);
  const raw=all.filter(x=>x.collection==='hollywood');
  assert.equal(raw.length,88);
- assert.equal(all.filter(x=>x.collection==='coca-cola').length,20);
+ assert.equal(all.filter(x=>x.collection==='coca-cola').length,43);
  assert.equal((grid.innerHTML.match(/class="pr-product"/g)||[]).length,4);
  assert.ok(grid.innerHTML.includes('CC-NEW-001'));
  assert.ok(grid.innerHTML.includes('$24.95'));
