@@ -2,6 +2,17 @@
 
 Updated 19 November 2026.
 
+## Marketing upgrades — November 19 release
+
+- Product detail dialogs now feature a simple "View larger photo" button, without a separate provenance disclaimer panel; condition and item details remain available.
+- Every product detail links to its permanent shareable SEO page via an automatically generated `product-links.js` SKU-to-URL map.
+- Permanent pages request current price and availability from the existing public `/api/catalog` endpoint. If sold or reserved, a product page links shoppers to other items instead of implying that the piece can be added to the bag. No private credentials are used.
+- The weekly content calendar now rotates among available Coca-Cola singles, Hollywood originals and collector sets, rather than publishing the same 14-product list each week.
+- GitHub's weekly draft workflow attempts to obtain current public inventory availability first. If inaccessible or incomplete, it falls back to catalogue-only draft suggestions for human review.
+- New exports: `weekly-social-queue.csv` (14 reviewed post candidates), `marketing-utm-links.csv` (share-ready tagged URLs for organic Pinterest, Facebook and Instagram links).
+- The public read-only `/feeds/collectibles.json` is available for future authorized syndication. It includes product descriptions, links and images; it does **not** push to third parties automatically.
+- No newsletter message is sent, and no accounts are connected or charged by the above operations.
+
 ## Built into the site
 
 - Every deployment builds 131 standalone, search-friendly product pages from the existing product catalogue. Pages include product-specific titles/descriptions, original product photos, share images, canonical URLs, Product structured data, internal links, condition disclaimers and a direct path back to the working shop.
