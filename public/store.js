@@ -89,7 +89,15 @@
   function setPreview(){const el=$('setupNotice');const testing=checkoutMode==='test_mode';el.hidden=(!C.showPreviewNotice&&checkoutMode!=='test_mode')||(checkoutReady&&!testing);el.textContent=testing?'STRIPE TEST MODE · Demonstration checkout only · No real money is charged. Use Stripe test card details, never a real card.':'Online card payments are not yet enabled. Add listed items to your bag to prepare a purchase enquiry.';}
   function renderProducts(){
     let list=items.filter(p=>(currentFilter==='all'||p.type===currentFilter)&&(currentCollection==='all'||p.collection===currentCollection)&&itemHasDecade(p,currentDecade)&&(!search||[p.title,p.year,p.sku,p.shortDescription,p.theme,(p.catalogIds||[]).join(' ')].join(' ').toLowerCase().includes(search)));
-    if(currentSort==='featured'){const priority=['CC-010','OH-003','CC-023','OH-004','OH-006','CC-006','OH-001','CC-020','CC-034','OH-005','SET-E','OH-002'];const rank=new Map(priority.map((sku,i)=>[sku,i]));list.sort((a,b)=>(rank.get(a.sku)??999)-(rank.get(b.sku)??999));}
+    if(currentSort==='featured'){
+      const orders=window.BURTON_FEATURED?.orders||{};
+      const priority=orders[currentCollection+':'+currentFilter]||orders[currentCollection+':all']||orders['all:'+currentFilter]||orders['all:all']||[];
+      const rank=new Map(priority.map((sku,i)=>[sku,i]));
+      list.sort((a,b)=>{
+        const unavailable=Number(a.stockState==='unavailable')-Number(b.stockState==='unavailable');
+        return unavailable||((rank.get(a.sku)??999)-(rank.get(b.sku)??999));
+      });
+    }
     if(currentSort==='low')list.sort((a,b)=>a.price-b.price);
     if(currentSort==='high')list.sort((a,b)=>b.price-a.price);
     if(currentSort==='oldest')list.sort((a,b)=>(a.year||9999)-(b.year||9999));
