@@ -50,6 +50,7 @@ const head=(title,desc,path,photo='',type='website',ld=null)=>{
   '<meta name="twitter:card" content="summary_large_image">'+
   '<link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'+
   '<link rel="stylesheet" href="/marketing.css">'+
+  (type==='product'?'<script defer src="/marketing-stock.js"></script>':'')+
   (ld?'<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'</script>':'')+'</head>';
 };
 const header='<header class="mk-head"><div class="mk-wrap mk-head-inner"><a class="mk-logo" href="/">B<span>&amp;</span>F <small>Burton &amp; Found</small></a><nav aria-label="Explore the collections"><a href="/collections/coca-cola.html">Coca-Cola</a><a href="/collections/hollywood.html">Old Hollywood</a><a href="/collections/sets.html">Curated sets</a><a href="/guides/collecting-vintage-ads.html">Collector guides</a><a href="/#shop">Shop</a></nav></div></header>';
@@ -70,13 +71,13 @@ for(const p of items){
  const photos=imgs.map((im,i)=>'<a href="/'+clean(im)+'" target="_blank" rel="noopener" aria-label="View photograph '+(i+1)+' of '+clean(p.title)+'"><img src="/'+clean(im)+'" alt="'+clean(p.title)+' — photograph '+(i+1)+'" '+(i?'loading="lazy"':'fetchpriority="high"')+' width="600" height="800"></a>').join('');
  const cat=collectionFor(p);
  const info='<nav class="mk-crumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="'+collectionUrl(cat)+'">'+(cat==='hollywood'?'Old Hollywood':'Coca-Cola')+'</a> / '+clean(p.title)+'</nav>'+
-  '<div class="mk-detail"><div class="mk-gallery">'+photos+'</div><div class="mk-detail-info"><p class="mk-kicker">'+clean(p.type==='bundle'?'Curated set':p.collection==='hollywood'?'Old Hollywood printed paper':'Vintage Coca-Cola advertising')+'</p>'+
-  '<h1>'+clean(p.title)+'</h1><p class="mk-price">'+dollar(p.price)+' <small>CAD asking price</small></p><p>'+clean(copy)+'</p>'+
+  '<div class="mk-detail" data-bf-stock-sku="'+clean(p.sku)+'"><div class="mk-gallery">'+photos+'</div><div class="mk-detail-info"><p class="mk-kicker">'+clean(p.type==='bundle'?'Curated set':p.collection==='hollywood'?'Old Hollywood printed paper':'Vintage Coca-Cola advertising')+'</p>'+
+  '<h1>'+clean(p.title)+'</h1><p class="mk-price"><span data-bf-price>'+dollar(p.price)+'</span> <small>CAD asking price</small></p><p class="mk-stock" aria-live="polite" data-bf-availability>Request availability</p><p>'+clean(copy)+'</p>'+
   '<dl><div><dt>Catalogue reference</dt><dd>'+clean(p.sku)+'</dd></div><div><dt>Item format</dt><dd>'+clean(p.edition||'Vintage printed-paper item')+'</dd></div>'+
   (p.year&&Number(p.year)>1900?'<div><dt>Year indicated</dt><dd>'+p.year+' (verify publication date)</dd></div>':'')+
   '<div><dt>Condition</dt><dd>'+clean(p.conditionNotes||p.condition||'Ask for current physical condition and dimensions')+'</dd></div></dl>'+
-  '<a class="mk-button" href="/index.html?item='+encodeURIComponent(p.sku)+'#shop">View in the shop / add to bag</a>'+
-  '<p class="mk-fine">Online card checkout is not yet enabled. Items can be saved in a bag for a purchase enquiry. Ask for exact measurements, reverse images and shipping details before payment.</p>'+
+  '<a class="mk-button" data-bf-shop-link href="/index.html?item='+encodeURIComponent(p.sku)+'#shop">View in the shop / add to bag</a>'+
+  '<p class="mk-fine">'+(checkoutApproved?'Shipping and applicable taxes are presented before payment.':'Online card checkout is not yet enabled. Items can be saved in a bag for a purchase enquiry.')+' Ask for exact measurements, reverse images and shipping details as needed.</p>'+
   (p.type==='bundle'?'<p>Set contents: '+p.catalogIds.map(id=>bySku.has(id)?'<a href="'+urlOf(bySku.get(id))+'">'+clean(bySku.get(id).title)+'</a>':clean(id)).join(', ')+'.</p>':'')+
   '<p class="mk-fine">Burton &amp; Found is an independent vintage-paper seller. Brand and entertainment names describe the historical materials, not an endorsement.</p></div></div>';
  const related=items.filter(x=>x.sku!==p.sku&&x.collection===p.collection&&x.type===p.type).slice(0,3);
