@@ -10,7 +10,7 @@ const parse=(p,marker)=>JSON.parse(read(p).split(marker)[1].trim().replace(/;$/,
 function load(){
   const ctx={window:{},console:{warn(){}},Intl};
   for(const s of ['products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js',
-                   'old-hollywood-products.js','featured-merchandising.js'])
+                   'old-hollywood-products.js','coke-new-products.js','featured-merchandising.js'])
     runInNewContext(read('public/'+s),ctx,{filename:s});
   return ctx.window;
 }
@@ -18,7 +18,7 @@ function load(){
 test('Every featured category points to distinct actual catalogue products with existing photographs',()=>{
  const W=load(),products=W.BURTON_DATA.inventory,bySku=new Map(products.map(p=>[p.sku,p]));
  const config=W.BURTON_FEATURED;
- assert.equal(products.length,104);
+ assert.equal(products.length,108);
  for(const [key,ids] of Object.entries(config.orders)){
    assert.ok(ids.length>=5,key);
    assert.equal(new Set(ids).size,ids.length,'Duplicate featured SKU in '+key);
@@ -46,7 +46,7 @@ test('Every featured category points to distinct actual catalogue products with 
    for(const id of ids)assert.ok(bySku.has(id),id);
  assert.equal(config.preview.hollywood[0],'OH-003');
  assert.equal(config.preview.sets[0],'OHS-003');
- assert.equal(config.preview['coca-cola'][0],'CC-010');
+ assert.equal(config.preview['coca-cola'][0],'CC-NEW-001');
 });
 
 test('11 collector-set covers are real member photos and lead the product gallery',()=>{
