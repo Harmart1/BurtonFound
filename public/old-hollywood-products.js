@@ -38,12 +38,15 @@
  const additions=[];
  for(const scan of source){
    if(scan.suggestedPriceCad==null)continue;
-   const photos=[scan.image,...Object.entries(alternateFor)
-     .filter(([,parent])=>parent===scan.sku).map(([alternate])=>bySku.get(alternate)?.image).filter(Boolean)];
+   const alternatePhotos=Object.entries(alternateFor)
+     .filter(([,parent])=>parent===scan.sku).map(([alternate])=>bySku.get(alternate)?.image).filter(Boolean);
+   const photos=scan.sku==='OH-NEW-003-04'&&alternatePhotos.length
+     ?[...alternatePhotos,scan.image]
+     :[scan.image,...alternatePhotos];
    additions.push({...itemBase,
      sku:scan.sku,title:scan.title,shortDescription:scan.description,
      cmsLongDescription:scan.description,theme:scan.category,category:scan.category,
-     image:scan.image,images:photos,catalogIds:[scan.sku],
+     image:photos[0],images:photos,catalogIds:[scan.sku],
      price:scan.suggestedPriceCad,priceStatus:'asking_price',
      conditionNotes:'Check the photographs for visible age-related marks. Exact dimensions, reverse and paper type can be confirmed before dispatch.',
      tags:scan.tags||['Old Hollywood'],sourceGroup:scan.sourceGroup,
