@@ -1,0 +1,33 @@
+name: Prepare Burton & Found weekly marketing kit
+
+on:
+  schedule:
+    # Monday 13:00 UTC. Artifacts only; nothing is auto-posted or emailed.
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-organic-content:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout inventory and product photographs
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate marketing outputs
+        run: npm run build:marketing
+      - name: Verify link and content generation
+        run: node --test tests/marketing-build.test.mjs
+      - name: Upload draft Pin catalogue, social posts, newsletter and readiness summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: burton-found-organic-marketing-kit
+          path: marketing-output/
+          retention-days: 30
+          if-no-files-found: error
