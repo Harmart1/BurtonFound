@@ -15,7 +15,8 @@
     count.textContent=list.length+" curated set"+(list.length===1?"":"s");
     grid.innerHTML=list.map(set=>{
       const members=set.memberSkus.map(sku=>bySku.get(sku)).filter(Boolean);
-      const mosaic=members.slice(0,4).map(item=>
+      const visualMembers=[...members].sort((a,b)=>Number(b.image===set.image)-Number(a.image===set.image));
+      const mosaic=visualMembers.slice(0,4).map(item=>
         '<a href="'+urlFor(item.sku)+'" aria-label="View '+esc(item.title)+'"><img src="'+esc(item.image)+'" loading="lazy" decoding="async" alt="'+esc(item.title)+'" width="320" height="410"></a>'
       ).join("");
       const membersHtml=members.map(item=>
