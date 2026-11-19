@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.mjs",
-    "check:deploy": "node scripts/check-deploy.mjs"
+    "test": "npm run build:marketing && node --test tests/*.test.mjs",
+    "check:deploy": "node scripts/check-deploy.mjs",
+    "build:marketing": "node scripts/build-marketing.mjs"
   },
   "description": "No runtime npm dependencies; Cloudflare Pages Functions use Web APIs and Supabase REST"
 }
