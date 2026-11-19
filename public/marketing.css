@@ -63,3 +63,6 @@ p{max-width:74ch}
 @media(max-width:650px){.mk-head-inner{min-height:0}.mk-head nav{gap:7px 15px}.mk-logo{font-size:1.38rem}.mk-logo small{display:block;margin-left:0}.mk-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.mk-card-copy{padding:10px}.mk-card-copy strong{font-size:1rem}.mk-detail{grid-template-columns:1fr;padding:20px 0 30px}.mk-gallery>a:first-child{max-height:550px}.mk-gallery>a:first-child img{max-height:520px}.mk-price{font-size:1.65rem}}
 @media(max-width:370px){.mk-grid{grid-template-columns:1fr 1fr}.mk-card-copy strong{font-size:.94rem}.mk-head nav{font-size:.76rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Live stock state, refreshed only when the public inventory API is available. */
+.mk-stock{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:7px 11px;font-size:.8rem;font-weight:750;color:var(--muted);margin:0 0 14px}
