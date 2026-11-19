@@ -1,0 +1,21 @@
+/* Lightweight collector-discovery navigation on the Burton & Found homepage */
+.bf-discovery{padding:clamp(32px,6vw,72px) clamp(18px,5vw,64px);background:#e9e7dc;color:#20382b}
+.bf-discovery-inner{max-width:1200px;margin:auto}
+.bf-discovery-head{max-width:840px;margin-bottom:23px}
+.bf-discovery-eyebrow{font:800 .75rem/1.5 system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase;color:#8a523e;margin:0 0 8px}
+.bf-discovery h2{font:normal clamp(1.85rem,3vw,2.9rem)/1.15 Georgia,serif;letter-spacing:-.03em;margin:0 0 12px}
+.bf-discovery-head p{font:.94rem/1.65 system-ui,sans-serif;color:#495b50;margin:0}
+.bf-discovery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.bf-discovery-card{min-height:170px;display:flex;flex-direction:column;gap:12px;border-radius:8px;background:#fffbf3;border:1px solid #b9c1b6;padding:21px;color:#21382b;text-decoration:none;box-shadow:none}
+.bf-discovery-card:hover{border-color:#925544}
+.bf-discovery-card:focus-visible{outline:3px solid #925544;outline-offset:3px}
+.bf-discovery-card strong{font:normal clamp(1.2rem,1.9vw,1.6rem)/1.25 Georgia,serif}
+.bf-discovery-card p{font:.85rem/1.52 system-ui,sans-serif;color:#4f6357;margin:0;flex:1}
+.bf-discovery-card span{font:800 .77rem/1.5 system-ui,sans-serif;color:#805039;text-decoration:underline;text-underline-offset:4px}
+html[data-theme="dark"] .bf-discovery{background:#24392e;color:#f5efdf}
+html[data-theme="dark"] .bf-discovery-head p{color:#dce8d9}
+html[data-theme="dark"] .bf-discovery-card{background:#304639;color:#fff4e0;border-color:#748d7c}
+html[data-theme="dark"] .bf-discovery-card p{color:#d4dfd4}
+html[data-theme="dark"] .bf-discovery-card span{color:#f0cead}
+@media(max-width:750px){.bf-discovery-grid{grid-template-columns:1fr 1fr}.bf-discovery-card{padding:15px;min-height:140px}.bf-discovery-card strong{font-size:1.19rem}}
+@media(max-width:480px){.bf-discovery-grid{grid-template-columns:1fr}.bf-discovery-card{min-height:0}.bf-discovery{padding:30px 17px}}
