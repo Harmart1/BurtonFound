@@ -171,12 +171,17 @@ jobs:
           curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview-launch.css" -o /tmp/bf-preview.css
           curl --fail --silent --show-error --max-time 20 --retry 2 "$base/old-hollywood-new.html" -o /tmp/bf-hollywood.html
           curl --fail --silent --show-error --max-time 20 --retry 2 "$base/assets/images/old-hollywood/ohnew-003-01.webp" -o /tmp/bf-photo.webp
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/coke-new-products.js" -o /tmp/bf-coke-products.js
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/coke-new-feature.css" -o /tmp/bf-coke-feature.css
+          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/assets/images/coca-cola/new-2026/brussels-1958-hero.webp" -o /tmp/bf-coke-photo.webp
           # Cloudflare may deliver managed-browser challenges to CI clients.
           # Keep diagnostics transparent: HTTP 200 is not proof of the actual page.
           python3 - <<'PY'
           from pathlib import Path
           checks=[
             ('/tmp/bf-preview.html',b'prFeaturedGrid'),
+            ('/tmp/bf-coke-products.js',b'CC-SET-F'),
+            ('/tmp/bf-coke-feature.css',b'bf-coke-feature-grid'),
             ('/tmp/bf-homepage.html',b'Browse the collection'),
             ('/tmp/bf-homepage.css',b'spotlight-grid'),
             ('/tmp/bf-preview.js',b'OH-NEW-003-01'),
@@ -193,6 +198,11 @@ jobs:
           else:
             print('WARNING: image endpoint responded with non-WebP content',repr(data[:65]))
           PY
+          python3 - <<'PY'
+          from pathlib import Path
+          data=Path('/tmp/bf-coke-photo.webp').read_bytes()
+          print('PASS Cocoa-Cola WebP image' if data[:4]==b'RIFF' and data[8:12]==b'WEBP' else 'WARNING Coca-Cola photo endpoint did not return WebP')
+          PY
           browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           if [[ -z "$browser" ]]; then
             echo "Browser unavailable; HTTP and inventory preflight passed."
@@ -205,11 +215,17 @@ jobs:
             test -s "/tmp/burtonfound-preview/$name.png"
             echo "PASS rendered preview: $name ($w x $h)"
           done
+          for spec in '1440 900 preview-desktop' '390 844 preview-mobile'; do
+            read -r w h name <<< "$spec"
+            "$browser" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars --virtual-time-budget=4500 --window-size="$w,$h" --screenshot="/tmp/burtonfound-preview/$name.png" "$base/preview.html" >/dev/null 2>&1
+            test -s "/tmp/burtonfound-preview/$name.png"
+            echo "PASS rendered interactive preview: $name ($w x $h)"
+          done
       - name: Attach desktop and mobile homepage screenshots
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: burtonfound-homepage-2026-11-19
+          name: burtonfound-coke-2026-11-19
           path: /tmp/burtonfound-preview/*.png
           if-no-files-found: ignore
           retention-days: 14
