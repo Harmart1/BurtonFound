@@ -76,6 +76,7 @@ test('Policy modal uses native dialog, close buttons and focus restoration witho
   assert.match(js,/createElement\('dialog'\)/);
   assert.match(js,/dialog\.showModal\(\)/);
   assert.match(js,/dialog\.close\(\)/);
+  assert.match(js,/currentRequest!==requestId/,'Out-of-order loading must not overwrite a newer policy');
   assert.match(js,/addEventListener\('close'/);
   assert.match(js,/element\.focus/);
   assert.match(js,/data-policy/);
