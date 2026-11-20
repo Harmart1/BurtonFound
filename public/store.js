@@ -273,7 +273,10 @@
     try {
       const params=new URLSearchParams(window.location.search),requested=params.get('collection');
       if(['hollywood','coca-cola','automobiles'].includes(requested))selectCollection(requested);
-      if(params.get('bag')==='open')setTimeout(openCart,0);
+      const toAdd=params.get('add');
+      if(toAdd&&bySku.has(toAdd)&&bySku.get(toAdd).collection==='automobiles'){
+        addItem(toAdd);setTimeout(openCart,0);
+      }else if(params.get('bag')==='open')setTimeout(openCart,0);
     }catch{}
     document.querySelectorAll('.tab').forEach(button=>button.addEventListener('click',()=>{selectFilter(button.dataset.filter);renderProducts();}));
     $('collectionFilter').addEventListener('change',e=>{currentCollection=e.target.value;renderProducts();});
