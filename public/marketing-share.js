@@ -51,7 +51,7 @@
         (image?'&media='+encodeURIComponent(image):'')+'&description='+encodeURIComponent(title);
     }
     if(!destination)return;
-    const opened=window.open(destination,'_blank','noopener,noreferrer');
-    status(button,opened===null?'Your browser may have blocked the share window. Use Copy link if needed.':'Share window opened.');
+    window.open(destination,'_blank','noopener,noreferrer');
+    status(button,'Choose where to share in the new window. If it was blocked, use Copy link.');
   });
 })();
