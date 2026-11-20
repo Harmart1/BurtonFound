@@ -106,7 +106,7 @@ test('automobile preview scripts load synchronously before merchandising and vis
  for(const source of sources){
    const match=page.match(new RegExp('<script([^>]*)src="'+source.replaceAll('.','\\.')+'"([^>]*)><\\/script>'));
    assert.ok(match,'Missing '+source);
-   assert.ok(!/\\bdefer\\b|\\basync\\b/i.test(match[1]+match[2]),'Must execute in order: '+source);
+   assert.ok(!/\bdefer\b|\basync\b/i.test(match[1]+match[2]),'Must execute in order: '+source);
    const pos=page.indexOf('src="'+source+'"');
    assert.ok(pos>previous,'Source must run before preview renderer: '+source);
    previous=pos;
