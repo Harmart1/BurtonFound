@@ -133,7 +133,17 @@
     $('catalogCount').textContent=list.length+' of '+items.length+' catalogue products · CAD';
     $('shopStatus').textContent=(currentDecade!=='all'||currentFilter!=='all'||currentCollection!=='all'||search)?'Showing '+list.length+' matching catalogue products.':'Browse vintage advertising, Old Hollywood and automobile print designs. Automobile prices are indicative; physical stock must be verified.';
   }
-  function addItem(sku){if(!bySku.has(sku))return;if(bySku.get(sku)?.cmsOnly){toast('This catalogue item is awaiting physical inventory verification. You can save it to your watchlist.');return;}if(bySku.get(sku)?.stockState==='unavailable'){toast('This item is sold or temporarily reserved.');return;}if(bag.includes(sku)){toast('Already in your paper bag.');return;}bag.push(sku);saveBag();renderProducts();renderCart();toast('A good find! Added to your paper bag.');}
+  function addItem(sku){
+    const p=bySku.get(sku);if(!p)return;
+    if(p.cmsOnly){toast('This product is awaiting stock review. Save it to your watchlist.');return;}
+    if(p.stockState==='unavailable'){toast('This product is sold or reserved.');return;}
+    if(bag.includes(sku)){toast('Already in your paper bag.');return;}
+    const units=new Set(p.catalogIds||[sku]);
+    const conflict=bag.map(id=>bySku.get(id)).find(existing=>existing&&(existing.catalogIds||[existing.sku]).some(unit=>units.has(unit)));
+    if(conflict){toast('A selected item is already included in '+conflict.title+'. Remove that item or set first.');return;}
+    bag.push(sku);saveBag();renderProducts();renderCart();
+    toast(needsVerification(p)?'Added for an availability enquiry. Physical stock and final price must be confirmed.':'A good find! Added to your paper bag.');
+  }
   function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();}
   function openCart(){
     if($('cartDrawer').classList.contains('open'))return;
@@ -160,14 +170,21 @@
     $('cartSubtotal').textContent=money(bag.reduce((s,id)=>s+(bySku.get(id)?.price||0),0));
     $('cartItems').innerHTML=bag.length?bag.map(id=>{
       const p=bySku.get(id);
-      return `<div class="cart-item"><img src="${safe(p.image)}" alt=""><div><small>${safe(p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD EPHEMERA':'ORIGINAL · '+p.year)}</small><strong>${safe(p.title)}</strong><small>${safe(p.sku)} · Qty 1</small><button type="button" data-remove="${safe(p.sku)}">Remove</button></div><b>${money(p.price)}</b></div>`;
+      return `<div class="cart-item"><img src="${safe(p.image)}" alt=""><div><small>${safe(p.collection==='automobiles'?'VINTAGE AUTOMOBILE · VERIFY STOCK':p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD EPHEMERA':'ORIGINAL · '+p.year)}</small><strong>${safe(p.title)}</strong><small>${safe(p.sku)} · Qty 1</small><button type="button" data-remove="${safe(p.sku)}">Remove</button></div><b>${needsVerification(p)?'Indicative '+money(p.price):money(p.price)}</b></div>`;
     }).join(''):`<div class="cart-empty"><span>✳</span><h3>Your bag is a blank page.</h3><p>A good find is just around the corner.</p><button type="button" class="btn btn-outline" id="bagBrowse">Explore the shelves ↗</button></div>`;
-    const b=$('checkoutButton');b.disabled=!bag.length||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&shippingMode==='live_carrier'&&!activeShippingQuote);
-    const estimator=$('shippingEstimator');if(estimator)estimator.hidden=!bag.length||shippingMode!=='live_carrier';
-    if(checkoutReady){b.innerHTML=(checkoutMode==='test_mode'?'Stripe test checkout':'Secure checkout with Stripe')+' <span>↗</span>';$('checkoutHelp').textContent=checkoutMode==='test_mode'?'TEST MODE ONLY · No real payments. Use Stripe test card details.':shippingMode==='live_carrier'?'Select a shipping quote, then enter the SAME destination at Stripe checkout. Different details will hold your paid order for review.':'Shipping and any configured taxes are shown before payment. Inventory is checked again securely.';}
+    const enquiryOnly=bagNeedsVerification();
+    const b=$('checkoutButton');b.disabled=!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
+    const estimator=$('shippingEstimator');if(estimator)estimator.hidden=!bag.length||enquiryOnly||shippingMode!=='live_carrier';
+    if(enquiryOnly){
+      $('cartSubtotal').textContent='Indicative '+money(bag.reduce((n,id)=>n+(bySku.get(id)?.price||0),0));
+      b.innerHTML=(C.sellerEmail?'Email availability request':'Copy availability request')+' <span>↗</span>';
+      $('checkoutHelp').textContent='Automobile prints and proposed sets may be added for a no-obligation enquiry. Physical stock, final price, condition and shipping must be confirmed. No payment or reservation occurs.';
+    }
+    else if(checkoutReady){b.innerHTML=(checkoutMode==='test_mode'?'Stripe test checkout':'Secure checkout with Stripe')+' <span>↗</span>';$('checkoutHelp').textContent=checkoutMode==='test_mode'?'TEST MODE ONLY · No real payments. Use Stripe test card details.':shippingMode==='live_carrier'?'Select a shipping quote, then enter the SAME destination at Stripe checkout. Different details will hold your paid order for review.':'Shipping and any configured taxes are shown before payment. Inventory is checked again securely.';}
     else if(C.sellerEmail){b.innerHTML='Email a purchase request <span>↗</span>';$('checkoutHelp').textContent='Online payment is not yet available. We will confirm availability and shipping before proceeding.';}
     else {b.innerHTML='Copy purchase request <span>↗</span>';$('checkoutHelp').textContent='Online payments are not enabled. You may save your bag or copy a purchase request; no payment is taken.';}
-    if(bag.some(sku=>bySku.get(sku)?.stockState==='unavailable'))$('checkoutHelp').textContent='An item in your bag is sold or reserved. Remove it before checking out.';
+    if(bagHasOverlappingUnits())$('checkoutHelp').textContent='Two selections contain the same pictured page. Remove one selection before proceeding.';
+    else if(bag.some(sku=>bySku.get(sku)?.stockState==='unavailable'))$('checkoutHelp').textContent='An item in your bag is sold or reserved. Remove it before checking out.';
   }
   function drawShippingOptions(data){
     liveOptions=data.options||[];activeShippingQuote=null;
@@ -178,7 +195,7 @@
     select(0);target.querySelectorAll('[name=carrierOption]').forEach(input=>input.addEventListener('change',()=>select(Number(input.value))));
   }
   async function getShippingQuote(e){
-    e.preventDefault();if(!bag.length)return;
+    e.preventDefault();if(!bag.length||bagNeedsVerification())return;
     activeShippingQuote=null;liveOptions=[];renderCart();
     const requestId=++shippingRequestId;const target=$('shippingResults');target.textContent='Checking available services with the carriers…';
     const form=e.currentTarget;
@@ -187,8 +204,8 @@
     catch(err){if(requestId!==shippingRequestId)return;target.textContent=err.message||'Rates unavailable · Contact the shop for a shipping quote';renderCart();}
   }
   async function handleCheckout(){
-    if(!bag.length)return;
-    if(checkoutReady){
+    if(!bag.length||bagHasOverlappingUnits())return;
+    if(checkoutReady&&!bagNeedsVerification()){
       if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Please remove unavailable items first.');return;}
       const btn=$('checkoutButton');btn.disabled=true;btn.textContent='Connecting securely…';
       try {
@@ -200,8 +217,8 @@
       finally{btn.disabled=false;renderCart();}
       return;
     }
-    let lines=bag.map(s=>{let p=bySku.get(s);return `${p.sku} — ${p.title} — ${money(p.price)}`;});
-    const msg=`Hello Burton & Found,\n\nI'm interested in the following original paper items:\n\n${lines.join('\n')}\n\nProposed subtotal: ${money(bag.reduce((s,id)=>s+bySku.get(id).price,0))} CAD (excluding shipping/taxes).\n\nPlease confirm availability, condition and shipping before payment.\n\nThank you.`;
+    let lines=bag.map(s=>{let p=bySku.get(s);return `${p.sku} — ${p.title} — ${money(p.price)}${needsVerification(p)?' (indicative; stock not verified)':''}`;});
+    const msg=`Hello Burton & Found,\n\nI'm interested in the following original paper items:\n\n${lines.join('\n')}\n\nIndicative subtotal: ${money(bag.reduce((s,id)=>s+bySku.get(id).price,0))} CAD (excluding shipping/taxes).\n\nPlease confirm physical inventory, condition, final asking prices and shipping before any payment. This is a non-binding enquiry and not a reservation.\n\nThank you.`;
     if(C.sellerEmail){window.location.href=`mailto:${encodeURIComponent(C.sellerEmail)}?subject=${encodeURIComponent('Vintage paper purchase enquiry')}&body=${encodeURIComponent(msg)}`;toast('Your email app will open. No payment has been taken.');return;}
     try{await navigator.clipboard.writeText(msg);toast('Purchase request copied. Add a seller email to enable sending enquiries.');}catch{
       const ta=document.createElement('textarea');ta.value=msg;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Purchase request copied to clipboard.');}catch{toast('Configure a seller email in config.js to accept enquiries.');}ta.remove();
