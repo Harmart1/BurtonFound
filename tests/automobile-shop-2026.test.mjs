@@ -26,13 +26,13 @@ test('Automobile integration lists all 80 unique photographed designs plus 18 pr
  assert.equal(cars.filter(p=>p.type==='bundle').length,18);
  assert.equal(ctx.window.BURTON_AUTOMOBILE_INTEGRATION.checkoutEligible,0);
  for(const p of cars){
-  assert.ok(Number.isFinite(p.price)&&p.price>0,'Indicative CAD price '+p.sku);
+  assert.ok(Number.isFinite(p.price)&&p.price>0,'CAD asking price '+p.sku);
   assert.ok(p.title&&p.shortDescription&&p.image,'Title, description and image '+p.sku);
   assert.ok(existsSync(join(root,'public',p.image)),'Photographed asset '+p.sku);
-  assert.equal(p.requiresVerification,true,'Physical verification must remain visible');
+  assert.equal(p.requiresVerification,true,'Internal physical inventory gate must remain enforced');
   assert.equal(p.availableForCheckout,false,'No unverified car print may be sent to Stripe');
   assert.equal(p.stockState,'verification_required');
-  assert.equal(p.priceStatus,'indicative');
+  assert.equal(p.priceStatus,'asking_price');
   assert.notEqual(p.cmsOnly,true,'Item can be added to enquiry bag');
   assert.ok(Array.isArray(p.catalogIds)&&p.catalogIds.length);
  }
@@ -45,7 +45,7 @@ test('Curated automobile sets point to unique individual paper design IDs withou
   assert.equal(p.catalogIds.length,p.memberDetails.length);
   assert.ok(p.catalogIds.every(id=>bySku.get(id)?.type==='original'),'Members refer to single pages');
   assert.equal(p.images.length,p.catalogIds.length-1,'Each member has a thumbnail');
-  assert.ok(p.price<p.catalogIds.reduce((n,id)=>n+bySku.get(id).price,0),'Proposed set price below separate indicative prices');
+  assert.ok(p.price<p.catalogIds.reduce((n,id)=>n+bySku.get(id).price,0),'Collector set price below individual asking prices');
  }
 });
 test('Automobile collection is a visible shop filter with actual Add to Bag and details navigation',()=>{
@@ -67,13 +67,13 @@ test('Automobile collection is a visible shop filter with actual Add to Bag and 
  assert.match(main,/bag\.push\(sku\)/);
  assert.match(main,/bagNeedsVerification\(\)/);
  assert.match(main,/if\(checkoutReady&&!bagNeedsVerification\(\)\)/);
- assert.match(main,/physical inventory|physical stock|Physical stock/i);
+ assert.match(main,/const bagNeedsVerification=/);
  const archive=read('public/vintage-cars-refined.js');
  assert.match(archive,/index\.html\?add=/);
  assert.match(archive,/index\.html\?item=/);
- assert.match(archive,/Add to bag for enquiry/);
- assert.match(archive,/Add set to bag for enquiry/);
- assert.match(read('public/vintage-cars.html'),/Enquiry bag now available|enquiry bag now available/);
+ assert.match(archive,/Add to bag/);
+ assert.match(archive,/Add set to bag/);
+ assert.match(read('public/vintage-cars.html'),/Shop vintage automobile advertising/);
  assert.match(read('public/vintage-cars.html'),/src="vintage-cars-refined\.js"/);
  assert.match(read('public/vintage-cars.html'),/vintage-cars-shop\.css/);
 });

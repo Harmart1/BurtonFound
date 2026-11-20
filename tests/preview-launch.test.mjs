@@ -36,7 +36,7 @@ test('release preview features accurate catalogue counts, collection entry point
  for(const f of ['preview-launch.js','preview.js'])execFileSync(process.execPath,['--check',file('public/'+f)]);
 });
 
-test('interactive preview reads 229 catalogue items across four themes with automobile verification labels',()=>{
+test('interactive preview reads 229 catalogue items across four themes with recommended automobile asking prices',()=>{
  const buttons=['coca-cola','hollywood','sets','automobiles'].map(key=>({
    dataset:{prCollection:key},attrs:{},
    events:{},setAttribute(name,value){this.attrs[name]=value},
@@ -72,8 +72,8 @@ test('interactive preview reads 229 catalogue items across four themes with auto
  assert.match(status.textContent,/curated Hollywood sets/);
  buttons[3].events.click();
  assert.ok(grid.innerHTML.includes('VA-049'));
- assert.match(grid.innerHTML,/Indicative/);
- assert.match(status.textContent,/physical paper stock must be confirmed/);
+ assert.doesNotMatch(grid.innerHTML,/Indicative|VERIFY STOCK/);
+ assert.match(status.textContent,/Automobile advertisements display CAD asking prices/);
  assert.equal(buttons[3].attrs['aria-pressed'],'true');
 });
 
