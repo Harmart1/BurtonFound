@@ -2,6 +2,10 @@
 (()=>{'use strict';
 const items=window.BURTON_VINTAGE_CARS||[],root=document.getElementById('cards');
 const proposedSets=Array.isArray(window.BURTON_VINTAGE_SETS)?window.BURTON_VINTAGE_SETS:[];
+const listedSkus=new Set(items.map(p=>p.sku));
+const listedSetSkus=new Set(proposedSets.map(p=>p.sku));
+const addUrl=sku=>'index.html?add='+encodeURIComponent(sku)+'&collection=automobiles#shop';
+const detailUrl=sku=>'index.html?item='+encodeURIComponent(sku)+'&collection=automobiles#shop';
 const search=document.getElementById('search'),brand=document.getElementById('brand'),era=document.getElementById('era'),sort=document.getElementById('sort');
 const showMore=document.getElementById('showMore'),result=document.getElementById('result'),dialog=document.getElementById('imageDialog');
 const viewButton=document.getElementById('viewComfort'),compactButton=document.getElementById('viewCompact');
@@ -76,7 +80,12 @@ function renderCuratedSets(){
   action.type='button';action.dataset.setSku=set.sku;
   action.setAttribute('aria-label','View pages in proposed set '+set.title);
   copy.appendChild(action);
-  copy.appendChild(makeElement('p','archive-bundle-review','Proposed grouping · not available for purchase'));
+  if(listedSetSkus.has(set.sku)){
+    const add=makeElement('a','archive-bag-action','Add set to bag for enquiry ↗');
+    add.href=addUrl(set.sku);add.setAttribute('aria-label','Add proposed '+set.title+' set to bag for availability enquiry');
+    copy.appendChild(add);
+  }
+  copy.appendChild(makeElement('p','archive-bundle-review','Indicative price · physical pages and final availability to confirm · no payment yet'));
   card.append(gallery,copy);grid.appendChild(card);
  }
  const expand=document.getElementById('showAllSets');
@@ -143,7 +152,18 @@ function update(){
     details.append(detailsLabel,detailsCopy,condition);body.appendChild(details);
 
     const button=document.createElement('button');button.type='button';button.className='gallery-view-button';button.dataset.sku=x.sku;button.textContent='View full photograph ↗';button.setAttribute('aria-label','Enlarge photograph of '+title(x));body.appendChild(button);
-    const notSale=document.createElement('p');notSale.className='small';notSale.textContent='Proposed CAD value only · Not for sale';body.appendChild(notSale);
+    if(listedSkus.has(x.sku)){
+      const buy=makeElement('a','archive-bag-action','Add to bag for enquiry ↗');
+      buy.href=addUrl(x.sku);
+      buy.setAttribute('aria-label','Add '+title(x)+' to bag for an availability enquiry');
+      body.appendChild(buy);
+      const detail=makeElement('a','archive-shop-detail','Product details in the shop ↗');
+      detail.href=detailUrl(x.sku);
+      body.appendChild(detail);
+    }
+    const pending=document.createElement('p');pending.className='small';
+    pending.textContent='Indicative CAD price · confirm physical paper, condition and availability before any purchase';
+    body.appendChild(pending);
     card.appendChild(body);root.appendChild(card);
   }
   if(!visibleItems.length){const empty=document.createElement('p');empty.textContent='No pages match those filters. Try a different search or clear the filters.';root.appendChild(empty)}
@@ -165,7 +185,7 @@ function updateDialog(){
   const image=document.getElementById('dialogImage');image.src=showOriginal?(item.originalImage||item.image):item.image;image.alt=(showOriginal?'Unmodified source scan of ':'Enhanced display photograph of ')+title(item);
   const sourceToggle=document.getElementById('toggleOriginal');sourceToggle.setAttribute('aria-pressed',String(showOriginal));sourceToggle.textContent=showOriginal?'Return to enhanced display':'View original scan';
   document.getElementById('dialogTitle').textContent=title(item);
-  document.getElementById('dialogInfo').textContent=item.sku+' · '+item.brand+(item.year?' · '+item.year:'')+' · Suggested CAD '+cad(item.suggestedPriceCAD)+' · Not for sale'+(item.duplicateGroup?' · Possible repeat: '+item.duplicateGroup:'');
+  document.getElementById('dialogInfo').textContent=item.sku+' · '+item.brand+(item.year?' · '+item.year:'')+' · Indicative CAD '+cad(item.suggestedPriceCAD)+' · Stock to verify'+(item.duplicateGroup?' · Possible repeat: '+item.duplicateGroup:'');
   document.getElementById('prevImage').disabled=dialogIndex===0;
   document.getElementById('nextImage').disabled=dialogIndex===visibleItems.length-1;
 }
@@ -177,8 +197,8 @@ document.getElementById('nextImage').addEventListener('click',()=>{if(dialogInde
 dialog.addEventListener('keydown',e=>{if(e.key==='ArrowRight'&&dialogIndex<visibleItems.length-1){e.preventDefault();dialogIndex++;updateDialog()}else if(e.key==='ArrowLeft'&&dialogIndex>0){e.preventDefault();dialogIndex--;updateDialog()}});
 dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
 
-/* Live published content from the private CMS. The service returns vetted copy only.
-   All automobile scans and all curated sets remain non-purchasable. */
+/* Live published editorial revisions may change display copy but cannot activate purchases.
+   Only the 80 known singles and 18 known sets are linked to the main enquiry bag. */
 async function refreshPublishedEditorial(){
  try{
   const res=await fetch('/api/cms/published',{cache:'no-store'});if(!res.ok)return;
