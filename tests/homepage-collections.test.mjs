@@ -21,7 +21,7 @@ test('root index is the real visitor homepage, with prominent accurate collectio
  assert.ok(main.includes('data-shop-hollywood="" href="#shop"'));
  assert.ok(main.includes('data-shop-hollywood-sets="" href="#shop"'));
  assert.ok(main.includes('href="vintage-cars.html"'));
- assert.ok(main.includes('Archive viewing only'),'automobiles must remain distinguished from sale products');
+ assert.ok(main.includes('Add to your bag for an availability enquiry'),'automobiles must be enquiry-only until stock is verified');
  assert.ok(main.includes('Coming next'));
  assert.ok(main.includes('href="books.html"'));
  assert.ok(main.includes('href="collectibles.html"'));
@@ -59,6 +59,7 @@ test('homepage links open correct shop collections without changing payments, pr
  assert.ok(js.includes("selectCollection('hollywood','bundle')"));
  assert.ok(js.includes("selectCollection('coca-cola')"));
  assert.ok(js.includes("selectCollection('hollywood')"));
+ assert.ok(js.includes("selectCollection('automobiles')"));
  execFileSync(process.execPath,['--check',at('public/store.js')]);
  const storefront=read('public/storefront.html');
  assert.ok(storefront.includes('href="homepage-collections.css"'));
