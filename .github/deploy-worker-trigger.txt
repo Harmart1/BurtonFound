@@ -54,3 +54,4 @@ Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside ho
 2026-11-20 — Deploy verified shopping bag keyboard fixes, live filter counts and sold-last sorting; checkout flags unchanged (preview only).
 2026-11-20 — Marketing discovery release: collector gift guide, visitor-triggered product sharing, social meta and caption improvements. Preserve checkout and indexing approvals OFF.
 2026-11-20 — Publish Ontario/Canada legal policies and closable, accessible footer dialogs; checkout and indexing approvals remain off.
+2026-11-20 — Final Ontario legal policy dialog hardening: race-safe loading, keyboard dismissal and compact footer polish. Checkout, shipping quote and indexing approvals remain OFF.
