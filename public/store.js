@@ -215,6 +215,12 @@
     $('productDialog').showModal();renderDetailImage();
   }
   function info(section){
+    // Route legacy information actions to the current standalone policy documents.
+    if(['shipping','terms','privacy'].includes(section)){
+      const slug=section==='shipping'?'shipping-returns':section;
+      window.BURTON_POLICY?.open(slug);
+      return;
+    }
     let texts={
       shipping:['Shipping & returns',`<p>We aim to ship original paper items flat, in a protective sleeve with strong rigid backing and weather protection. Measured parcel shipping charges and carrier delivery estimates appear in the bag when connected. Final address details are collected at Stripe Checkout and must match the shipping quote. Our orders are packed and dispatched manually with tracking.</p><p>Exact dispatch times, shipping locations, insurance and returns terms must be confirmed by the store owner before the site is published. Consumer rights under applicable law are not limited by this draft.</p><p>Ask for additional condition photographs before purchasing, especially for older or fragile paper.</p>`],
       condition:['Our condition guide',`<p><strong>Very good:</strong> the image and text are complete, with some ordinary handling marks, gentle toning or worn edges.</p><p><strong>Good:</strong> visible age-related wear such as staining, edge damage, folds or pencil marks, disclosed in the listing.</p><p>Condition information is based on the photographed item. Ask for additional views and measurements when needed.</p>`],

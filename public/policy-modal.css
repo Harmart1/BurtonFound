@@ -1,0 +1,42 @@
+/* Shared accessible policy modal and footer links. */
+.bf-policy-links{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.bf-policy-links a,.bf-dept-policy-links a,.bf-inline-policy-links a{color:inherit;text-underline-offset:3px}
+.bf-policy-links a:hover,.bf-dept-policy-links a:hover,.bf-inline-policy-links a:hover{text-decoration-thickness:2px}
+.bf-policy-links :focus-visible,.bf-dept-policy-links :focus-visible,.bf-inline-policy-links :focus-visible{outline:3px solid #ba7058;outline-offset:3px}
+.bf-dept-policy-links,.bf-inline-policy-links{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:12px;font-size:.83rem}
+.bf-policy-dialog{color:#22352a;background:#faf8f1;border:1px solid #b0b9ab;border-radius:10px;padding:0;width:min(875px,calc(100vw - 24px));max-width:875px;max-height:min(88vh,900px);box-shadow:0 18px 55px rgba(0,0,0,.22);overscroll-behavior:contain}
+.bf-policy-dialog::backdrop{background:rgba(10,21,16,.72)}
+.bf-policy-dialog-frame{display:flex;flex-direction:column;max-height:min(88vh,900px)}
+.bf-policy-dialog-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;background:#20372d;color:#fffaf0;padding:16px clamp(17px,3vw,28px);position:relative}
+.bf-policy-dialog-brand{font:700 .73rem/1.4 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;margin:0;width:100%;color:#f4dccb}
+.bf-policy-dialog-head h2{font:normal clamp(1.35rem,2vw,1.75rem)/1.15 Georgia,serif;flex:1;margin:0;color:#fffaf0}
+.bf-policy-dialog-close,.bf-policy-dialog-bottom-close{appearance:none;cursor:pointer;font:700 .85rem/1.3 system-ui,sans-serif;padding:9px 15px;min-height:44px;border:1px solid #ccd9cc;border-radius:5px;background:#fdf9ef;color:#244236}
+.bf-policy-dialog-close span{font-size:1.3rem;margin-left:8px}
+.bf-policy-dialog-scroll{overflow-y:auto;padding:clamp(16px,3.6vw,32px);scrollbar-gutter:stable;flex:1;min-height:0}
+.bf-policy-dialog-foot{border-top:1px solid #d1d3c8;padding:10px 20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;background:#f2f0e9}
+.bf-policy-dialog-foot a{color:#2c6149;font:700 .88rem/1.4 system-ui,sans-serif}
+.bf-policy-dialog :focus-visible{outline:3px solid #b76b4c;outline-offset:3px}
+.bf-policy-content{max-width:75ch;margin:0 auto;font:normal 1rem/1.69 system-ui,-apple-system,"Segoe UI",sans-serif;color:#253b2e;overflow-wrap:break-word}
+.bf-policy-content h1{font:normal clamp(1.7rem,3vw,2.4rem)/1.2 Georgia,serif;color:#20372d;margin:4px 0 10px}
+.bf-policy-dialog .bf-policy-content h1{display:none}
+.bf-policy-content h2{font:normal clamp(1.16rem,2.2vw,1.4rem)/1.3 Georgia,serif;color:#20372d;margin:28px 0 8px}
+.bf-policy-content p{margin:10px 0 15px;max-width:unset}
+.bf-policy-content ul{padding-left:1.45rem}
+.bf-policy-content li{margin:0 0 10px}
+.bf-policy-content a{color:#7a3c2e;text-decoration:underline;text-underline-offset:3px}
+.bf-policy-content address{font-style:normal;padding:11px 15px;background:#edf0e9;border-left:3px solid #47745f}
+.bf-policy-content strong{color:#20372d}
+.bf-policy-content .bf-policy-kicker{color:#8b5038;font-size:.75rem;font-weight:800;letter-spacing:.1em}
+.bf-policy-effective{color:#51695b;font-size:.85rem}
+.bf-policy-intro{font-size:1.06rem;color:#3a5848}
+.bf-policy-content section{border-top:1px solid #d5d9ce;padding-top:4px}
+.bf-policy-related{border-top:2px solid #b7c7b9;margin-top:35px;padding-top:8px;display:flex;flex-wrap:wrap;gap:8px 17px}
+.bf-policy-related h2{width:100%}
+.bf-policy-loading{min-height:140px}
+@media(max-width:580px){.bf-policy-dialog{max-height:94dvh;width:calc(100vw - 12px)}.bf-policy-dialog-frame{max-height:94dvh}.bf-policy-dialog-head{padding:12px 16px}.bf-policy-dialog-scroll{padding:15px}.bf-policy-dialog-foot{padding:8px 13px}.bf-policy-content{font-size:.94rem;line-height:1.6}}
+@media(prefers-reduced-motion:reduce){.bf-policy-dialog *{scroll-behavior:auto!important}}
+
+/* Compact policy navigation for legacy pages without a formal site footer. */
+.bf-policy-compact-footer{margin-top:20px;padding:22px max(20px,calc((100vw - 1100px)/2));background:#20372d;color:#f7f0e1;font:400 .88rem/1.5 system-ui,sans-serif}
+.bf-policy-compact-footer a{color:#f6d3bb}
+.bf-policy-compact-footer .bf-inline-policy-links{margin-top:12px}
