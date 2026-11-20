@@ -56,3 +56,4 @@ Final mobile UX correction: move Vintage Automobiles dark-mode toggle outside ho
 2026-11-20 — Publish Ontario/Canada legal policies and closable, accessible footer dialogs; checkout and indexing approvals remain off.
 2026-11-20 — Final Ontario legal policy dialog hardening: race-safe loading, keyboard dismissal and compact footer polish. Checkout, shipping quote and indexing approvals remain OFF.
 2026-11-20 — Policy pop-up readability fix: high-contrast paired light/dark surfaces, readable system type, responsive spacing and regression checks; checkout and indexing remain OFF.
+2026-11-20 — Vintage automobile release: 80 photographed designs, 18 priced collector sets and shared enquiry bag; stock verification mandatory; Stripe checkout, taxes, carrier quotes and search indexing remain OFF.
