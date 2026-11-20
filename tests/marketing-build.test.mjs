@@ -49,8 +49,8 @@ test('human-readable category pages and collector guides are generated and linke
 test('sitemap is complete but public indexing remains disabled pending approval',()=>{
  const sitemap=read('public/sitemap.xml');
  const entries=[...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(x=>x[1]);
- assert.equal(entries.length,138,'Home, products, collections, 3 guides');
- assert.equal(new Set(entries).size,138);
+ assert.equal(entries.length,139,'Home, 131 products, 3 collections, 3 guides, 1 gift landing page');
+ assert.equal(new Set(entries).size,entries.length);
  for(const url of entries)assert.ok(url.startsWith('https://burtonfound.timharmar.workers.dev/'),url);
  assert.ok(sitemap.includes('/products/'));
  const robots=read('public/robots.txt');
