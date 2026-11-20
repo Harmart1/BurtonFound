@@ -71,7 +71,7 @@ test('Coke imports are linked across all shop/account/preview surfaces without d
   for(const id of ['CC-NEW-001','CC-NEW-002','CC-NEW-003','CC-SET-F'])
    assert.ok(html.includes('item='+id+'#shop'),'New product missing home link '+id);
   assert.ok(html.includes('href="coke-new-feature.css"'));
-  assert.ok(html.includes('131 product listings'));
+  assert.ok(html.includes('229 product listings'));
   assert.ok(html.includes('43 listings'));
   assert.ok(html.includes('37 SINGLE FINDS + 6 SETS'));
   assert.ok(html.includes('37 DISTINCT DESIGNS'));

@@ -55,7 +55,8 @@ window.BURTON_FEATURED=Object.freeze({
   preview:{
     hollywood:['OH-003','OH-NEW-004-10','OH-NEW-002-05','OH-NEW-007-01'],
     sets:['OHS-003','OHS-011','OHS-001','OHS-007'],
-    'coca-cola':['CC-NEW-001','CC-NEW-002','CC-NEW-003','CC-SET-F']
+    'coca-cola':['CC-NEW-001','CC-NEW-002','CC-NEW-003','CC-SET-F'],
+    automobiles:['VA-049','VA-022','VA-016','VA-002']
   },
   setCovers:{
     'OHS-001':'OH-NEW-002-05',

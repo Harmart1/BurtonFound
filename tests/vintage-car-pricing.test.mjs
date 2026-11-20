@@ -63,11 +63,11 @@ test('All eighteen proposed sets use distinct recorded pages and an explicit dis
  }
  assert.equal(used.size,53);
 });
-test('Customer-facing page has bundle recommendations, pricing evidence and browse-only safeguards',()=>{
+test('Customer-facing page offers enquiry bag, photographs and safeguarded indicative prices',()=>{
  const html=read('public/vintage-cars.html'),script=read('public/vintage-cars-refined.js');
  for(const term of ['vintage-cars-sets.js','vintage-cars-pricing.css','id="bundleGrid"','id="pricingMethod"','id="activeSetNote"','id="era"','id="showAllSets"','id="toggleOriginal"','value="lowprice"','value="highprice"'])
   assert.ok(html.includes(term),'Missing '+term);
- assert.match(html,/not yet for sale/);
+ assert.match(html,/enquiry bag now available/);
  assert.match(html,/noindex, nofollow/);
  assert.match(script,/suggestedPriceCAD/);
  assert.match(script,/renderCuratedSets/);
@@ -76,7 +76,8 @@ test('Customer-facing page has bundle recommendations, pricing evidence and brow
  assert.match(script,/originalImage/);
  assert.match(script,/showOriginal/);
  assert.match(script,/renderCuratedSets/);
- assert.ok(!script.includes('/api/checkout'),'Preview gallery must never submit a checkout');
+ assert.ok(!script.includes('/api/checkout'),'Automobile enquiry gallery must never submit a checkout');
+ assert.match(script,/Add set to bag for enquiry/);
  const result=spawnSync(process.execPath,['--check',new URL('../public/vintage-cars-refined.js',import.meta.url).pathname],{encoding:'utf8'});
  assert.equal(result.status,0,result.stderr);
 });
