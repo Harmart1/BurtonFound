@@ -19,7 +19,7 @@ test('Primary store promotes automobile catalogue while original backend sale in
  const html=read('public/storefront.html');
  assert.match(html,/class="editorial-archive-band"/);
  assert.match(html,/id="editorialArchiveTitle"/);
- assert.match(html,/All 80 designs and 18 sets can be added to your bag/);
+ assert.match(html,/published Canadian-dollar price, detailed descriptions and Add to Bag/);
  assert.match(html,/editorial-refresh\.css/);
  const products=read('public/products.js');
  const obj=JSON.parse(products.slice(products.indexOf('=')+1).trim().replace(/;\s*$/,''));
