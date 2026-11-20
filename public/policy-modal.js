@@ -1,7 +1,7 @@
 /* Burton & Found policy viewer: links remain valid standalone pages without JS. */
 (()=>{'use strict';
   const allowed=new Set(['privacy','terms','shipping-returns','cookies','accessibility']);
-  let dialog,content,title,closeButton,lastTrigger=null;
+  let dialog,content,title,closeButton,lastTrigger=null,requestId=0;
   const cache=new Map();
   function ensureDialog(){
     if(dialog)return dialog;
@@ -18,6 +18,7 @@
       if(element?.isConnected&&typeof element.focus==='function')element.focus({preventScroll:true});
       else document.querySelector('a[data-policy]')?.focus({preventScroll:true});
       lastTrigger=null;
+      requestId++;
     });
     dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close()});
     return dialog;
@@ -32,6 +33,7 @@
   async function show(slug,trigger){
     if(!allowed.has(slug))return;
     const target='/policies/'+slug+'.html';
+    const currentRequest=++requestId;
     ensureDialog();
     if(!dialog.open){lastTrigger=trigger||document.activeElement;dialog.showModal()}
     content.innerHTML='<p class="bf-policy-loading" role="status">Loading policy…</p>';
@@ -50,9 +52,11 @@
         cache.set(slug,markup);
       }
       // The source is our own same-origin static policy page, not user input.
+      if(currentRequest!==requestId||!dialog.open)return;
       content.innerHTML=markup.html;
       title.textContent=markup.title;
     }catch{
+      if(currentRequest!==requestId||!dialog.open)return;
       content.innerHTML='<p>We could not load this policy in the pop-up. <a href="'+target+'">Open the full policy page</a> instead.</p>';
       title.textContent='Policy unavailable in pop-up';
     }
