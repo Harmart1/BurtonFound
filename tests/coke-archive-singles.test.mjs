@@ -92,10 +92,10 @@ test('New individual listings load everywhere and homepage labels correctly indi
  for(const page of ['public/index.html','public/storefront.html']){
   const html=read(page);
   assert.ok(html.includes('43 listings'),page);
-  assert.ok(html.includes('131 product listings'),page);
+  assert.ok(html.includes('229 product listings'),page);
   assert.ok(html.includes('37 SINGLE FINDS + 6 SETS'),page);
   assert.ok(html.includes('37 DISTINCT DESIGNS'),page);
-  assert.ok(html.includes('Single pieces <span>114</span>'),page);
+  assert.ok(html.includes('Single pieces <span>194</span>'),page);
  }
  const html=read('public/preview.html');
  assert.ok(html.includes('131</strong>'));
