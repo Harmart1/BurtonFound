@@ -24,3 +24,5 @@ html[data-theme="dark"] .bf-discovery-card span{color:#f0cead}
 .detail-product-link{display:inline-flex;align-items:center;padding:10px 0;min-height:44px;font-size:.86rem;font-weight:750;color:#945540!important;text-decoration:underline;text-underline-offset:4px}
 html[data-theme="dark"] .detail-product-link{color:#efc4a3!important}
 .detail-product-link:focus-visible{outline:3px solid #b8795d;outline-offset:3px}
+
+/* The gift discovery strip is in marketing-growth.css. */
