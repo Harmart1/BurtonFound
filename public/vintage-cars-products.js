@@ -1,8 +1,9 @@
 /* Integrate the 80 distinct scanned automobile designs and 18 curated sets
  * into the normal Burton & Found bag, account and filter catalogue.
- * Prices are existing researched CAD suggestions. Physical stock, original format,
- * condition and ownership are NOT verified; enquiry-only is enforced separately
- * from the site's live payment status. No new back-end inventory is created.
+ * Research-supported CAD amounts are the seller's posted asking prices.
+ * Internally, original physical inventory and ownership still require merchant
+ * review, so checkout is blocked independently of customer-facing labels.
+ * No new back-end inventory is created.
  */
 (()=>{
  'use strict';
@@ -15,15 +16,15 @@
  const common={
    collection:'automobiles',status:'enquiry_only',stockState:'verification_required',
    availableForCheckout:false,requiresVerification:true,
-   priceStatus:'indicative',quantity:0,
+   priceStatus:'asking_price',quantity:0,
    category:'Vintage automobile advertising',
-   condition:'Physical paper not yet inspected',
-   conditionNotes:'Physical stock, ownership, dimensions, verso, printing date, and condition must be confirmed before any sale.',
+   condition:'See photographs; further condition details available on request',
+   conditionNotes:'Please review the supplied photographs. Details about paper condition, size and reverse-side printing can be requested before purchase.',
    issue:'Magazine issue unverified',publicationConfidence:'The image is catalogued; precise printed issue and source have not been independently authenticated.',
-   photoNote:'Photograph of the catalogued advertising design; physical original and exact print format have not been verified.',
+   photoNote:'Photograph of the catalogued advertising design; additional paper and printing details can be requested.',
    authenticityNote:'No authentication or verified provenance is asserted. The depicted vehicle period may differ from the printing date.',
-   edition:'Vintage automobile advertising · printed-paper format to be verified',
-   priceQualifier:'INDICATIVE CAD PRICE'
+   edition:'Vintage automobile advertising · printed-paper details on request',
+   priceQualifier:'CAD ASKING PRICE'
  };
  for(const p of individuals){
    if(!/^VA-\d{3}$/.test(p.sku)||bySku.has(p.sku)||!p.title||!p.image||!Number.isFinite(p.suggestedPriceCAD)||p.suggestedPriceCAD<=0||p.physicalItemVerified||p.salesEnabled)throw Error('Invalid or unverified automobile product '+p.sku);
@@ -31,7 +32,7 @@
    rows.push({...common,type:'original',sku:p.sku,title:p.title,
      year:Number.isInteger(p.year)?p.year:null,dateLabel:p.year?String(p.year)+' automobile image · printing date unverified':'Printing date unverified',
      theme:p.brand+' vintage motoring',brand:p.brand||'Unknown',shortDescription:p.summary||p.description,
-     cmsLongDescription:p.description,price:p.suggestedPriceCAD,image:p.image,
+     cmsLongDescription:p.summary||p.description,price:p.suggestedPriceCAD,image:p.image,
      images:[p.image,...(p.originalImage&&p.originalImage!==p.image?[p.originalImage]:[])],
      catalogIds:[p.sku],tags:['Vintage automobiles',p.brand,String(p.year||'Date unknown')]
    });
@@ -49,9 +50,9 @@
      price:set.suggestedSetPriceCAD,
      image:members[0].image,images:members.slice(1).map(x=>x.image),
      catalogIds:[...set.componentSkus],memberDetails:members.map(x=>({sku:x.sku,title:x.title,image:x.image})),
-     edition:'Proposed curated automobile advertising group · '+members.length+' scanned designs',
+     edition:'Curated automobile advertising collection · '+members.length+' pictured designs',
      tags:['Vintage automobiles','Curated collector sets',set.theme],
-     priceQualifier:'INDICATIVE SET PRICE'
+     priceQualifier:'CAD SET PRICE'
    });
  }
  if(rows.length!==98||rows.some(p=>!Number.isFinite(p.price)))throw Error('Automobile integration incomplete');
