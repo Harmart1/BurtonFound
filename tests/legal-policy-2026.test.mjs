@@ -36,7 +36,7 @@ test('Privacy, marketing and consumer policies are grounded in applicable statut
   assert.match(sale,/does not override, statutory cancellation/);
   const terms=read('public/policies/terms.html');
   assert.match(terms,/statutory warranties/);
-  assert.match(terms,/not affiliated/);
+  assert.match(terms,/not endorsed by or affiliated with/);
   assert.match(terms,/cannot be guaranteed/);
   const cookies=read('public/policies/cookies.html');
   assert.match(cookies,/local storage/);
