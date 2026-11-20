@@ -45,3 +45,148 @@
 .bf-policy-compact-footer{padding:23px clamp(18px,5vw,55px);background:#20372d;color:#fff6e7;font:400 .9rem/1.6 system-ui,sans-serif}
 .bf-policy-compact-footer .bf-inline-policy-links{margin-top:7px}
 .bf-policy-compact-footer a{color:#f7d1b8}
+
+/*
+ * Accessible reading colours for legal pop-ups.
+ * The site's legacy dark theme sets background: var(--ui-surface) !important on ALL
+ * dialog elements; without an equally explicit matching text palette this made
+ * policy content dark-on-dark. These id-scoped rules override that global selector
+ * without changing product/cart dialogs or the standalone legal pages.
+ */
+#bfPolicyDialog {
+  --bf-policy-paper: #fffef9;
+  --bf-policy-ink: #182b22;
+  --bf-policy-muted: #3a5144;
+  --bf-policy-soft: #edf2e9;
+  --bf-policy-head: #203c2f;
+  --bf-policy-head-ink: #ffffff;
+  --bf-policy-link: #71351f;
+  --bf-policy-rule: #aec0b2;
+  color-scheme: light;
+  background: var(--bf-policy-paper) !important;
+  color: var(--bf-policy-ink) !important;
+  font-family: system-ui,-apple-system,"Segoe UI",Arial,sans-serif !important;
+}
+html[data-theme="dark"] #bfPolicyDialog {
+  --bf-policy-paper: #17271f;
+  --bf-policy-ink: #f5f8f1;
+  --bf-policy-muted: #dceadf;
+  --bf-policy-soft: #263d30;
+  --bf-policy-head: #10261c;
+  --bf-policy-head-ink: #ffffff;
+  --bf-policy-link: #ffd3aa;
+  --bf-policy-rule: #779584;
+  color-scheme: dark;
+  background: var(--bf-policy-paper) !important;
+  color: var(--bf-policy-ink) !important;
+}
+#bfPolicyDialog :is(.bf-policy-dialog-frame,.bf-policy-dialog-scroll) {
+  background: var(--bf-policy-paper) !important;
+  color: var(--bf-policy-ink) !important;
+}
+#bfPolicyDialog .bf-policy-dialog-head {
+  background: var(--bf-policy-head) !important;
+  color: var(--bf-policy-head-ink) !important;
+}
+#bfPolicyDialog .bf-policy-dialog-head :is(h2,p,span) {
+  color: var(--bf-policy-head-ink) !important;
+}
+#bfPolicyDialog .bf-policy-dialog-brand {
+  color: #f1d8c2 !important;
+  font-family: system-ui,-apple-system,"Segoe UI",Arial,sans-serif !important;
+  font-size: .8rem !important;
+  line-height: 1.5 !important;
+}
+#bfPolicyDialog .bf-policy-dialog-scroll {
+  overscroll-behavior: contain;
+  padding: clamp(19px,3.5vw,36px);
+}
+#bfPolicyDialog .bf-policy-content {
+  color: var(--bf-policy-ink) !important;
+  font-family: system-ui,-apple-system,"Segoe UI",Arial,sans-serif !important;
+  font-size: 1.075rem !important;
+  font-weight: 400 !important;
+  line-height: 1.76 !important;
+  letter-spacing: normal !important;
+  max-width: 70ch;
+}
+#bfPolicyDialog .bf-policy-content :is(p,ul,li,div,section,dl,dd,dt,em,small,span,address) {
+  color: var(--bf-policy-ink) !important;
+}
+#bfPolicyDialog .bf-policy-content :is(p,li,dd,dt,address) {
+  font-family: inherit !important;
+  font-size: 1em !important;
+  line-height: 1.76 !important;
+  font-weight: 400 !important;
+  letter-spacing: normal !important;
+}
+#bfPolicyDialog .bf-policy-content :is(h1,h2,h3,strong) {
+  color: var(--bf-policy-ink) !important;
+}
+#bfPolicyDialog .bf-policy-content h2 {
+  font-family: system-ui,-apple-system,"Segoe UI",Arial,sans-serif !important;
+  font-size: clamp(1.2rem,2vw,1.48rem) !important;
+  line-height: 1.38 !important;
+  font-weight: 750 !important;
+  letter-spacing: -.015em;
+  margin: 31px 0 13px !important;
+}
+#bfPolicyDialog .bf-policy-content .bf-policy-effective,
+#bfPolicyDialog .bf-policy-content .bf-policy-intro {
+  color: var(--bf-policy-muted) !important;
+}
+#bfPolicyDialog .bf-policy-content .bf-policy-kicker {
+  color: var(--bf-policy-muted) !important;
+}
+#bfPolicyDialog .bf-policy-content :is(a,a:visited) {
+  color: var(--bf-policy-link) !important;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+#bfPolicyDialog .bf-policy-content address {
+  background: var(--bf-policy-soft) !important;
+  border-left: 4px solid var(--bf-policy-rule);
+  padding: 13px 17px;
+}
+#bfPolicyDialog .bf-policy-content section,
+#bfPolicyDialog .bf-policy-related {
+  border-color: var(--bf-policy-rule) !important;
+}
+#bfPolicyDialog .bf-policy-dialog-foot {
+  background: var(--bf-policy-soft) !important;
+  border-color: var(--bf-policy-rule) !important;
+  color: var(--bf-policy-ink) !important;
+}
+#bfPolicyDialog .bf-policy-dialog-foot a {
+  color: var(--bf-policy-link) !important;
+  font-size: .94rem !important;
+  line-height: 1.5 !important;
+}
+#bfPolicyDialog :is(.bf-policy-dialog-close,.bf-policy-dialog-bottom-close) {
+  background: #fcfcf6 !important;
+  color: #182b22 !important;
+  border: 2px solid #adc0b2 !important;
+  border-radius: 7px;
+  font-family: system-ui,-apple-system,"Segoe UI",Arial,sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
+  min-height: 46px;
+}
+#bfPolicyDialog :is(.bf-policy-dialog-close,.bf-policy-dialog-bottom-close):hover {
+  background: #eaf1e9 !important;
+  color: #182b22 !important;
+}
+#bfPolicyDialog :is(button,a,[tabindex]):focus-visible {
+  outline: 3px solid #d89045 !important;
+  outline-offset: 3px !important;
+}
+@media (max-width: 580px) {
+  #bfPolicyDialog .bf-policy-dialog-scroll {padding: 19px 17px;}
+  #bfPolicyDialog .bf-policy-content {font-size: 1.0625rem !important;line-height: 1.7 !important;}
+  #bfPolicyDialog .bf-policy-content :is(p,li,dd,dt,address) {line-height: 1.7 !important;}
+  #bfPolicyDialog .bf-policy-dialog-head {gap: 9px;padding: 13px 16px;}
+  #bfPolicyDialog .bf-policy-dialog-head h2 {font-size: 1.35rem !important;}
+}
