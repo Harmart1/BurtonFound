@@ -118,7 +118,7 @@ test('Standard shop cards, watchlists, carts and detail galleries support all li
  const store=readFileSync(file('public/store.js'),'utf8');
  const account=readFileSync(file('public/account-core.js'),'utf8');
  assert.ok(store.includes("$('productGrid').innerHTML=list.map(p=>{"));
- assert.ok(store.includes("if(bySku.get(sku)?.cmsOnly)"),'Other CMS unpublished products still excluded from shopping');
+ assert.ok(store.includes('if(p.cmsOnly)'),'Other unpublished CMS-only products remain excluded from the bag');
  assert.ok(store.includes("const p=bySku.get(sku)"),'Native SKU details used');
  assert.ok(store.includes("p.memberDetails"),'Curated set contents use standard detail panel');
  assert.ok(store.includes("checkoutReady=false"),'Global payment capability remains gated');
@@ -132,7 +132,7 @@ test('Standard shop cards, watchlists, carts and detail galleries support all li
      previous=at;
    }
    if(!p.endsWith('account.html')){
-     assert.ok(h.includes('131 product listings'),p);
+     assert.ok(h.includes('229 product listings'),p);
      assert.ok(h.includes('old-hollywood-product-native.css'),p);
      assert.ok(h.includes('id="productGrid"'),p);
    }
