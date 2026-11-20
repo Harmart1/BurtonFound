@@ -1,0 +1,20 @@
+/* Vintage automobile shopping enquiry actions, with explicit contrast in both themes. */
+.archive-bag-action{
+ display:flex;align-items:center;justify-content:center;text-align:center;
+ min-height:49px;padding:12px 18px;margin-top:9px;
+ border:2px solid #203c2c;border-radius:6px;
+ background:#203c2c;color:#fffaf1!important;
+ font:750 .95rem/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;
+ text-decoration:none;letter-spacing:normal;
+}
+.archive-bag-action:hover{background:#325b43;color:#fff!important;border-color:#325b43}
+.archive-shop-detail{display:inline-flex;align-items:center;min-height:44px;color:var(--gallery-accent)!important;font-size:.91rem;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.archive-bag-action:focus-visible,.archive-shop-detail:focus-visible{outline:3px solid #d58e42!important;outline-offset:3px!important}
+.archive-bundle-content>.archive-bag-action{margin:6px 0 0}
+.archive-bundle-review,.archive-gallery-section .card .small{overflow-wrap:break-word}
+.archive-page-price{flex-wrap:wrap}
+.archive-page-price strong{flex-shrink:0}
+html[data-theme="dark"] .archive-bag-action{background:#e2ede0;color:#142b20!important;border-color:#e2ede0}
+html[data-theme="dark"] .archive-bag-action:hover{background:#fff8e7;border-color:#fff8e7;color:#142b20!important}
+html[data-theme="dark"] .archive-shop-detail{color:#ffd9b2!important}
+@media(max-width:550px){.archive-bag-action{min-height:49px;font-size:.94rem}.archive-shop-detail{font-size:.9rem}}
