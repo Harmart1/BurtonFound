@@ -77,10 +77,43 @@ test('interactive preview reads 229 catalogue items across four themes with reco
  assert.equal(buttons[3].attrs['aria-pressed'],'true');
 });
 
-test('preview sharing goes to preview page and merchant feedback without email never falsely claims submission',()=>{
+test('preview sharing works without visitor reviews, forms or feedback menu items',()=>{
  const src=read('public/preview.js');
+ const page=read('public/preview.html');
+ const retired=read('public/review.html');
  assert.ok(src.includes("new URL('preview.html',location.href)"));
- assert.ok(src.includes("if(!address){try{await copy(feedback())"));
- assert.ok(!src.includes("new URL('./',location.href).href"));
- assert.ok(!src.includes("Your email application should open; choose the owner"));
+ assert.ok(src.includes("navigator.share"));
+ assert.ok(src.includes("shareCopy"));
+ assert.ok(src.includes("shareEmail"));
+ assert.ok(src.includes("shareFacebook"));
+ assert.ok(!/feedback\(|reviewForm|reviewStatus|emailFeedback|copyFeedback|saveFeedback/.test(src));
+ assert.ok(!/href="#feedback"|id="feedback"|reviewForm|copyFeedback|emailFeedback|saveFeedback|Give feedback|Share your feedback/i.test(page));
+ assert.ok(!/feedback/i.test(page),'No public-facing visitor feedback invitation should remain');
+ assert.ok(page.includes('Share a good <em>find</em>'));
+ assert.ok(page.includes('pr-collection-nav'));
+ assert.ok(retired.includes('url=preview.html'),'Old review links should redirect to the presentation');
+ assert.ok(!retired.includes('reviewForm'));
+});
+test('automobile preview scripts load synchronously before merchandising and visual rendering',()=>{
+ const page=read('public/preview.html');
+ const sources=[
+   'products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js',
+   'old-hollywood-products.js','coke-new-products.js','coke-archive-singles.js',
+   'vintage-cars-data.js','vintage-cars-sets.js','vintage-cars-products.js',
+   'featured-merchandising.js','preview-launch.js'
+ ];
+ let previous=-1;
+ for(const source of sources){
+   const match=page.match(new RegExp('<script([^>]*)src="'+source.replaceAll('.','\\.')+'"([^>]*)><\\/script>'));
+   assert.ok(match,'Missing '+source);
+   assert.ok(!/\bdefer\b|\basync\b/i.test(match[1]+match[2]),'Must execute in order: '+source);
+   const pos=page.indexOf('src="'+source+'"');
+   assert.ok(pos>previous,'Source must run before preview renderer: '+source);
+   previous=pos;
+ }
+ assert.equal((page.match(/data-pr-collection=/g)||[]).length,4);
+ assert.ok(page.includes('Vintage automobiles'));
+ assert.ok(page.includes('229</strong>'));
+ assert.ok(page.includes('Online card payment is not yet active'));
+ assert.ok(existsSync(file('public/assets/images/curated/vintage-cars/va-049.webp')));
 });

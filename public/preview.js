@@ -1,14 +1,52 @@
-(()=>{'use strict';const $=id=>document.getElementById(id),form=$('reviewForm');const status=$('reviewStatus'),shareStatus=$('shareStatus');const live=()=>location.protocol==='https:'&&!/(localhost|127\.0\.0\.1|chatgpt|openai|oaiusercontent|sandbox)/i.test(location.hostname);const url=()=>new URL('preview.html',location.href).href;const seller=()=>String(window.BURTON_CONFIG?.feedbackEmail||window.BURTON_CONFIG?.sellerEmail||'').trim();
-function feedback(){const f=new FormData(form);const get=n=>String(f.get(n)||'(not provided)').trim();return ['BURTON & FOUND — SITE REVIEW','Website: '+(live()?url():'interactive preview supplied as a file'),'Perspective: '+get('perspective'),'Rating (1–5): '+get('rating'),'Area reviewed: '+get('section'),'Ease of use: '+get('ease'),'What works well: '+get('liked'),'What could improve: '+get('change'),'Additional idea: '+get('idea'),'','Preview feedback only — not an order or customer account.'].join('\n');}
-function copy(s){if(navigator.clipboard?.writeText)return navigator.clipboard.writeText(s);const x=document.createElement('textarea');x.value=s;x.style.position='fixed';x.style.left='-9999px';document.body.appendChild(x);x.select();const ok=document.execCommand('copy');x.remove();return ok?Promise.resolve():Promise.reject(new Error('Copy unavailable'))}
-function check(){if(!form.querySelector('input[name="rating"]:checked')){status.textContent='Please select a rating of 1–5 first.';form.querySelector('input[name="rating"]').focus();return false}return true}
-$('copyFeedback').addEventListener('click',async()=>{if(!check())return;try{await copy(feedback());status.textContent='Review copied. Paste it into any message or email to Burton & Found.';}catch{status.textContent='Copy was blocked; use Save .txt file instead.'}});
-$('saveFeedback').addEventListener('click',()=>{if(!check())return;const blob=new Blob([feedback()],{type:'text/plain'}),a=document.createElement('a'),x=URL.createObjectURL(blob);a.href=x;a.download='Burton-And-Found-Site-Feedback.txt';a.click();setTimeout(()=>URL.revokeObjectURL(x),500);status.textContent='Review downloaded as a text file. You can email it to the shop owner.'});
-$('emailFeedback').addEventListener('click',async()=>{if(!check())return;const address=seller();if(!address){try{await copy(feedback());status.textContent='Feedback copied. Paste it into a message to the shop owner; direct email is not configured yet.';}catch{status.textContent='Direct email is not configured; use Save .txt file instead.'}return;}const q=new URLSearchParams({subject:'Burton & Found — Website Preview Feedback',body:feedback()});location.href='mailto:'+encodeURIComponent(address)+'?'+q.toString();status.textContent='Your email application should open with the review addressed to Burton & Found.'});
-function gate(){if(live())return true;shareStatus.textContent='This page is not hosted on a public HTTPS address. Share the published preview link once the site is deployed.';return false}
-$('shareCopy').addEventListener('click',async()=>{if(!gate())return;try{await copy(url());shareStatus.textContent='Public preview URL copied. Share it with anyone you would like feedback from.';}catch{shareStatus.textContent='Could not copy. Select the address bar and copy the URL.'}});
-$('shareFacebook').addEventListener('click',()=>{if(!gate())return;window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url()),'_blank','noopener,noreferrer')});
-$('shareEmail').addEventListener('click',()=>{if(!gate())return;const body=`I’d appreciate your feedback on the Burton & Found website preview:\n\n${url()}\n\nExplore the 108-product catalogue, Old Hollywood curated sets, upcoming books and collectibles, and the Paper Trail Lab. The preview includes a short feedback form.\n\nCard checkout is not yet activated; no payment is taken on the preview page.`;location.href='mailto:?subject='+encodeURIComponent('Would you review the Burton & Found website?')+'&body='+encodeURIComponent(body)});
-$('shareNative').addEventListener('click',async()=>{if(!gate())return;if(navigator.share){try{await navigator.share({title:'Preview Burton & Found',text:'Books, ephemera and collectibles — share your thoughts.',url:url()})}catch{}}else{$('shareCopy').click()}});
-if(!live())$('shareContext').textContent='This preview is not hosted on a public HTTPS link. Once deployed, the sharing controls will use this page’s public address.';
+/* Burton & Found · public collection preview sharing.
+   No feedback form, visitor review collection, or unconfigured email delivery. */
+(()=>{
+ 'use strict';
+ const byId=id=>document.getElementById(id);
+ const status=byId('shareStatus');
+ const context=byId('shareContext');
+ const previewUrl=()=>new URL('preview.html',location.href).href;
+ const publicLink=()=>location.protocol==='https:'&&!/(localhost|127\.0\.0\.1|chatgpt|openai|oaiusercontent|sandbox)/i.test(location.hostname);
+ const announce=message=>{if(status)status.textContent=message;};
+ function gate(){
+   if(publicLink())return true;
+   announce('Use the published HTTPS website address to share the collection.');
+   return false;
+ }
+ async function copy(value){
+   if(navigator.clipboard?.writeText){try{await navigator.clipboard.writeText(value);return;}catch{}}
+   const temp=document.createElement('textarea');
+   temp.value=value;temp.style.cssText='position:fixed;top:-10000px;left:-10000px';
+   document.body.appendChild(temp);temp.focus();temp.select();
+   let ok=false;try{ok=document.execCommand('copy')}catch{}
+   temp.remove();
+   if(!ok)throw Error('Copy unavailable');
+ }
+ const on=(id,fn)=>byId(id)?.addEventListener('click',fn);
+ on('shareCopy',async()=>{
+   if(!gate())return;
+   try{await copy(previewUrl());announce('Collection preview link copied.');}
+   catch{announce('Unable to copy automatically. Copy this page address from your browser.');}
+ });
+ on('shareFacebook',()=>{
+   if(!gate())return;
+   window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(previewUrl()),'_blank','noopener,noreferrer');
+ });
+ on('shareEmail',()=>{
+   if(!gate())return;
+   const subject='Discover Burton & Found — vintage advertising and collectibles';
+   const body='I thought you might enjoy browsing Burton & Found, a vintage paper and collectibles store with Coca-Cola advertising, Old Hollywood, and classic automobile advertisements.\n\n'+previewUrl()+'\n\nExplore the photographed items and prices in Canadian dollars. Online card payments are not yet enabled.';
+   location.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+ });
+ on('shareNative',async()=>{
+   if(!gate())return;
+   if(navigator.share){
+     try{
+       await navigator.share({title:'Burton & Found | Collection Preview',text:'Explore vintage advertising, Old Hollywood, automobiles and collectible paper.',url:previewUrl()});
+     }catch(error){if(error?.name!=='AbortError')announce('Sharing was unavailable. Use Copy preview link instead.');}
+   }else{
+     byId('shareCopy')?.click();
+   }
+ });
+ if(!publicLink()&&context)context.textContent='These sharing controls use the public website address when the preview is hosted over HTTPS.';
 })();
