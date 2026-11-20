@@ -1,0 +1,18 @@
+/* Standalone legal policy pages also work if popup JS or network fetch is unavailable. */
+:root{color-scheme:light}
+*{box-sizing:border-box}
+body.bf-policy-page{margin:0;background:#f8f6f0;color:#263c2f;font:16px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}
+.bf-policy-skip{position:absolute;left:10px;top:-100px;background:#fff;padding:12px;color:#20372d;z-index:20}
+.bf-policy-skip:focus{top:6px}
+.bf-policy-sitehead{background:#20372d;color:#fff7ea}
+.bf-policy-sitehead>div{max-width:1120px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:15px;min-height:80px;padding:15px 23px}
+.bf-policy-sitehead a{color:#fff9ec}
+.bf-policy-logo{font:normal clamp(1.25rem,3vw,1.8rem)/1.2 Georgia,serif;text-decoration:none;white-space:nowrap}
+.bf-policy-logo em{color:#edbe9d}
+#policyMain{padding:clamp(23px,4vw,50px) 22px 60px}
+.bf-policy-sitefoot{padding:25px max(22px,calc((100vw - 1120px)/2));background:#20372d;color:#fff6e7;font-size:.88rem}
+.bf-policy-sitefoot p{margin:0 0 13px}
+.bf-policy-sitefoot nav{display:flex;flex-wrap:wrap;gap:10px 22px}
+.bf-policy-sitefoot a{color:#f6d1b6}
+.bf-policy-page a:focus-visible{outline:3px solid #b87250;outline-offset:3px}
+@media print{.bf-policy-sitehead,.bf-policy-sitefoot,.bf-policy-related{display:none!important}body.bf-policy-page{background:#fff;color:#000}#policyMain{padding:0}.bf-policy-content{max-width:100%;color:#000}}
