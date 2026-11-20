@@ -58,19 +58,28 @@ const head=(title,desc,path,photo='',type='website',ld=null)=>{
   '<meta name="robots" content="'+robots+'"><meta name="theme-color" content="#203730">'+
   '<title>'+clean(title)+' | Burton &amp; Found</title>'+
   '<meta name="description" content="'+clean(short(desc,155))+'"><link rel="canonical" href="'+clean(canonical)+'">'+
-  '<meta property="og:type" content="'+type+'"><meta property="og:title" content="'+clean(title)+'">'+
+  '<meta property="og:locale" content="en_CA"><meta property="og:type" content="'+type+'"><meta property="og:title" content="'+clean(title)+'">'+
   '<meta property="og:description" content="'+clean(short(desc,180))+'"><meta property="og:site_name" content="Burton &amp; Found">'+
   '<meta property="og:url" content="'+clean(canonical)+'"><meta property="og:image" content="'+clean(abs(img))+'">'+
+  '<meta property="og:image:alt" content="'+clean(title+' · Burton & Found catalogue')+'">'+
   '<meta name="twitter:card" content="summary_large_image">'+
+  '<meta name="twitter:title" content="'+clean(title)+'"><meta name="twitter:description" content="'+clean(short(desc,180))+'">'+
+  '<meta name="twitter:image" content="'+clean(abs(img))+'"><meta name="twitter:image:alt" content="'+clean(title+' · Burton & Found catalogue')+'">'+
   '<link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'+
-  '<link rel="stylesheet" href="/marketing.css">'+
+  '<link rel="stylesheet" href="/marketing.css"><script defer src="/marketing-share.js"></script>'+
   (type==='product'?'<script defer src="/marketing-stock.js"></script>':'')+
   (ld?'<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'</script>':'')+'</head>';
 };
-const header='<header class="mk-head"><div class="mk-wrap mk-head-inner"><a class="mk-logo" href="/">B<span>&amp;</span>F <small>Burton &amp; Found</small></a><nav aria-label="Explore the collections"><a href="/collections/coca-cola.html">Coca-Cola</a><a href="/collections/hollywood.html">Old Hollywood</a><a href="/collections/sets.html">Curated sets</a><a href="/guides/collecting-vintage-ads.html">Collector guides</a><a href="/#shop">Shop</a></nav></div></header>';
-const footer='<footer class="mk-foot"><div class="mk-wrap"><strong>Burton &amp; Found</strong><p>Thoughtfully catalogued vintage paper · Ontario, Canada · All prices CAD</p><p>Explore historical advertising, movie portraits and themed collector sets. Brand names identify the featured vintage material.</p><a href="/">Home</a> · <a href="/#shop">Main shop</a> · <a href="/guides/caring-for-vintage-paper.html">Caring for vintage paper</a></div></footer>';
+const header='<header class="mk-head"><div class="mk-wrap mk-head-inner"><a class="mk-logo" href="/">B<span>&amp;</span>F <small>Burton &amp; Found</small></a><nav aria-label="Explore the collections"><a href="/collections/coca-cola.html">Coca-Cola</a><a href="/collections/hollywood.html">Old Hollywood</a><a href="/collections/sets.html">Curated sets</a><a href="/guides/collecting-vintage-ads.html">Collector guides</a><a href="/gifts/vintage-gifts-for-collectors.html">Gift ideas</a><a href="/#shop">Shop</a></nav></div></header>';
+const footer='<footer class="mk-foot"><div class="mk-wrap"><strong>Burton &amp; Found</strong><p>Thoughtfully catalogued vintage paper · Ontario, Canada · All prices CAD</p><p>Explore historical advertising, movie portraits and themed collector sets. Brand names identify the featured vintage material.</p><a href="/">Home</a> · <a href="/#shop">Main shop</a> · <a href="/guides/caring-for-vintage-paper.html">Caring for vintage paper</a> · <a href="/gifts/vintage-gifts-for-collectors.html">Gift ideas for collectors</a></div></footer>';
 const frame=(title,description,path,content,img='',kind='website',ld=null)=>head(title,description,path,img,kind,ld)+'<body><a class="mk-skip" href="#main">Skip to content</a>'+header+'<main class="mk-wrap" id="main">'+content+'</main>'+footer+'</body></html>';
 const card=p=>'<a class="mk-card" href="'+urlOf(p)+'"><span class="mk-photo"><img src="/'+clean(p.image)+'" alt="'+clean(p.title)+' — photographed catalogue item" loading="lazy" decoding="async" width="380" height="480"></span><span class="mk-card-copy"><small>'+clean(p.type==='bundle'?'Curated collector set':p.collection==='hollywood'?'Old Hollywood':'Coca-Cola advertising')+'</small><strong>'+clean(p.title)+'</strong><span>'+dollar(p.price)+' CAD</span></span></a>';
+const shareControls=(path,title,image)=>'<div class="mk-share"><strong>Know someone who would love this?</strong><div class="mk-share-actions">'+
+ '<button type="button" data-bf-copy-link="'+clean(abs(path))+'">Copy link</button>'+
+ '<button type="button" data-bf-share-platform="native" data-bf-share-url="'+clean(abs(path))+'" data-bf-share-title="'+clean(title)+'">Share</button>'+
+ '<button type="button" data-bf-share-platform="pinterest" data-bf-share-url="'+clean(abs(path))+'" data-bf-share-image="'+clean(abs(image||"assets/brand/burton-found-preview-social.jpg"))+'" data-bf-share-title="'+clean(title)+'">Pinterest</button>'+
+ '<button type="button" data-bf-share-platform="facebook" data-bf-share-url="'+clean(abs(path))+'" data-bf-share-title="'+clean(title)+'">Facebook</button>'+
+ '</div><span class="mk-share-feedback" data-bf-copy-status role="status" aria-live="polite"></span></div>';
 const urls=['/'];
 const productLinks=Object.fromEntries(items.map(p=>[p.sku,urlOf(p)]));
 mk('product-links.js','/* Generated; map product SKUs to searchable permanent URLs. */\nwindow.BURTON_PRODUCT_LINKS = '+JSON.stringify(productLinks)+';\n');
@@ -90,11 +99,16 @@ for(const p of items){
   '<dl><div><dt>Catalogue reference</dt><dd>'+clean(p.sku)+'</dd></div><div><dt>Item format</dt><dd>'+clean(p.edition||'Vintage printed-paper item')+'</dd></div>'+
   (p.year&&Number(p.year)>1900?'<div><dt>Year indicated</dt><dd>'+p.year+' (verify publication date)</dd></div>':'')+
   '<div><dt>Condition</dt><dd>'+clean(p.conditionNotes||p.condition||'Ask for current physical condition and dimensions')+'</dd></div></dl>'+
-  '<a class="mk-button" data-bf-shop-link href="/index.html?item='+encodeURIComponent(p.sku)+'#shop">View in the shop / add to bag</a>'+
+  '<a class="mk-button" data-bf-shop-link href="/index.html?item='+encodeURIComponent(p.sku)+'#shop">View in the shop / add to bag</a>'+shareControls(path,p.title,p.image)+
   '<p class="mk-fine">'+(checkoutApproved?'Shipping and applicable taxes are presented before payment.':'Online card checkout is not yet enabled. Items can be saved in a bag for a purchase enquiry.')+' Ask for exact measurements, reverse images and shipping details as needed.</p>'+
   (p.type==='bundle'?'<p>Set contents: '+p.catalogIds.map(id=>bySku.has(id)?'<a href="'+urlOf(bySku.get(id))+'">'+clean(bySku.get(id).title)+'</a>':clean(id)).join(', ')+'.</p>':'')+
   '<p class="mk-fine">Burton &amp; Found is an independent vintage-paper seller. Brand and entertainment names describe the historical materials, not an endorsement.</p></div></div>';
- const related=items.filter(x=>x.sku!==p.sku&&x.collection===p.collection&&x.type===p.type).slice(0,3);
+ const score=x=>Number(marketable(x))*50+Number(x.type===p.type)*8+
+  Number(x.year&&p.year&&Math.floor(x.year/10)===Math.floor(p.year/10))*5+
+  Number(x.theme&&p.theme&&x.theme===p.theme)*5+
+  (Array.isArray(x.tags)&&Array.isArray(p.tags)?x.tags.filter(t=>p.tags.includes(t)).length:0);
+ const related=items.filter(x=>x.sku!==p.sku&&x.collection===p.collection)
+  .sort((a,b)=>score(b)-score(a)||a.sku.localeCompare(b.sku)).slice(0,3);
  const also='<section class="mk-related"><h2>Explore related finds</h2><div class="mk-grid">'+related.map(card).join('')+'</div></section>';
  const ld={'@context':'https://schema.org','@type':'Product',name:p.title,description:short(copy,600),sku:p.sku,image:imgs.map(abs),category:p.collection==='hollywood'?'Old Hollywood vintage printed paper':'Vintage Coca-Cola advertising',url:abs(path)};
  // Offers omitted until merchant checkout AND tax approvals are confirmed, to avoid implying online payments.
@@ -146,6 +160,27 @@ for(const g of guides){
  mk(g.path.slice(1),frame(g.title,g.description,g.path,'<nav class="mk-crumb"><a href="/">Home</a> / Collector guides</nav><p class="mk-kicker">The collector desk</p><article class="mk-article"><h1>'+clean(g.title)+'</h1><p class="mk-lead">'+clean(g.description)+'</p>'+sections+related+'</article>','','article',ld));
  urls.push(g.path);
 }
+// Evergreen, gift-intent landing page. Factual item suggestions; no invented discounts or delivery promises.
+const giftPath='/gifts/vintage-gifts-for-collectors.html';
+const giftGroups=[
+ {title:'For vintage advertising fans',intro:'A nostalgic choice for someone who remembers the soda fountain, classic typography or mid-century illustration.',matches:items.filter(p=>p.collection==='coca-cola'&&p.type==='original'&&marketable(p)).slice(0,4)},
+ {title:'For classic movie lovers',intro:'Magazine portraits and film-related printed paper make a personal gift for a cinema enthusiast.',matches:items.filter(p=>p.collection==='hollywood'&&p.type==='original'&&marketable(p)).slice(0,4)},
+ {title:'For the collector who enjoys a theme',intro:'Curated groupings are a starting point for a cohesive collection; verify set contents and availability before gifting.',matches:items.filter(p=>p.type==='bundle'&&marketable(p)).slice(0,4)}
+];
+const giftProducts=giftGroups.flatMap(group=>group.matches);
+const giftDescription='Explore vintage gift ideas for Coca-Cola advertising fans, Old Hollywood enthusiasts and paper collectors. Browse actual-item photos and CAD asking prices.';
+const giftSchema={'@context':'https://schema.org','@type':'CollectionPage',name:'Vintage gift ideas for collectors',description:giftDescription,url:abs(giftPath),mainEntity:{'@type':'ItemList',itemListElement:giftProducts.map((p,i)=>({'@type':'ListItem',position:i+1,name:p.title,url:abs(urlOf(p))}))}};
+const giftContent='<nav class="mk-crumb" aria-label="Breadcrumb"><a href="/">Home</a> / Gift ideas</nav>'+
+ '<p class="mk-kicker">Thoughtful gifts with a story</p><h1>Vintage gift ideas for collectors</h1>'+
+ '<p class="mk-lead">'+giftDescription+'</p>'+
+ '<p>Rather than a mass-produced novelty, consider a catalogued piece of advertising or printed movie history tied to someone\'s favourite era. Every pictured item has its own listing with format and condition notes.</p>'+
+ '<p class="mk-fine">Availability, exact condition, shipping cost and delivery timing must be confirmed. No promotional discounts or holiday arrival dates are promised. Online card checkout is not yet enabled.</p>'+
+ '<nav class="mk-collection-nav" aria-label="Explore gift themes"><a href="/collections/coca-cola.html">Coca-Cola advertising</a><a href="/collections/hollywood.html">Classic film paper</a><a href="/collections/sets.html">Curated sets</a></nav>'+
+ giftGroups.map(g=>'<section class="mk-gift-group"><h2>'+clean(g.title)+'</h2><p>'+clean(g.intro)+'</p><div class="mk-grid">'+g.matches.map(card).join('')+'</div></section>').join('')+
+ '<section class="mk-gift-advice"><h2>Before choosing a vintage-paper gift</h2><p>Review dimensions, printing-date qualifications, trimming, and whether an item is framed. Consider an archival sleeve or reversible display rather than an adhesive mount. For more detail, read our <a href="/guides/collecting-vintage-ads.html">collecting guide</a> and <a href="/guides/caring-for-vintage-paper.html">paper-care guide</a>.</p></section>'+
+ shareControls(giftPath,'Vintage gift ideas at Burton & Found',giftProducts[0]?.image||'assets/brand/burton-found-preview-social.jpg');
+mk(giftPath.slice(1),frame('Vintage Gift Ideas for Collectors',giftDescription,giftPath,giftContent,giftProducts[0]?.image||'','website',giftSchema));urls.push(giftPath);
+
 // Public read-only JSON Feed for future authorized Pinterest/social syndication.
 const feedItems=items.filter(marketable).map(p=>({
  id:abs(urlOf(p)),url:abs(urlOf(p)),title:p.title,
@@ -211,7 +246,7 @@ writeFileSync(join(out,'collector-newsletter-draft.md'),
  '# Subject: Three paper finds worth a closer look\n\nHello collectors,\n\nThis edition of Burton & Found highlights three vintage-paper finds:\n\n'+picks.slice(0,3).map(p=>'- '+p.title+' — '+dollar(p.price)+' CAD\n  '+abs(urlOf(p))).join('\n')+
  '\n\nA paper-collecting tip: always ask about the back of a vintage ad, the dimensions and any trimming before deciding to buy.\n\nBrowse the collection: '+base+'/collections/coca-cola.html?utm_source=newsletter&utm_medium=email&utm_campaign=collector_weekly\n\nThis is a DRAFT, not a sent email. Send only to subscribers with valid consent and include merchant identification and a working unsubscribe mechanism.\n');
 writeFileSync(join(out,'marketing-readiness.json'),JSON.stringify({
- timestamp:new Date().toISOString(),base,productPages:items.length,collectionPages:collection.length,guidePages:guides.length,indexable,weeklyRotation:weekNumber,weeklyDraftItems:picks.map(p=>p.sku),jsonFeedItems:feedItems.length,liveStockSnapshotUsed:liveStock!==null,
+ timestamp:new Date().toISOString(),base,productPages:items.length,collectionPages:collection.length,guidePages:guides.length,giftLandingPages:1,indexable,weeklyRotation:weekNumber,weeklyDraftItems:picks.map(p=>p.sku),jsonFeedItems:feedItems.length,liveStockSnapshotUsed:liveStock!==null,
  checkoutApproved,merchantFeedCreated:false,productLinksCreated:true,socialPostsPublished:false,newsletterSent:false,
  nextSteps:['Approve search indexing after seller content review','Connect Google Search Console and submit sitemap','Connect Pinterest business account to import CSV or create Pins','Confirm live checkout and shipping before Merchant Center','Connect a consent-managed email platform before collecting newsletter subscribers']
 },null,2));
