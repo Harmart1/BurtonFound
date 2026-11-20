@@ -98,7 +98,7 @@ test('New individual listings load everywhere and homepage labels correctly indi
   assert.ok(html.includes('Single pieces <span>194</span>'),page);
  }
  const html=read('public/preview.html');
- assert.ok(html.includes('131</strong>'));
+ assert.ok(html.includes('229</strong>'));
  assert.ok(html.includes('43</strong>'));
  for(const s of scripts)execFileSync(process.execPath,['--check',at('public/'+s)]);
 });
