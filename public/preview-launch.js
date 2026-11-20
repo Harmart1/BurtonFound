@@ -14,20 +14,20 @@ const featureSku=window.BURTON_FEATURED?.preview||{
 };
 const bySku=new Map(items.map(p=>[p.sku,p]));
 const card=p=>{
-  const type=p.collection==='automobiles'?'VINTAGE AUTOMOBILE · VERIFY STOCK':p.type==='bundle'?'CURATED COLLECTOR SET':p.collection==='hollywood'?'OLD HOLLYWOOD ORIGINAL':'VINTAGE ADVERTISING';
-  const note=p.type==='bundle'?(p.catalogIds?.length||0)+' included pieces':p.collection==='automobiles'?'Advertising print design · physical stock unverified':p.collection==='hollywood'?'Printed-paper collectible':'Original magazine advertising';
+  const type=p.collection==='automobiles'?'VINTAGE AUTOMOBILE ADVERTISING':p.type==='bundle'?'CURATED COLLECTOR SET':p.collection==='hollywood'?'OLD HOLLYWOOD ORIGINAL':'VINTAGE ADVERTISING';
+  const note=p.type==='bundle'?(p.catalogIds?.length||0)+' included pieces':p.collection==='automobiles'?'Vintage automobile advertising':p.collection==='hollywood'?'Printed-paper collectible':'Original magazine advertising';
   return '<a class="pr-product" href="index.html?item='+encodeURIComponent(p.sku)+'#shop" aria-label="View '+safe(p.title)+' in the shop, '+money(p.price)+' Canadian">'+
     '<span class="pr-product-photo"><img src="'+safe(p.image)+'" alt="'+safe(p.title)+' vintage paper artwork" loading="lazy" decoding="async" width="500" height="625"></span>'+
     '<div class="pr-product-info"><span class="pr-product-kicker">'+type+'</span>'+
     '<h3>'+safe(p.title)+'</h3><p>'+safe(p.shortDescription||note)+'</p>'+
-    '<div class="pr-product-bottom"><strong class="pr-product-price">'+(p.requiresVerification?'Indicative ':'')+money(p.price)+' <small>CAD</small></strong><span class="pr-product-view">View product ↗</span></div></div></a>';
+    '<div class="pr-product-bottom"><strong class="pr-product-price">'+money(p.price)+' <small>CAD</small></strong><span class="pr-product-view">View product ↗</span></div></div></a>';
 };
 function render(collection){
   const chosen=(featureSku[collection]||featureSku.hollywood).map(s=>bySku.get(s)).filter(Boolean);
   box.innerHTML=chosen.map(card).join('')||'<p>Items temporarily unavailable. Browse the full catalogue.</p>';
   for(const tab of tabs){const selected=tab.dataset.prCollection===collection;tab.setAttribute('aria-pressed',String(selected));}
   const names={'hollywood':'Old Hollywood individual finds','sets':'curated Hollywood sets','coca-cola':'Coca-Cola vintage advertising','automobiles':'vintage automobile advertising scans'};
-  status.textContent=chosen.length+' photographed product selections from '+(names[collection]||names.hollywood)+'. Prices in Canadian dollars. '+(collection==='automobiles'?'Automobile prices are indicative and physical paper stock must be confirmed before purchase. ':'')+'Each card opens its full listing in the shop.';
+  status.textContent=chosen.length+' photographed product selections from '+(names[collection]||names.hollywood)+'. Prices in Canadian dollars. '+(collection==='automobiles'?'Automobile advertisements display CAD asking prices. ':'')+'Each card opens its full listing in the shop.';
 }
 tabs.forEach(tab=>tab.addEventListener('click',()=>render(tab.dataset.prCollection)));
 render('coca-cola');
