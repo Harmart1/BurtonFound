@@ -6,7 +6,7 @@
  const status=byId('shareStatus');
  const context=byId('shareContext');
  const previewUrl=()=>new URL('preview.html',location.href).href;
- const publicLink=()=>location.protocol==='https:'&&!/(localhost|127\\.0\\.0\\.1|chatgpt|openai|oaiusercontent|sandbox)/i.test(location.hostname);
+ const publicLink=()=>location.protocol==='https:'&&!/(localhost|127\.0\.0\.1|chatgpt|openai|oaiusercontent|sandbox)/i.test(location.hostname);
  const announce=message=>{if(status)status.textContent=message;};
  function gate(){
    if(publicLink())return true;
@@ -35,7 +35,7 @@
  on('shareEmail',()=>{
    if(!gate())return;
    const subject='Discover Burton & Found — vintage advertising and collectibles';
-   const body='I thought you might enjoy browsing Burton & Found, a vintage paper and collectibles store with Coca-Cola advertising, Old Hollywood, and classic automobile advertisements.\\n\\n'+previewUrl()+'\\n\\nExplore the photographed items and prices in Canadian dollars. Online card payments are not yet enabled.';
+   const body='I thought you might enjoy browsing Burton & Found, a vintage paper and collectibles store with Coca-Cola advertising, Old Hollywood, and classic automobile advertisements.\n\n'+previewUrl()+'\n\nExplore the photographed items and prices in Canadian dollars. Online card payments are not yet enabled.';
    location.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
  });
  on('shareNative',async()=>{
