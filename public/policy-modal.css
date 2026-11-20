@@ -40,3 +40,8 @@
 .bf-policy-compact-footer{margin-top:20px;padding:22px max(20px,calc((100vw - 1100px)/2));background:#20372d;color:#f7f0e1;font:400 .88rem/1.5 system-ui,sans-serif}
 .bf-policy-compact-footer a{color:#f6d3bb}
 .bf-policy-compact-footer .bf-inline-policy-links{margin-top:12px}
+
+/* Compact policy footer for informational pages without a full shop footer. */
+.bf-policy-compact-footer{padding:23px clamp(18px,5vw,55px);background:#20372d;color:#fff6e7;font:400 .9rem/1.6 system-ui,sans-serif}
+.bf-policy-compact-footer .bf-inline-policy-links{margin-top:7px}
+.bf-policy-compact-footer a{color:#f7d1b8}
