@@ -66,3 +66,15 @@ p{max-width:74ch}
 
 /* Live stock state, refreshed only when the public inventory API is available. */
 .mk-stock{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:7px 11px;font-size:.8rem;font-weight:750;color:var(--muted);margin:0 0 14px}
+
+/* Organic product referral controls; nothing is sent until the visitor clicks. */
+.mk-share{margin:19px 0 6px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.mk-share strong{display:block;margin-bottom:11px;font-size:.91rem}
+.mk-share-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mk-share-actions button{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:5px;min-height:44px;padding:8px 13px;font:650 .87rem system-ui,sans-serif;cursor:pointer}
+.mk-share-actions button:hover{border-color:var(--accent)}
+.mk-share-feedback{display:block;min-height:1.4em;color:var(--muted);font-size:.79rem;margin-top:7px}
+.mk-gift-group{padding:22px 0 28px;border-top:1px solid var(--line)}
+.mk-gift-group h2{margin-bottom:5px}
+.mk-gift-group>p{margin-top:0;color:var(--muted)}
+.mk-gift-advice{margin:30px 0;padding:18px 24px;background:var(--panel);border-left:4px solid var(--accent)}
