@@ -1,5 +1,15 @@
 # Burton & Found — organic marketing automation and launch checklist
 
+## Marketing discovery and sharing — 20 November 2026
+- Added an evergreen vintage-gift discovery landing page with actual catalogue items segmented into advertising, film and curated-set gift interests.
+- Added a visible gift-discovery invitation and simple share-site controls to both store landing pages.
+- Product and gift landing pages now have visitor-triggered Copy Link, native share, Pinterest and Facebook options. These are not automatic social posts, cookies, pixels or analytics.
+- Improved Open Graph / X Card descriptions and image accessibility text for social previews.
+- Related-product suggestions now prioritize relevant themes/eras and available catalogue entries.
+- Added new checks to prevent accidental indexing or checkout activation during marketing edits.
+- The owner must still set an actual monitored seller contact address in `public/config.js`, finish sale/returns policy review and expressly approve search indexing; do not imply that unconfigured email enquiry will be delivered.
+
+
 Updated 19 November 2026.
 
 ## Marketing upgrades — November 19 release
