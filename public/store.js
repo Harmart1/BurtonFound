@@ -11,6 +11,7 @@
   const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   let currentFilter='all', currentSort='featured', currentDecade='all', currentCollection='all', search='';
   let selectedProduct=null,selectedImage=0;
+  let cartReturnFocus=null;
   let bag=[];
   try {bag=JSON.parse(localStorage.getItem('burton_found_bag')||'[]');if(!Array.isArray(bag))bag=[];}catch{bag=[];}
   bag=[...new Set(bag.filter(s=>bySku.has(s)&&!bySku.get(s)?.cmsOnly))];
@@ -102,6 +103,14 @@
     if(currentSort==='high')list.sort((a,b)=>b.price-a.price);
     if(currentSort==='oldest')list.sort((a,b)=>(a.year||9999)-(b.year||9999));
     if(currentSort==='newest')list.sort((a,b)=>(b.year||0)-(a.year||0));
+    // Preserve the requested sort within availability groups; never prioritize a sold item.
+    if(currentSort!=='featured')list.sort((a,b)=>Number(a.stockState==='unavailable')-Number(b.stockState==='unavailable'));
+    // Counts reflect the selected collection, era and search instead of stale HTML numbers.
+    const countPool=items.filter(p=>(currentCollection==='all'||p.collection===currentCollection)&&itemHasDecade(p,currentDecade)&&(!search||[p.title,p.year,p.sku,p.shortDescription,p.theme,(p.catalogIds||[]).join(' ')].join(' ').toLowerCase().includes(search)));
+    for(const tab of document.querySelectorAll('.tab[data-filter]')){
+      const el=tab.querySelector('span');
+      if(el)el.textContent=String(countPool.filter(p=>p.type===tab.dataset.filter).length);
+    }
     $('productGrid').innerHTML=list.map(p=>{
       let badge=p.cmsOnly&&p.collection==='hollywood'?(p.draftDuplicate?'ALTERNATE SCAN · REVIEW':p.type==='bundle'?`${p.catalogIds.length} SCANS · CURATED SET`:'NEW HOLLYWOOD FIND · PREVIEW'):p.type==='bundle'?`${p.catalogIds.length} PIECES · ONE SET`:p.collection==='hollywood'?'CLASSIC FILM EPHEMERA':'VINTAGE COCA-COLA AD';
       let watched=!!window.BURTON_ACCOUNT?.isWatching?.(p.sku);
@@ -117,8 +126,26 @@
   }
   function addItem(sku){if(!bySku.has(sku))return;if(bySku.get(sku)?.cmsOnly){toast('This catalogue item is awaiting physical inventory verification. You can save it to your watchlist.');return;}if(bySku.get(sku)?.stockState==='unavailable'){toast('This item is sold or temporarily reserved.');return;}if(bag.includes(sku)){toast('Already in your paper bag.');return;}bag.push(sku);saveBag();renderProducts();renderCart();toast('A good find! Added to your paper bag.');}
   function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();}
-  function openCart(){renderCart();$('scrim').hidden=false;$('cartDrawer').classList.add('open');$('cartDrawer').setAttribute('aria-hidden','false');document.body.classList.add('no-scroll');$('cartClose').focus();}
-  function closeCart(){$('scrim').hidden=true;$('cartDrawer').classList.remove('open');$('cartDrawer').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll');$('cartOpen').focus();}
+  function openCart(){
+    if($('cartDrawer').classList.contains('open'))return;
+    const active=document.activeElement;
+    cartReturnFocus=active&&active!==document.body&&typeof active.focus==='function'?active:null;
+    renderCart();
+    $('scrim').hidden=false;$('cartDrawer').classList.add('open');
+    $('cartDrawer').setAttribute('aria-hidden','false');
+    document.body.classList.add('no-scroll');
+    $('cartClose').focus();
+  }
+  function closeCart(){
+    if(!$('cartDrawer').classList.contains('open'))return;
+    $('scrim').hidden=true;$('cartDrawer').classList.remove('open');
+    $('cartDrawer').setAttribute('aria-hidden','true');
+    document.body.classList.remove('no-scroll');
+    const previous=cartReturnFocus;
+    cartReturnFocus=null;
+    const target=previous?.isConnected&&previous.getClientRects?.().length?previous:$('cartOpen');
+    target?.focus();
+  }
   function renderCart(){
     $('cartCount').textContent=bag.length;$('cartHeaderCount').textContent=`(${bag.length})`;
     $('cartSubtotal').textContent=money(bag.reduce((s,id)=>s+(bySku.get(id)?.price||0),0));
@@ -244,7 +271,19 @@
     $('contactButton').addEventListener('click',()=>{if(C.sellerEmail){window.location.href=`mailto:${encodeURIComponent(C.sellerEmail)}?subject=${encodeURIComponent('Burton & Found enquiry')}`;}else info('contact');});
 
 
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('cartDrawer').classList.contains('open'))closeCart();});
+    document.addEventListener('keydown',e=>{
+      const drawer=$('cartDrawer');
+      if(!drawer.classList.contains('open'))return;
+      if(e.key==='Escape'){e.preventDefault();closeCart();return;}
+      if(e.key!=='Tab')return;
+      const focusable=[...drawer.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+        .filter(el=>!el.closest('[hidden]')&&el.getClientRects().length);
+      if(!focusable.length){e.preventDefault();drawer.focus();return;}
+      const first=focusable[0],last=focusable[focusable.length-1];
+      if(e.shiftKey&&(document.activeElement===first||document.activeElement===drawer)){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+      else if(!drawer.contains(document.activeElement)){e.preventDefault();(e.shiftKey?last:first).focus();}
+    });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
