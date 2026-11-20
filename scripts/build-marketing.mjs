@@ -207,8 +207,10 @@ if(indexable){
 }
 mkdirSync(out,{recursive:true});
 const csv=x=>'"'+String(x??'').replace(/"/g,'""').replace(/[\r\n]+/g,' ')+'"';
+const pinCopy=p=>short((p.collection==='hollywood'?'Old Hollywood printed-paper collectible':p.type==='bundle'?'Curated vintage-paper collector set':'Vintage Coca-Cola advertising')+': '+p.title+'. '+text(p.shortDescription)+'. See the actual item photograph, condition notes and CAD asking price at Burton & Found.',410);
+const socialCopy=p=>short((p.collection==='hollywood'?'For classic-film collectors: ':p.type==='bundle'?'For lovers of themed paper collections: ':'For vintage advertising enthusiasts: ')+p.title+'. '+text(p.shortDescription)+'. Explore the item photos and condition details at Burton & Found; confirm current availability before purchasing.',330);
 const rows=items.map(p=>[p.sku,p.title,p.collection,p.type,dollar(p.price),abs(urlOf(p)),abs(p.image),
- short('Original vintage paper: '+p.shortDescription,410),
+ pinCopy(p),
  'Burton & Found · '+p.title+' · Vintage '+(p.collection==='hollywood'?'cinema':'advertising')+' · Catalogue photograph'].map(csv).join(','));
 writeFileSync(join(out,'pinterest-and-social-catalog.csv'),['sku,title,collection,type,asking_cad,product_url,image_url,pin_description,image_alt',...rows].join('\n')+'\n');
 // Deterministic weekly rotation across real Coca-Cola singles, Old Hollywood pieces and sets.
@@ -233,11 +235,11 @@ for(let i=0;i<14;i++){
 }
 const tagUrl=(p,source,slot)=>abs(urlOf(p))+'?utm_source='+source+'&utm_medium=organic&utm_campaign=collector_weekly&utm_content='+encodeURIComponent(p.sku.toLowerCase()+'-'+slot);
 writeFileSync(join(out,'14-day-social-calendar.md'),
- '# Burton & Found · 14 post ideas (editorial drafts)\n\nThese drafts are not scheduled or published. Check condition and claims; follow each community\'s promotion rules.\n\n'+picks.map((p,i)=>'### Day '+(i+1)+' — '+p.title+'\n\n'+short(p.shortDescription,230)+'\n\nView item photographs and CAD asking price: '+tagUrl(p,'pinterest','day'+(i+1))+'\n\nSuggested tags: #VintageAdvertising #BurtonAndFound '+(p.collection==='hollywood'?'#OldHollywood':'#CocaColaCollectibles')+'\n').join('\n'));
+ '# Burton & Found · 14 post ideas (editorial drafts)\n\nThese drafts are not scheduled or published. Check condition and claims; follow each community\'s promotion rules.\n\n'+picks.map((p,i)=>'### Day '+(i+1)+' — '+p.title+'\n\n'+socialCopy(p)+'\n\nView item photographs and CAD asking price: '+tagUrl(p,'pinterest','day'+(i+1))+'\n\nSuggested tags: #VintageAdvertising #BurtonAndFound '+(p.collection==='hollywood'?'#OldHollywood':'#CocaColaCollectibles')+'\n').join('\n'));
 writeFileSync(join(out,'weekly-social-queue.csv'),
  ['day,sku,collection,product_title,image_url,product_url,caption,pinterest_link',
  ...picks.map((p,i)=>[i+1,p.sku,p.collection,p.title,abs(p.image),abs(urlOf(p)),
- short(p.shortDescription,220)+' View this find at Burton & Found.',
+ socialCopy(p),
  tagUrl(p,'pinterest','day'+(i+1))].map(csv).join(','))].join('\n')+'\n');
 writeFileSync(join(out,'marketing-utm-links.csv'),
  ['sku,pinterest_url,facebook_url,instagram_bio_url',...items.map(p=>[p.sku,
