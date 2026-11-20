@@ -70,7 +70,7 @@ function renderCuratedSets(){
   copy.appendChild(list);
   const price=makeElement('div','archive-bundle-price');
   const label=makeElement('div','');
-  label.appendChild(makeElement('span','archive-bundle-label','Suggested set asking price'));
+  label.appendChild(makeElement('span','archive-bundle-label','Set price · CAD'));
   label.appendChild(makeElement('strong','',cad(set.suggestedSetPriceCAD)));
   price.appendChild(label);
   const total=makeElement('p','',cad(set.individualSuggestedTotalCAD)+' separately · Potential saving '+cad(set.potentialSavingsCAD));
@@ -81,11 +81,11 @@ function renderCuratedSets(){
   action.setAttribute('aria-label','View pages in proposed set '+set.title);
   copy.appendChild(action);
   if(listedSetSkus.has(set.sku)){
-    const add=makeElement('a','archive-bag-action','Add set to bag for enquiry ↗');
-    add.href=addUrl(set.sku);add.setAttribute('aria-label','Add proposed '+set.title+' set to bag for availability enquiry');
+    const add=makeElement('a','archive-bag-action','Add set to bag ↗');
+    add.href=addUrl(set.sku);add.setAttribute('aria-label','Add '+set.title+' curated set to bag');
     copy.appendChild(add);
   }
-  copy.appendChild(makeElement('p','archive-bundle-review','Indicative price · physical pages and final availability to confirm · no payment yet'));
+  copy.appendChild(makeElement('p','archive-bundle-review','Curated automobile advertising · CAD asking price'));
   card.append(gallery,copy);grid.appendChild(card);
  }
  const expand=document.getElementById('showAllSets');
@@ -142,27 +142,27 @@ function update(){
     const description=makeElement('p','archive-page-description',x.summary||x.description);
     body.appendChild(description);
     const price=makeElement('div','archive-page-price');
-    price.appendChild(makeElement('span','archive-price-label','Suggested asking price · CAD'));
+    price.appendChild(makeElement('span','archive-price-label','Price · CAD'));
     price.appendChild(makeElement('strong','',cad(x.suggestedPriceCAD)));
     body.appendChild(price);
     const details=makeElement('details','archive-page-details');
     const detailsLabel=makeElement('summary','','More about this page');
-    const detailsCopy=makeElement('p','',x.description||'Full print details are being checked');
-    const condition=makeElement('p','archive-page-condition','Physical print, dimensions and paper condition not yet verified.');
+    const detailsCopy=makeElement('p','',x.summary||'View the pictured automobile advertisement');
+    const condition=makeElement('p','archive-page-condition','Contact us for dimensions, paper condition or reverse-side details.');
     details.append(detailsLabel,detailsCopy,condition);body.appendChild(details);
 
     const button=document.createElement('button');button.type='button';button.className='gallery-view-button';button.dataset.sku=x.sku;button.textContent='View full photograph ↗';button.setAttribute('aria-label','Enlarge photograph of '+title(x));body.appendChild(button);
     if(listedSkus.has(x.sku)){
-      const buy=makeElement('a','archive-bag-action','Add to bag for enquiry ↗');
+      const buy=makeElement('a','archive-bag-action','Add to bag ↗');
       buy.href=addUrl(x.sku);
-      buy.setAttribute('aria-label','Add '+title(x)+' to bag for an availability enquiry');
+      buy.setAttribute('aria-label','Add '+title(x)+' to bag');
       body.appendChild(buy);
       const detail=makeElement('a','archive-shop-detail','Product details in the shop ↗');
       detail.href=detailUrl(x.sku);
       body.appendChild(detail);
     }
     const pending=document.createElement('p');pending.className='small';
-    pending.textContent='Indicative CAD price · confirm physical paper, condition and availability before any purchase';
+    pending.textContent='Vintage automobile advertising · priced in Canadian dollars';
     body.appendChild(pending);
     card.appendChild(body);root.appendChild(card);
   }
@@ -170,7 +170,7 @@ function update(){
   const n=Math.min(shown,visibleItems.length);
   const chosen=document.getElementById('activeSetNote');
   chosen.hidden=!activeSet;
-  chosen.textContent=activeSet?'Viewing proposed set: '+activeSet.title+'. Suggested set price '+cad(activeSet.suggestedSetPriceCAD)+'. Clear filters to return to all 80 distinct pictured designs.':'';
+  chosen.textContent=activeSet?'Viewing curated set: '+activeSet.title+'. Set price '+cad(activeSet.suggestedSetPriceCAD)+'. Clear filters to return to all 80 photographed designs.':'';
   result.textContent=n===visibleItems.length?n+' scanned page'+(n===1?'':'s')+' displayed':n+' of '+visibleItems.length+' scanned pages shown';
   showMore.hidden=n>=visibleItems.length;
   showMore.textContent='Show '+Math.min(24,visibleItems.length-n)+' more pages';
@@ -185,7 +185,7 @@ function updateDialog(){
   const image=document.getElementById('dialogImage');image.src=showOriginal?(item.originalImage||item.image):item.image;image.alt=(showOriginal?'Unmodified source scan of ':'Enhanced display photograph of ')+title(item);
   const sourceToggle=document.getElementById('toggleOriginal');sourceToggle.setAttribute('aria-pressed',String(showOriginal));sourceToggle.textContent=showOriginal?'Return to enhanced display':'View original scan';
   document.getElementById('dialogTitle').textContent=title(item);
-  document.getElementById('dialogInfo').textContent=item.sku+' · '+item.brand+(item.year?' · '+item.year:'')+' · Indicative CAD '+cad(item.suggestedPriceCAD)+' · Stock to verify'+(item.duplicateGroup?' · Possible repeat: '+item.duplicateGroup:'');
+  document.getElementById('dialogInfo').textContent=item.sku+' · '+item.brand+(item.year?' · '+item.year:'')+' · Price '+cad(item.suggestedPriceCAD)+' CAD'+(item.duplicateGroup?' · Possible repeat: '+item.duplicateGroup:'');
   document.getElementById('prevImage').disabled=dialogIndex===0;
   document.getElementById('nextImage').disabled=dialogIndex===visibleItems.length-1;
 }
