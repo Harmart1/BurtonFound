@@ -4,7 +4,7 @@ import {readFileSync,existsSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 const read=(p)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const slugs=['privacy','terms','shipping-returns','cookies','accessibility'];
-const staticPages=['index','storefront','account','books','collectibles','vintage-cars','papertrail','preview','review','old-hollywood-new','checkout-success'];
+const staticPages=['index','storefront','account','books','collectibles','vintage-cars','papertrail','preview','old-hollywood-new','checkout-success'];
 test('five substantive Ontario/Canada policy pages provide fully functional standalone navigation',()=>{
   for(const slug of slugs){
     const path='public/policies/'+slug+'.html';
@@ -53,6 +53,11 @@ test('Every static visitor-facing page links to all policies with a safe modal f
     }
     assert.match(html,/<footer[\s>]/,name);
   }
+  // Legacy review.html is now an immediate redirect to the policy-linked collection preview.
+  const oldReview=read('public/review.html');
+  assert.match(oldReview,/<meta http-equiv="refresh" content="0; url=preview.html">/);
+  assert.match(oldReview,/window\.location\.replace/);
+  assert.doesNotMatch(oldReview,/reviewForm|emailFeedback|copyFeedback|saveFeedback/);
   const account=read('public/account.html');
   assert.match(account,/<a href="\/policies\/privacy\.html" data-policy="privacy">full Privacy Policy<\/a>/);
 });
