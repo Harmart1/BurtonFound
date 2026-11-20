@@ -35,3 +35,8 @@
 .bf-policy-loading{min-height:140px}
 @media(max-width:580px){.bf-policy-dialog{max-height:94dvh;width:calc(100vw - 12px)}.bf-policy-dialog-frame{max-height:94dvh}.bf-policy-dialog-head{padding:12px 16px}.bf-policy-dialog-scroll{padding:15px}.bf-policy-dialog-foot{padding:8px 13px}.bf-policy-content{font-size:.94rem;line-height:1.6}}
 @media(prefers-reduced-motion:reduce){.bf-policy-dialog *{scroll-behavior:auto!important}}
+
+/* Compact policy navigation for legacy pages without a formal site footer. */
+.bf-policy-compact-footer{margin-top:20px;padding:22px max(20px,calc((100vw - 1100px)/2));background:#20372d;color:#f7f0e1;font:400 .88rem/1.5 system-ui,sans-serif}
+.bf-policy-compact-footer a{color:#f6d3bb}
+.bf-policy-compact-footer .bf-inline-policy-links{margin-top:12px}
