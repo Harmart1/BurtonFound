@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
-test('Four visual collection choices include automobile enquiry listings with explicit stock uncertainty',()=>{
+test('Four visual collection choices include priced automobile listings without checkout claims',()=>{
  const html=read('public/index.html');
  for(const cls of ['spotlight-coke','spotlight-hollywood','spotlight-sets','spotlight-cars'])assert.match(html,new RegExp('class="spotlight '+cls+'"'));
  assert.equal((html.match(/class="spotlight spotlight-/g)||[]).length,4);
  assert.match(html,/href="vintage-cars\.html"/);
  assert.match(html,/AUTOMOTIVE ARCHIVE/);
- assert.match(html,/Add to your bag for an availability enquiry/);
+ assert.match(html,/Add your favourites to the bag/);
  assert.match(html,/data-shop-hollywood-sets/);
  assert.doesNotMatch(html,/class="vintage-cars-promo"/);
  assert.match(html,/editorial-refresh\.css/);
@@ -29,7 +29,7 @@ test('Primary store promotes automobile catalogue while original backend sale in
 test('Vintage archive preserves enquiry-only and responsive filter controls',()=>{
  const html=read('public/vintage-cars.html');
  assert.match(html,/noindex, nofollow/);
- assert.match(html,/enquiry bag now available/);
+ assert.match(html,/Shop vintage automobile advertising/);
  for(const id of ['archiveHeroTitle','archiveGalleryTitle','cards','search','brand','era','sort','showMore','imageDialog','viewComfort','viewCompact','clearFilters','showAllSets','toggleOriginal'])
   assert.match(html,new RegExp('id="'+id+'"'),'Missing UI control: '+id);
  assert.match(html,/vintage-cars-refined\.js/);
@@ -39,7 +39,7 @@ test('Vintage archive preserves enquiry-only and responsive filter controls',()=
  assert.match(script,/dialog\.showModal/);
  assert.match(script,/burton_found_theme/);
  assert.doesNotMatch(script,/api\/checkout|Stripe|addToBag|bf_units/);
- assert.match(script,/Add to bag for enquiry/);
+ assert.match(script,/Add to bag/);
  const subprocess=spawnSync(process.execPath,['--check',new URL('../public/vintage-cars-refined.js',import.meta.url).pathname],{encoding:'utf8'});
  assert.equal(subprocess.status,0,subprocess.stderr);
 });
