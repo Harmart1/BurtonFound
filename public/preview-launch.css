@@ -54,3 +54,48 @@ html[data-theme="dark"] .pr-hero,.pr-copy{background:transparent}
 @media(max-width:730px){.pr-products{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-readiness-inner{grid-template-columns:1fr}}
 @media(max-width:520px){.pr-products{gap:9px}.pr-product-info{padding:12px}.pr-product h3{font-size:1.02rem}.pr-product-price{font-size:1.07rem}.pr-release-stats>div{padding:10px}.pr-release-stats strong{font-size:1.4rem}.pr-release-stats span{font-size:.67rem}.pr-hero-montage{aspect-ratio:1.13}}
 @media(prefers-reduced-motion:reduce){.pr-product-photo img{transition:none!important;transform:none!important}}
+
+/* Production-facing showcase navigation and theme-safe reading surfaces. */
+.pr-collection-nav{border-bottom:1px solid #c8c5b4;background:#f2ebdf}
+.pr-collection-nav-inner{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2.4vw,30px);flex-wrap:wrap;padding-block:12px}
+.pr-collection-nav a{display:inline-flex;align-items:center;min-height:44px;padding:7px 5px;border-bottom:2px solid transparent;color:#244436;text-decoration:none;font:700 .85rem/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+.pr-collection-nav a:hover,.pr-collection-nav a:focus-visible{border-bottom-color:#9d5037;color:#763c2b}
+.pr-hero .pr-lede,.pr-hero .pr-note{max-width:66ch}
+.pr-product:focus-visible,.pr-card:focus-visible{outline:3px solid #bd7843;outline-offset:4px}
+.pr-share-controls .pr-button{min-height:48px}
+.pr-share-controls .pr-result{color:#553321}
+html[data-theme="dark"] .pr-collection-nav{background:#20332a!important;border-color:#688374}
+html[data-theme="dark"] .pr-collection-nav a{color:#f1f5e8!important}
+html[data-theme="dark"] .pr-collection-nav a:hover{color:#ffe2b9!important;border-bottom-color:#ffe2b9}
+html[data-theme="dark"] .pr-hero .pr-lede{color:#dae6da!important}
+html[data-theme="dark"] .pr-hero .pr-note{color:#c4d7c9!important}
+html[data-theme="dark"] .pr-hero .pr-eyebrow,
+html[data-theme="dark"] .pr-featured .pr-eyebrow{color:#f2bf92!important}
+html[data-theme="dark"] .pr-hero .pr-copy em,
+html[data-theme="dark"] .pr-featured .pr-head em{color:#ffc6a0!important}
+html[data-theme="dark"] .pr-tour{background:#21352b!important;color:#f8f7ef!important}
+html[data-theme="dark"] .pr-tour .pr-head :is(h2,p){color:#f2f6ec!important}
+html[data-theme="dark"] .pr-tour .pr-head .pr-eyebrow{color:#f0c9a6!important}
+html[data-theme="dark"] .pr-tour .pr-head em{color:#ffd1ae!important}
+html[data-theme="dark"] .pr-card{background:#2d4738!important;color:#f9f8ee!important;border:1px solid #88a38e!important}
+html[data-theme="dark"] .pr-card :is(h3,b){color:#f9f8ee!important}
+html[data-theme="dark"] .pr-card p{color:#dfeadc!important}
+html[data-theme="dark"] .pr-card>span{color:#f4c9a3!important}
+html[data-theme="dark"] .pr-share{background:#294236!important;color:#f9f8ee!important}
+html[data-theme="dark"] .pr-share :is(h2,p){color:#edf7eb!important}
+html[data-theme="dark"] .pr-share .pr-eyebrow{color:#ffd1ae!important}
+html[data-theme="dark"] .pr-share em{color:#ffd1ae!important}
+html[data-theme="dark"] .pr-share-controls .pr-result{color:#f6e5cd!important}
+html[data-theme="dark"] .pr-button.pr-primary{background:#e8f1e1!important;color:#18382b!important;border-color:#e8f1e1!important}
+html[data-theme="dark"] .pr-button:not(.pr-primary){background:transparent!important;color:#f9f8ef!important;border-color:#a6c2aa!important}
+html[data-theme="dark"] .pr-button:not(.pr-primary):hover{background:#354f40!important}
+@media(max-width:650px){
+ .pr-collection-nav-inner{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;gap:18px;padding-block:7px}
+ .pr-collection-nav a{white-space:nowrap;font-size:.82rem}
+ .pr-buttons .pr-button{flex:1 1 190px}
+}
+@media(max-width:420px){
+ .pr-collection-nav-inner{padding-inline:16px}
+ .pr-featured-actions .pr-button{flex:1 1 100%;text-align:center}
+ .pr-share-controls>.pr-button{flex:1 1 100%}
+}
