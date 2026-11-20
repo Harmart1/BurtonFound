@@ -21,14 +21,22 @@
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
   let checkoutReady=false,checkoutMode='preview_only',inventoryConnected=false,shippingMode='flat_rate',allowedShippingCountries=['CA'];
   let activeShippingQuote=null,liveOptions=[],shippingRequestId=0;
-  const isCheckoutReady=()=>checkoutReady&&bag.length&&bag.every(id=>!bySku.get(id)?.cmsOnly&&bySku.get(id)?.stockState!=='unavailable');
+  const needsVerification=p=>p?.requiresVerification===true||p?.availableForCheckout===false;
+  const bagNeedsVerification=()=>bag.some(id=>needsVerification(bySku.get(id)));
+  const bagHasOverlappingUnits=()=>{
+    const chosen=new Set();
+    for(const id of bag){const p=bySku.get(id);if(!p)continue;
+      for(const unit of p.catalogIds||[id]){if(chosen.has(unit))return true;chosen.add(unit);}
+    }return false;
+  };
+  const isCheckoutReady=()=>checkoutReady&&bag.length&&!bagNeedsVerification()&&!bagHasOverlappingUnits()&&bag.every(id=>!bySku.get(id)?.cmsOnly&&bySku.get(id)?.stockState!=='unavailable');
   async function loadLiveStatus(){
     try {
       const health=await fetch('/api/health',{cache:'no-store'});
       if(health.ok){const v=await health.json();checkoutMode=v.checkout||'preview_only';shippingMode=v.shippingMode||'flat_rate';checkoutReady=['test_mode','live_mode','configured'].includes(checkoutMode);allowedShippingCountries=Array.isArray(v.shippingCountries)?v.shippingCountries:['CA'];const menu=$('shipCountry');if(menu){for(const opt of menu.options){opt.disabled=!allowedShippingCountries.includes(opt.value);}if(!allowedShippingCountries.includes(menu.value)){menu.value=allowedShippingCountries.find(c=>[...menu.options].some(o=>o.value===c))||'CA';}}}else{checkoutReady=false;checkoutMode='preview_only';}
       const res=await fetch('/api/catalog',{cache:'no-store'});
       if(res.ok){const v=await res.json();if(v.configured&&Array.isArray(v.items)){
-        inventoryConnected=true;for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly)continue;
+        inventoryConnected=true;for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly||needsVerification(p))continue;
           if(Number.isInteger(row.price_cents))p.price=row.price_cents/100;
           p.stockState=row.available?'available':'unavailable';
         }
@@ -96,7 +104,8 @@
       const rank=new Map(priority.map((sku,i)=>[sku,i]));
       list.sort((a,b)=>{
         const unavailable=Number(a.stockState==='unavailable')-Number(b.stockState==='unavailable');
-        return unavailable||((rank.get(a.sku)??999)-(rank.get(b.sku)??999));
+        const verification=Number(needsVerification(a))-Number(needsVerification(b));
+        return unavailable||verification||((rank.get(a.sku)??999)-(rank.get(b.sku)??999));
       });
     }
     if(currentSort==='low')list.sort((a,b)=>a.price-b.price);
@@ -112,17 +121,17 @@
       if(el)el.textContent=String(countPool.filter(p=>p.type===tab.dataset.filter).length);
     }
     $('productGrid').innerHTML=list.map(p=>{
-      let badge=p.cmsOnly&&p.collection==='hollywood'?(p.draftDuplicate?'ALTERNATE SCAN · REVIEW':p.type==='bundle'?`${p.catalogIds.length} SCANS · CURATED SET`:'NEW HOLLYWOOD FIND · PREVIEW'):p.type==='bundle'?`${p.catalogIds.length} PIECES · ONE SET`:p.collection==='hollywood'?'CLASSIC FILM EPHEMERA':'VINTAGE COCA-COLA AD';
+      let badge=p.collection==='automobiles'?(p.type==='bundle'?p.catalogIds.length+' AUTOMOBILE PRINTS · CURATED SET':'VINTAGE AUTOMOBILE ADVERTISING'):p.cmsOnly&&p.collection==='hollywood'?(p.draftDuplicate?'ALTERNATE SCAN · REVIEW':p.type==='bundle'?`${p.catalogIds.length} SCANS · CURATED SET`:'NEW HOLLYWOOD FIND · PREVIEW'):p.type==='bundle'?`${p.catalogIds.length} PIECES · ONE SET`:p.collection==='hollywood'?'CLASSIC FILM EPHEMERA':'VINTAGE COCA-COLA AD';
       let watched=!!window.BURTON_ACCOUNT?.isWatching?.(p.sku);
-      let cat=p.cmsOnly&&p.collection==='hollywood'?('OLD HOLLYWOOD · '+(p.type==='bundle'?'CURATED SET':p.theme)):p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD · '+(p.issue&&p.issue!=='Unknown'&&p.issue!=='Publication unconfirmed'?p.issue:'PRINT DATE UNVERIFIED'):`${p.year} · VINTAGE ADVERTISING`;
+      let cat=p.collection==='automobiles'?'AUTOMOBILES · '+(p.type==='bundle'?'CURATED SET':p.brand||'VINTAGE CAR'):p.cmsOnly&&p.collection==='hollywood'?('OLD HOLLYWOOD · '+(p.type==='bundle'?'CURATED SET':p.theme)):p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD · '+(p.issue&&p.issue!=='Unknown'&&p.issue!=='Publication unconfirmed'?p.issue:'PRINT DATE UNVERIFIED'):`${p.year} · VINTAGE ADVERTISING`;
       return `<article class="product-card" data-sku="${safe(p.sku)}">
-        <button class="product-media" type="button" data-view="${safe(p.sku)}" aria-label="View ${safe(p.title)} details"><span class="media-kicker">${safe(p.cmsOnly&&p.collection==='hollywood'?badge:p.cmsOnly?'COMING SOON · PREVIEW':p.stockState==='unavailable'?'SOLD OR RESERVED':badge)}</span><img src="${safe(p.image)}" alt="${safe(p.shortDescription)}" loading="lazy" decoding="async" width="800" height="900"><span class="media-view" aria-hidden="true">↗</span></button><button class="product-watch ${watched?'watch-active':''}" type="button" data-watch="${safe(p.sku)}" aria-pressed="${watched}" aria-label="${watched?'Remove from':'Add to'} watchlist: ${safe(p.title)}" title="${watched?'Remove from watchlist':'Watch this find'}">${watched?'♥':'♡'}</button>
-        <div class="product-info"><p class="product-meta">${safe(cat)}</p><h3 class="product-title">${safe(p.title)}</h3><p class="product-desc">${safe(p.shortDescription).replace(/[.\s]+$/,'')}.</p><div class="product-price-row"><div class="product-price">${p.cmsOnly&&p.draftDuplicate?'Alternate scan · unpriced':p.cmsOnly?'Suggested '+money(p.price)+' CAD':money(p.price)+' CAD'}</div><button class="add-small" type="button" data-add="${safe(p.sku)}" ${p.cmsOnly||bag.includes(p.sku)||p.stockState==='unavailable'?'disabled':''}>${p.cmsOnly?'STOCK REVIEW':p.stockState==='unavailable'?'UNAVAILABLE':bag.includes(p.sku)?'IN YOUR BAG':'ADD TO BAG'}</button></div></div></article>`;
+        <button class="product-media" type="button" data-view="${safe(p.sku)}" aria-label="View ${safe(p.title)} details"><span class="media-kicker">${safe(p.cmsOnly&&p.collection==='hollywood'?badge:p.cmsOnly?'COMING SOON · PREVIEW':p.stockState==='unavailable'?'SOLD OR RESERVED':needsVerification(p)?'INDICATIVE PRICE · VERIFY STOCK':badge)}</span><img src="${safe(p.image)}" alt="${safe(p.shortDescription)}" loading="lazy" decoding="async" width="800" height="900"><span class="media-view" aria-hidden="true">↗</span></button><button class="product-watch ${watched?'watch-active':''}" type="button" data-watch="${safe(p.sku)}" aria-pressed="${watched}" aria-label="${watched?'Remove from':'Add to'} watchlist: ${safe(p.title)}" title="${watched?'Remove from watchlist':'Watch this find'}">${watched?'♥':'♡'}</button>
+        <div class="product-info"><p class="product-meta">${safe(cat)}</p><h3 class="product-title">${safe(p.title)}</h3><p class="product-desc">${safe(p.shortDescription).replace(/[.\s]+$/,'')}.</p><div class="product-price-row"><div class="product-price">${p.cmsOnly&&p.draftDuplicate?'Alternate scan · unpriced':p.cmsOnly||needsVerification(p)?'Indicative '+money(p.price)+' CAD':money(p.price)+' CAD'}</div><button class="add-small" type="button" data-add="${safe(p.sku)}" ${p.cmsOnly||bag.includes(p.sku)||p.stockState==='unavailable'?'disabled':''}>${p.cmsOnly?'STOCK REVIEW':p.stockState==='unavailable'?'UNAVAILABLE':bag.includes(p.sku)?'IN YOUR BAG':'ADD TO BAG'}</button></div></div></article>`;
     }).join('');
     $('noResults').hidden=!!list.length;
-    const empty=$('emptyShopCopy');if(empty)empty.textContent=currentCollection==='books'?'The vintage books department is being catalogued. No books are listed for purchase yet. Browse existing finds or save your interest in your collector profile.':currentCollection==='collectibles'?'The collectibles department is being curated. No objects are listed for purchase yet. Browse the current archive or save your interest in your collector profile.':'No treasures match that search.';
+    const empty=$('emptyShopCopy');if(empty)empty.textContent=currentCollection==='books'?'The vintage books department is being catalogued. No books are listed for purchase yet. Browse existing finds or save your interest in your collector profile.':currentCollection==='collectibles'?'The collectibles department is being curated. No objects are listed for purchase yet. Browse the current archive or save your interest in your collector profile.' :currentCollection==='automobiles'?'No automobile print designs match these filters. Clear the filters to browse all 80 pictured advertisements and 18 curated sets.':'No treasures match that search.';
     $('catalogCount').textContent=list.length+' of '+items.length+' catalogue products · CAD';
-    $('shopStatus').textContent=(currentDecade!=='all'||currentFilter!=='all'||currentCollection!=='all'||search)?'Showing '+list.length+' matching catalogue products.':'Browse the full Old Hollywood and vintage advertising inventory. Printed dates and condition details are described in each listing.';
+    $('shopStatus').textContent=(currentDecade!=='all'||currentFilter!=='all'||currentCollection!=='all'||search)?'Showing '+list.length+' matching catalogue products.':'Browse vintage advertising, Old Hollywood and automobile print designs. Automobile prices are indicative; physical stock must be verified.';
   }
   function addItem(sku){if(!bySku.has(sku))return;if(bySku.get(sku)?.cmsOnly){toast('This catalogue item is awaiting physical inventory verification. You can save it to your watchlist.');return;}if(bySku.get(sku)?.stockState==='unavailable'){toast('This item is sold or temporarily reserved.');return;}if(bag.includes(sku)){toast('Already in your paper bag.');return;}bag.push(sku);saveBag();renderProducts();renderCart();toast('A good find! Added to your paper bag.');}
   function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();}
