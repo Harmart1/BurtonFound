@@ -22,7 +22,7 @@ test('five substantive Ontario/Canada policy pages provide fully functional stan
     assert.match(html,/src="\/policy-modal\.js"/);
     assert.match(html,/href="\/policy-pages\.css"/);
     assert.ok((html.match(/<h2>/g)||[]).length>=5,'Policy must contain detailed sections');
-    assert.doesNotMatch(html,/<script[^>]*>\s*\S/,'Policies should not embed inline executable scripts');
+    assert.doesNotMatch(html,/<script(?![^>]*\bsrc=)[^>]*>/i,'Policies should not embed inline executable scripts');
   }
 });
 test('Privacy, marketing and consumer policies are grounded in applicable statutes, not waived',()=>{
