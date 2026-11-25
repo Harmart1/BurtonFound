@@ -16,9 +16,9 @@ export async function onRequestPost({request,env}){
  // Canada Post Test apps return canned/stub prices; FedEx sandbox is likewise
  // never represented as live postage to public visitors.
  const calls=[
-  env.CANADA_POST_TEST_APP==='true'||env.CANADA_POST_API_MODE==='legacy'&&env.CANADA_POST_SANDBOX==='true'
+  env.CANADA_POST_PRODUCTION_VERIFIED!=='true'||env.CANADA_POST_TEST_APP==='true'||env.CANADA_POST_API_MODE==='legacy'&&env.CANADA_POST_SANDBOX==='true'
     ?Promise.resolve([]):canadaPostRates(env,to,parcel,shipDate),
-  env.FEDEX_SANDBOX==='true'?Promise.resolve([]):fedexRates(env,to,parcel,shipDate)
+  env.FEDEX_PRODUCTION_VERIFIED!=='true'||env.FEDEX_SANDBOX==='true'?Promise.resolve([]):fedexRates(env,to,parcel,shipDate)
  ];
  const results=await Promise.allSettled(calls);
  const available=results.flatMap(r=>r.status==='fulfilled'?r.value:[]).filter(r=>r.amount_cents>0&&r.amount_cents<=500000&&r.currency==='CAD'&&/^[A-Z0-9._-]{2,65}$/.test(r.code||'')&&r.name);
