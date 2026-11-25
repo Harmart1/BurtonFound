@@ -4,7 +4,10 @@ LIVE_CHECKOUT_ENABLED="false"
 TAX_CONFIGURATION_APPROVED="false"
 CARRIER_QUOTES_ENABLED="false"
 SHIPPING_MODE="flat_rate"
-SHIPPING_ALLOWED_COUNTRIES="CA"
+SHIPPING_ALLOWED_COUNTRIES="CA,US"
+CANADA_POST_API_MODE="json"
+US_SHIPPING_APPROVED="false"
+CANADA_POST_US_DUTIES_APPROVED="false"
 STRIPE_AUTOMATIC_TAX="false"
 
 SUPABASE_URL=""
@@ -16,3 +19,25 @@ SHIPPING_STANDARD_CA_CENTS=""
 SHIPPING_EXPRESS_CA_CENTS=""
 SHIPPING_QUOTE_SECRET=""
 SHIPPING_PACKAGES_JSON="{}"
+
+# 2026 Canada Post Developer Portal (JSON/OAuth). Use a [Test] app first.
+CANADA_POST_CLIENT_ID=""
+CANADA_POST_CLIENT_SECRET=""
+CANADA_POST_CUSTOMER_NUMBER=""
+CANADA_POST_CONTRACT_ID=""
+CANADA_POST_TEST_APP="true"
+# Never add platform-id unless acting under an authorized platform integration.
+# Explicit old XML fallback only: CANADA_POST_API_MODE="legacy" and legacy keys.
+CANADA_POST_USERNAME=""
+CANADA_POST_PASSWORD=""
+# FedEx Developer Portal Rates & Transit Times API.
+FEDEX_CLIENT_ID=""
+FEDEX_CLIENT_SECRET=""
+FEDEX_ACCOUNT_NUMBER=""
+FEDEX_SANDBOX="true"
+# Customer-facing quotes can be enabled independently of paid checkout
+# only after real credentials AND verified packed parcel measurements exist.
+
+# Explicit merchant approvals required for accepting live carrier quotations.
+CANADA_POST_PRODUCTION_VERIFIED="false"
+FEDEX_PRODUCTION_VERIFIED="false"

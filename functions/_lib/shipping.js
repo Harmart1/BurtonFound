@@ -1,12 +1,13 @@
 /* Burton & Found carrier rating. Server-only, credentials never exposed to the browser.
    All package sizes and weights must be verified and supplied by the owner before live quotes. */
+import {canadaPostJsonRates} from './canada-post-json.js';
 const enc=new TextEncoder();
 export const ORIGIN={country:'CA',postal:'P6A1Z1',city:'Sault Ste. Marie',state:'ON'};
 export const cleanPostal=(s)=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
 export function destination(raw,env){
  const country=String(raw?.country||'').trim().toUpperCase();
  const allowed=String(env.SHIPPING_ALLOWED_COUNTRIES||'CA').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
- if(!/^[A-Z]{2}$/.test(country)||!allowed.includes(country))throw Error('Shipping to that country is not currently enabled');
+ if(!['CA','US'].includes(country)||!allowed.includes(country))throw Error('Shipping to that country is not currently enabled');
  const postal=cleanPostal(raw?.postal);if(country==='CA'&&!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(postal))throw Error('Enter a complete Canadian postal code');
  if(country==='US'&&!/^\d{5}(\d{4})?$/.test(postal))throw Error('Enter a valid US ZIP code');
  if(country!=='CA'&&country!=='US'&&!/^[A-Z0-9]{2,12}$/.test(postal))throw Error('Enter the destination postal code');
@@ -50,6 +51,8 @@ export function canadaPostRequest(env,to,pkg,shipDate){
  return {url:base+'/rs/ship/price',body};
 }
 export async function canadaPostRates(env,to,pkg,shipDate){
+ // Use the current JSON/OAuth portal by default. Legacy XML requires explicit opt-in.
+ if(env.CANADA_POST_API_MODE!=='legacy')return canadaPostJsonRates(env,to,pkg,shipDate);
  if(!env.CANADA_POST_USERNAME||!env.CANADA_POST_PASSWORD)return [];
  const {url,body}=canadaPostRequest(env,to,pkg,shipDate);
  const auth=btoa(`${env.CANADA_POST_USERNAME}:${env.CANADA_POST_PASSWORD}`);
@@ -108,6 +111,20 @@ export async function verifyQuote(env,token,skus){
  if([current.weightKg,current.lengthCm,current.widthCm,current.heightCm].join(',')!==value.packed.join(','))throw Error('Packaging has changed; request a new shipping quote');
  const checked=destination(value.to,env);
  if(JSON.stringify(checked)!==JSON.stringify(value.to))throw Error('Shipping destination must be rechecked');
+ // U.S. postage quotes exclude customs/duties and cannot become paid orders
+ // until the owner has approved a documented cross-border fulfilment process.
+ // Real-money Stripe Checkout also requires production carrier verification,
+ // independent of successful token signing or possession of a carrier API key.
+ if(String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_')){
+  if(value.carrier==='Canada Post'&&env.CANADA_POST_PRODUCTION_VERIFIED!=='true')
+   throw Error('Canada Post production rates have not been verified');
+  if(value.carrier==='FedEx'&&env.FEDEX_PRODUCTION_VERIFIED!=='true')
+   throw Error('FedEx production rates have not been verified');
+ }
+ if(checked.country==='US'&&env.US_SHIPPING_APPROVED!=='true')
+  throw Error('US checkout is not enabled until customs and duty handling is approved');
+ if(checked.country==='US'&&value.carrier==='Canada Post'&&env.CANADA_POST_US_DUTIES_APPROVED!=='true')
+  throw Error('Canada Post US shipment requires an approved duty/declaration workflow');
  if(!/^\d{4}-\d{2}-\d{2}$/.test(value.ship_date||''))throw Error('Invalid dispatch date');
  return value;
 }
@@ -123,4 +140,4 @@ export function mailingDate(handlingDays=2,now=new Date()){
  if(day.getUTCDay()===6)day.setUTCDate(day.getUTCDate()+2);
  return day.toISOString().slice(0,10);
 }
-export function safeQuoteError(e){console.error('Carrier shipping unavailable:',e.message);return 'No live carrier quote is available for this destination or parcel. Please contact Burton & Found for manual shipping confirmation.';}
+export function safeQuoteError(e){console.error('Carrier shipping unavailable:',String(e?.message||'unavailable').slice(0,140));return 'No live carrier quote is available for this destination or parcel. Please contact Burton & Found for manual shipping confirmation.';}

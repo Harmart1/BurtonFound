@@ -1,4 +1,4 @@
-# Burton & Found — GitHub, Cloudflare Pages, Supabase and Stripe
+> **Current carrier launch update — November 25, 2026:** The current Cloudflare **Worker** release supports Canada Post's 2026 JSON/OAuth Rating API as the default, FedEx Rates & Transit Times, and Canada/U.S. shipping with explicit U.S. customs gates. See [CARRIER_LAUNCH_CA_US.md](CARRIER_LAUNCH_CA_US.md). Older instructions in this document describing the Canada Post integration as legacy-only, or requiring a new Cloudflare Pages project, are historical and superseded by the current Worker setup. Real rates still require carrier credentials and verified packed measurements; live payments remain disabled.\n\n# Burton & Found — GitHub, Cloudflare Pages, Supabase and Stripe
 
 This is a **working integration scaffold**, not a live payment system. The preview stays safe and non-transactional until the owner creates credentials, executes SQL, configures real shipping fees and taxes, and deliberately enables live checkout. The code contains no secret keys.
 
