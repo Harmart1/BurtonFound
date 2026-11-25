@@ -67,7 +67,7 @@ test('shipping quote endpoint returns real mocked carrier quotes and signed sele
   return new Response(cpXml,{status:200,headers:{'content-type':'application/xml'}});
  };
  try {
-  const res=await getQuotes({request:fakeReq('/api/shipping-quotes',{skus:['OH-003'],destination:place}),env:{...env,CANADA_POST_API_MODE:'legacy',CANADA_POST_USERNAME:'test_user',CANADA_POST_PASSWORD:'test_password'}});
+  const res=await getQuotes({request:fakeReq('/api/shipping-quotes',{skus:['OH-003'],destination:place}),env:{...env,CANADA_POST_API_MODE:'legacy',CANADA_POST_PRODUCTION_VERIFIED:'true',CANADA_POST_USERNAME:'test_user',CANADA_POST_PASSWORD:'test_password'}});
   assert.equal(res.status,200);const body=await res.json();assert.equal(body.options.length,1);
   assert.equal(body.options[0].amount_cents,1272);assert.equal(body.options[0].carrier,'Canada Post');
   const verified=await verifyQuote(env,body.options[0].quote_token,['OH-003']);
