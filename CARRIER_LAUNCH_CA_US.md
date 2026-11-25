@@ -15,6 +15,17 @@ A **read-only** GitHub Actions workflow now uses the existing Cloudflare deploym
 
 The site still leaves `CARRIER_QUOTES_ENABLED=false`, all payment gates off, and `SHIPPING_MODE=flat_rate` until a controlled launch. The audit is intentionally not a workflow for remotely enabling payments or shipping without merchant authorization.
 
+### Automatic signing-key initialization
+
+The [Initialize private shipping quote signing key](https://github.com/Harmart1/BurtonFound/actions/workflows/carrier-secret-init.yml) workflow can run through GitHub Actions using the already-authorized Cloudflare connection. It:
+
+- Inspects the existing `burtonfound` Worker without printing tokens, account IDs, environment values or secret material.
+- Refuses to run unless live checkout, live payments, and public rate quoting are each demonstrably **disabled** on the Worker.
+- Creates a cryptographically random `SHIPPING_QUOTE_SECRET` **only when missing**, directly as a Cloudflare **encrypted secret**.
+- Leaves any existing signing key unchanged to avoid invalidating signed quotes, and does not activate checkout, carrier quoting, shipping labels or external carrier accounts.
+
+The generated secret is **not** stored in GitHub source, Actions artifacts, or chat. A separate read-only audit confirms whether the binding exists. The two workflows do not obtain Canada Post or FedEx merchant credentials and cannot approve customs or physically verify parcels.
+
 ## Architecture now in GitHub
 
 - Current Cloudflare Worker `burtonfound` stays as the host; no migration to Pages or GitHub Pages.
