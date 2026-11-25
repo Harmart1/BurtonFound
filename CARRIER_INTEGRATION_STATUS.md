@@ -1,23 +1,23 @@
-# Burton & Found — Live Carrier Integration Status
+# Burton & Found — Carrier integration status (25 November 2026)
+
+**Deployment: safely prepared; customer payments and public carrier quotes remain disabled.** Full setup: [CARRIER_LAUNCH_CA_US.md](CARRIER_LAUNCH_CA_US.md).
 
 | Component | Status |
 |---|---|
-| Customer destination and carrier service selector | Implemented |
-| FedEx OAuth / Rates & Transit Times API | Implemented, not live-tested without credentials |
-| Canada Post legacy XML v4 Rating API | Implemented; Canada Post deprecated legacy platform in 2026 |
-| Canada Post new JSON/OAuth Rating API | **Not yet integrated**; obtain the current OpenAPI specification and credentials |
-| International destination restrictions | Implemented through explicit country allowlist |
-| Packed weight and dimension profiles | Template delivered, awaits physical measurements |
-| Signed short-lived quote / Stripe shipping charge | Implemented, automated tests pass |
-| Paid order country/postal/city/state mismatch review | Implemented, automated tests pass |
-| Manual shipping dashboard | Implemented, needs live Supabase credentials |
-| Shipping mismatch reviewed and unblocked by owner, with note and inventory checks | Implemented in migration 004, not live tested |
-| Packaging CSV to verified JSON helper | Implemented; refuses missing measurements |
-| Estimated dispatch dates in Ontario local time | Implemented; weekends excluded, holidays require manual review |
-| Standalone shareable shipping preview | Implemented using **illustrative, not real** carrier charges |
-| Automatic labels, carrier tracking events, customs filing | Not implemented; use Snap Ship / FedEx Ship Manager manually |
-| Live-rate verification | Not possible until credentials and measured parcels available |
+| Destination selector (Canada and United States only) | Implemented; public choices scoped |
+| Canada Post Developer Portal Rating v4 JSON/OAuth | **Implemented against official 2026 OpenAPI**; requires merchant app credentials and actual sandbox/production checks |
+| Legacy Canada Post XML v4 | Kept only as explicit `CANADA_POST_API_MODE=legacy` fallback, not the default |
+| FedEx OAuth Rates & Transit Times API | Existing implementation retained; production credentials and real quote comparison outstanding |
+| Signed 10-minute rate/parcel/country/price quote | Implemented with HMAC and alteration/expiry checks |
+| Untracked Canada Post services | Excluded |
+| Test-app / sandbox quote suppression | Public quote API does **not** offer carrier stub/sample prices |
+| Canada and U.S. destination validation | Enforced server side; no other countries |
+| U.S. cross-border checkout | Blocked pending `US_SHIPPING_APPROVED` owner approval |
+| Canada Post U.S. duty declarations | Blocked pending `CANADA_POST_US_DUTIES_APPROVED` owner approval and Zonos/Declaration ID process |
+| Live Stripe checkout | **OFF**, all payment and tax gates unchanged |
+| Parcel measurement worksheet | 229-SKU generator; no dimensions or weights fabricated |
+| Verified packed parcel measurements | **Not yet supplied by owner** |
+| Carrier API production tests | **Not performed**; no merchant secrets available |
+| Labels, tracked events and customs declarations | Manual fulfillment remains; no claim of carrier billing or label purchase automation |
 
-**Do not imply live shipping is already connected.**
-
-Carrier credentials **do not activate quoting** by themselves: explicitly set `CARRIER_QUOTES_ENABLED=true` after validating allowed countries and measured packages. For real checkout, `LIVE_CHECKOUT_ENABLED=true` and the other payment/tax gates remain separately required. Carrier APIs are not public demos.
+**Note:** Customer postcode/city/state is re-entered in Stripe. Shipping mismatches are flagged *after payment* for manual review. This risk must be addressed before enabling live money for cross-border orders. Postal postage excludes U.S. customs duties/taxes/brokerage.
