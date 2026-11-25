@@ -116,6 +116,6 @@ test('Measurement worksheet covers website inventory without making any product 
   const data=readFileSync(output,'utf8');
   for(const sku of ['VA-001','VA-049','CC-010','OH-003','BF-VA-SET01'])assert.ok(data.includes('"'+sku+'"'),sku);
   assert.equal((data.match(/,"true",/g)||[]).length,0);
-  assert.ok(data.split('\\n').length>230);
+  assert.ok(data.split('\n').length>230);
  }finally{rmSync(dir,{recursive:true,force:true})}
 });
