@@ -1,0 +1,136 @@
+name: Read-only carrier configuration audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/carrier-readiness-trigger.txt
+
+permissions:
+  contents: read
+
+jobs:
+  carrier-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Inspect existing Cloudflare Worker carrier bindings (never print secrets)
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, urllib.request, urllib.error, pathlib
+          target=pathlib.Path("carrier-readiness-report.md")
+          def report(lines):
+              target.write_text("\n".join(lines)+"\n",encoding="utf-8")
+              print("Wrote sanitized carrier readiness report; no secret values, account IDs or tokens are logged.")
+          prefix=[
+            "# Burton & Found — carrier configuration audit",
+            "",
+            "Generated automatically from the **existing** Cloudflare Worker bindings.",
+            "This is read-only: it never creates credentials, alters variables, enables customer quotes or activates payments.",
+            "Credential **presence is not proof of account activation, valid pricing, verified packaging, duties or production readiness**.",
+            "",
+          ]
+          raw=os.environ.get("CF_TOKEN","").strip()
+          token=raw.strip("\"'")
+          if token.lower().startswith("bearer "):
+              token=token[7:].strip().strip("\"'")
+          if not re.fullmatch(r"[A-Za-z0-9_.-]+",token):
+              found=re.findall(r"cf(?:at|ut)_[A-Za-z0-9_.-]+",raw)
+              token=found[0] if len(found)==1 else ""
+          hint=os.environ.get("CF_ACCOUNT_HINT","")
+          if not token or not hint:
+              report(prefix+["**Audit unavailable:** GitHub Cloudflare authentication secrets are absent.","The store remains in its currently configured state."])
+              raise SystemExit(0)
+          def cf(path):
+              req=urllib.request.Request(
+                  "https://api.cloudflare.com/client/v4"+path,
+                  headers={"Authorization":"Bearer "+token,"Accept":"application/json"})
+              with urllib.request.urlopen(req,timeout=20) as resp:
+                  payload=json.load(resp)
+              if not payload.get("success"):raise ValueError("Cloudflare API returned an unsuccessful response")
+              return payload.get("result")
+          try:
+              ids=re.findall(r"(?<![a-fA-F0-9])[a-fA-F0-9]{32}(?![a-fA-F0-9])",hint)
+              if len(ids)==1:accounts=ids
+              elif len(ids)==0:accounts=[a.get("id","") for a in cf("/accounts?per_page=50")]
+              else:raise ValueError("Ambiguous account identifier")
+              matches=[]
+              for account in accounts:
+                  if not re.fullmatch(r"[a-fA-F0-9]{32}",account):continue
+                  scripts=cf("/accounts/"+account+"/workers/scripts")
+                  if any(x.get("id")=="burtonfound" for x in scripts or []):matches.append(account)
+              if len(matches)!=1:raise ValueError("Existing Worker cannot be uniquely identified")
+              account=matches[0]
+              settings=cf("/accounts/"+account+"/workers/scripts/burtonfound/settings")
+          except (urllib.error.HTTPError,urllib.error.URLError,TimeoutError,ValueError,TypeError,KeyError) as exc:
+              report(prefix+[
+                 "**Audit unavailable:** Cloudflare could not be queried using the configured deployment token.",
+                 "Check that the GitHub Actions token permits Workers Scripts Read and that the Account ID is correct.",
+                 "No settings were changed.",
+              ])
+              raise SystemExit(0)
+          bindings={b.get("name"):b for b in (settings or {}).get("bindings",[]) if isinstance(b,dict) and b.get("name")}
+          def kind(name):
+              b=bindings.get(name)
+              if not b:return "Missing"
+              if b.get("type") in ("secret_text","secret_key"):return "Present (encrypted)"
+              return "Present (plain text — move into encrypted Worker secrets)"
+          rows=["## Existing carrier credentials (names/types only)","","| Worker binding | Status |","|---|---|"]
+          for k in ("CANADA_POST_CLIENT_ID","CANADA_POST_CLIENT_SECRET",
+                    "FEDEX_CLIENT_ID","FEDEX_CLIENT_SECRET","FEDEX_ACCOUNT_NUMBER",
+                    "SHIPPING_QUOTE_SECRET"):
+              rows.append("| `"+k+"` | "+kind(k)+" |")
+          rows+=["","## Safe configuration gates","","| Setting | Current status |","|---|---|"]
+          config=("SHIPPING_MODE","SHIPPING_ALLOWED_COUNTRIES","CANADA_POST_API_MODE",
+                  "CANADA_POST_TEST_APP","FEDEX_SANDBOX","CANADA_POST_PRODUCTION_VERIFIED",
+                  "FEDEX_PRODUCTION_VERIFIED","CARRIER_QUOTES_ENABLED","US_SHIPPING_APPROVED",
+                  "CANADA_POST_US_DUTIES_APPROVED","LIVE_CHECKOUT_ENABLED",
+                  "LIVE_PAYMENTS_APPROVED","TAX_CONFIGURATION_APPROVED")
+          for k in config:
+              b=bindings.get(k)
+              text=b.get("text") if b and b.get("type")=="plain_text" else None
+              if text is None:status="Missing or not readable"
+              elif k=="SHIPPING_MODE":status="Live carrier mode" if text=="live_carrier" else "Flat rate (not live)" if text=="flat_rate" else "Unrecognized"
+              elif k=="SHIPPING_ALLOWED_COUNTRIES":status="Canada and US configured" if text=="CA,US" else "Different allowlist — review"
+              elif k=="CANADA_POST_API_MODE":status="JSON/OAuth" if text=="json" else "Legacy or unrecognized"
+              elif text=="false":status="Off"
+              elif text=="true":status="On"
+              else:status="Present (non-boolean value)"
+              rows.append("| `"+k+"` | "+status+" |")
+          b=bindings.get("SHIPPING_PACKAGES_JSON")
+          measured="Not configured"
+          if b:
+              if b.get("type")=="plain_text":
+                  try:
+                      value=json.loads(b.get("text") or "{}")
+                      if isinstance(value,dict):
+                          count=sum(1 for p in value.values() if isinstance(p,dict) and p.get("verified") is True and all(isinstance(p.get(x),(int,float)) and p[x]>0 for x in ("weightKg","lengthCm","widthCm","heightCm")))
+                          measured=str(count)+" physically verified profiles configured (not independently remeasured by this audit)"
+                      else:measured="Configured but invalid JSON profile structure"
+                  except (TypeError,ValueError):measured="Configured but JSON is invalid"
+              else:measured="Configured as encrypted Worker secret; count not inspected"
+          rows+=["","## Packed parcel profiles","",measured,"",
+                 "## Next actions","",
+                 "1. Obtain merchant-approved **Canada Post** Developer Portal Rating production app and **FedEx** Ratings API credentials directly from each provider.",
+                 "2. Add missing private values through Cloudflare **Worker encrypted secrets**; never send them through chat or commit them.",
+                 "3. Fill the generated `shipping-measurements-to-complete.csv` with real measured packed sizes. Apply only owner-verified sizes.",
+                 "4. Compare genuine Canada and US carrier quotes with identical packages and destinations in each merchant portal.",
+                 "5. Approve US customs, Canada Post US duty-declaration arrangements and customer delivery terms before permitting US checkout.",
+                 "6. Have a developer adjust the deployment gates for a separate controlled rate-preview rollout. **Leave live payments off.**","",
+                 "This audit does not validate credentials by logging into carriers; no rate API calls were made.",
+          ]
+          report(prefix+rows)
+          PY
+      - name: Upload sanitized report
+        uses: actions/upload-artifact@v4
+        with:
+          name: burtonfound-carrier-readiness-report
+          path: carrier-readiness-report.md
+          if-no-files-found: error
+          retention-days: 30
