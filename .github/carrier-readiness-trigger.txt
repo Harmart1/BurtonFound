@@ -1,0 +1,1 @@
+2026-11-25 — Run read-only carrier configuration audit against the existing Burton & Found Cloudflare Worker. No settings to change.
