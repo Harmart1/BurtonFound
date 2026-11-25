@@ -9,7 +9,13 @@ export function hasVerifiedPackages(env){
 }
 export function secure(env){
   // A separate explicit approval is required before any sk_live_* key can enable checkout.
-  if(String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_')&&env.LIVE_PAYMENTS_APPROVED!=='true')return false;
+  const liveMoney=String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_');
+  if(liveMoney&&env.LIVE_PAYMENTS_APPROVED!=='true')return false;
+  // A valid API key or a synthetic quote is not evidence of verified commercial rates.
+  // In live money mode require a separately signed-off production carrier.
+  if(liveMoney&&env.SHIPPING_MODE==='live_carrier'
+    &&env.CANADA_POST_PRODUCTION_VERIFIED!=='true'
+    &&env.FEDEX_PRODUCTION_VERIFIED!=='true')return false;
   return !!(env.SUPABASE_URL&&env.SUPABASE_SECRET_KEY&&/^sk_(test|live)_/.test(env.STRIPE_SECRET_KEY||'')&&/^whsec_/.test(env.STRIPE_WEBHOOK_SECRET||'')&&(env.SHIPPING_MODE==='live_carrier'?(env.CARRIER_QUOTES_ENABLED==='true'&&String(env.SHIPPING_QUOTE_SECRET||'').length>=32&&hasVerifiedPackages(env)&&((env.CANADA_POST_API_MODE==='legacy'?env.CANADA_POST_USERNAME&&env.CANADA_POST_PASSWORD:env.CANADA_POST_CLIENT_ID&&env.CANADA_POST_CLIENT_SECRET)||env.FEDEX_CLIENT_ID&&env.FEDEX_CLIENT_SECRET&&env.FEDEX_ACCOUNT_NUMBER)&&!(String(env.STRIPE_SECRET_KEY).startsWith('sk_live_')&&(env.CANADA_POST_SANDBOX==='true'||env.FEDEX_SANDBOX==='true'||env.CANADA_POST_TEST_APP==='true'))):env.SHIPPING_STANDARD_CA_CENTS)&&env.TAX_CONFIGURATION_APPROVED==='true'&&env.LIVE_CHECKOUT_ENABLED==='true');}
 export function requireDb(env){if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(env.SUPABASE_URL||'')||!(env.SUPABASE_SECRET_KEY||'').trim())throw Error('Database is not configured');}
 export async function db(env,table,{method='GET',query='',body,prefer='return=representation'}={}){

@@ -74,6 +74,21 @@ test('Canada Post JSON connector exchanges OAuth token using server-only credent
   assert.equal(calls.length,2);
  }finally{globalThis.fetch=before}
 });
+test('Rate API refuses production carrier calls without explicit verification, even if credentials exist',async()=>{
+ const prev=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>{calls++;throw Error('Must not call unapproved carrier credentials')};
+ try{
+  const request=new Request(origin+'/api/shipping-quotes',{method:'POST',
+   headers:{Origin:origin,'Content-Type':'application/json'},
+   body:JSON.stringify({skus:['OH-003'],destination:ca})});
+  const r=await ratesEndpoint({request,env:{...env,
+   CANADA_POST_TEST_APP:'false',CANADA_POST_CLIENT_ID:'placeholder',CANADA_POST_CLIENT_SECRET:'placeholder',
+   FEDEX_SANDBOX:'false',FEDEX_CLIENT_ID:'placeholder',FEDEX_CLIENT_SECRET:'placeholder',FEDEX_ACCOUNT_NUMBER:'placeholder',
+   CANADA_POST_PRODUCTION_VERIFIED:'false',FEDEX_PRODUCTION_VERIFIED:'false'}});
+  assert.equal(r.status,503);
+  assert.equal(calls,0);
+ }finally{globalThis.fetch=prev}
+});
 test('Public rate endpoint never presents Canada Post Test app or FedEx sandbox stub prices to shoppers',async()=>{
  const previous=globalThis.fetch;let called=0;
  globalThis.fetch=async()=>{called++;throw Error('No external API must be invoked')};
