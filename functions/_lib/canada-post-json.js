@@ -5,19 +5,19 @@
 const API='https://api.canadapost-postescanada.ca/prod/devportal-portaildesdeveloppeurs';
 const TOKEN_URL=API+'/cpc-api-native-oauth-provider/oauth2/token';
 const RATES_URL=API+'/rating/v1/prices';
-const isoDate=s=>/^\\d{4}-\\d{2}-\\d{2}(?:T|$)/.test(String(s||''))?String(s).slice(0,10):null;
+const isoDate=s=>/^\d{4}-\d{2}-\d{2}(?:T|$)/.test(String(s||''))?String(s).slice(0,10):null;
 const money=n=>typeof n==='number'&&Number.isFinite(n)&&n>0&&n<=5000&&Math.round(n*100)===Math.round(Number(n.toFixed(2))*100)?Math.round(n*100):NaN;
 const excludedService=new Set(['USA.SP.AIR','INT.SP.AIR','INT.SP.SURF','USA.PW.ENV','USA.PW.PAK']);
 
 export function canadaPostJsonRequest(env,to,pkg,shipDate){
  if(!['CA','US'].includes(to.country))throw Error('Canada Post rating is configured for Canada and US only');
- if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(shipDate))throw Error('Invalid shipping dispatch date');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(shipDate))throw Error('Invalid shipping dispatch date');
  const dims=[pkg.lengthCm,pkg.widthCm,pkg.heightCm].map(Number).sort((a,b)=>b-a);
  const weight=Number(pkg.weightKg);
  if(!Number.isFinite(weight)||weight<=0||weight>30||dims.some(v=>!Number.isFinite(v)||v<=0||v>150))throw Error('Verified packed dimensions required');
  const customer=String(env.CANADA_POST_CUSTOMER_NUMBER||'').trim();
  const contract=String(env.CANADA_POST_CONTRACT_ID||'').trim();
- if(customer&&!/^\\d{1,10}$/.test(customer)||contract&&!/^\\d{1,10}$/.test(contract))throw Error('Invalid Canada Post customer or contract number');
+ if(customer&&!/^\d{1,10}$/.test(customer)||contract&&!/^\d{1,10}$/.test(contract))throw Error('Invalid Canada Post customer or contract number');
  if(contract&&!customer)throw Error('Canada Post contract requires a matching customer number');
  return {
   ...(customer?{customerNumber:customer}:{}),
@@ -35,7 +35,7 @@ export function parseCanadaPostJson(payload,country){
  const out=[],seen=new Set();
  for(const entry of payload){
   const code=String(entry?.serviceCode||'');
-  if(!/^(DOM|USA)\\.[A-Z0-9.]{2,35}$/.test(code))continue;
+  if(!/^(DOM|USA)\.[A-Z0-9.]{2,35}$/.test(code))continue;
   if(country==='CA'&&!code.startsWith('DOM.')||country==='US'&&!code.startsWith('USA.'))continue;
   if(excludedService.has(code)||seen.has(code))continue;
   const amount=money(entry?.priceDetails?.due);
