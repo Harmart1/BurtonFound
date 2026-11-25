@@ -2,6 +2,19 @@
 **Implementation date:** November 25, 2026  
 **Status:** Code prepared and unit-tested; merchant accounts, real parcel measurements and live-carrier quotes **not enabled**; customer payments **disabled**.
 
+## Automated carrier setup and configuration audit (new)
+
+A **read-only** GitHub Actions workflow now uses the existing Cloudflare deployment connection to inspect whether the live `burtonfound` Worker has the expected Canada Post, FedEx and shipping-signature bindings. The workflow never prints a credential value, logs a shipping secret, calls the carriers, buys a label, or changes a Cloudflare setting.
+
+1. Open [GitHub Actions → Read-only carrier configuration audit](https://github.com/Harmart1/BurtonFound/actions/workflows/carrier-readiness.yml).
+2. Choose **Run workflow** (or, as part of a controlled release, update `.github/carrier-readiness-trigger.txt` on `main`).
+3. Download the **burtonfound-carrier-readiness-report** artifact. It identifies missing secret binding names, configured Canada/U.S. countries, whether the customer quote and payment gates are off, and the count of already-verified packed profiles if visible.
+4. When a carrier provides a client ID and secret, add them **directly to Cloudflare encrypted Worker secrets**. Do **not** paste them into GitHub source, commit logs, or a chat.
+5. Rerun the same audit and confirm the credentials show **Present (encrypted)**. Credential presence does **not** mean the account is production-approved or that any real price was obtained.
+6. Before a public rate is shown, its provider must pass a real account-specific production-rate comparison and have `CANADA_POST_PRODUCTION_VERIFIED` or `FEDEX_PRODUCTION_VERIFIED` explicitly approved. The public rate endpoint now **suppresses providers without this approval**, independently of whether API keys exist.
+
+The site still leaves `CARRIER_QUOTES_ENABLED=false`, all payment gates off, and `SHIPPING_MODE=flat_rate` until a controlled launch. The audit is intentionally not a workflow for remotely enabling payments or shipping without merchant authorization.
+
 ## Architecture now in GitHub
 
 - Current Cloudflare Worker `burtonfound` stays as the host; no migration to Pages or GitHub Pages.
