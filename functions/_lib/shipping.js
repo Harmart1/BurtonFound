@@ -113,6 +113,14 @@ export async function verifyQuote(env,token,skus){
  if(JSON.stringify(checked)!==JSON.stringify(value.to))throw Error('Shipping destination must be rechecked');
  // U.S. postage quotes exclude customs/duties and cannot become paid orders
  // until the owner has approved a documented cross-border fulfilment process.
+ // Real-money Stripe Checkout also requires production carrier verification,
+ // independent of successful token signing or possession of a carrier API key.
+ if(String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_')){
+  if(value.carrier==='Canada Post'&&env.CANADA_POST_PRODUCTION_VERIFIED!=='true')
+   throw Error('Canada Post production rates have not been verified');
+  if(value.carrier==='FedEx'&&env.FEDEX_PRODUCTION_VERIFIED!=='true')
+   throw Error('FedEx production rates have not been verified');
+ }
  if(checked.country==='US'&&env.US_SHIPPING_APPROVED!=='true')
   throw Error('US checkout is not enabled until customs and duty handling is approved');
  if(checked.country==='US'&&value.carrier==='Canada Post'&&env.CANADA_POST_US_DUTIES_APPROVED!=='true')
