@@ -37,3 +37,7 @@ FEDEX_ACCOUNT_NUMBER=""
 FEDEX_SANDBOX="true"
 # Customer-facing quotes can be enabled independently of paid checkout
 # only after real credentials AND verified packed parcel measurements exist.
+
+# Explicit merchant approvals required for accepting live carrier quotations.
+CANADA_POST_PRODUCTION_VERIFIED="false"
+FEDEX_PRODUCTION_VERIFIED="false"
