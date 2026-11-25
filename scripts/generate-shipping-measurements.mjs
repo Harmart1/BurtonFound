@@ -32,14 +32,14 @@ function parseCsv(content){
    else cell+=ch;
   }else if(ch==='"')quoted=true;
   else if(ch===','){row.push(cell);cell=''}
-  else if(ch==='\\n'){row.push(cell.replace(/\\r$/,''));rows.push(row);row=[];cell=''}
+  else if(ch==='\n'){row.push(cell.replace(/\r$/,''));rows.push(row);row=[];cell=''}
   else cell+=ch;
  }
- if(cell||row.length){row.push(cell.replace(/\\r$/,''));rows.push(row)}
+ if(cell||row.length){row.push(cell.replace(/\r$/,''));rows.push(row)}
  if(quoted)throw Error('Malformed source CSV');
  return rows;
 }
-const source=parseCsv(readFileSync(existing,'utf8').replace(/^\\uFEFF/,''));
+const source=parseCsv(readFileSync(existing,'utf8').replace(/^\uFEFF/,''));
 if(JSON.stringify(source[0])!==JSON.stringify(headings))throw Error('Measurement CSV columns have changed');
 const previous=new Map();
 for(const values of source.slice(1)){
@@ -58,7 +58,7 @@ for(const p of inventory){
 for(const [sku,values] of previous)if(!current.has(sku))current.set(sku,values);
 const printable=s=>'"'+String(s??'').replaceAll('"','""')+'"';
 const csv=[headings,...[...current.values()].sort((a,b)=>a[0].localeCompare(b[0]))]
-  .map(row=>row.map(printable).join(',')).join('\\n')+'\\n';
+  .map(row=>row.map(printable).join(',')).join('\n')+'\n';
 mkdirSync(dirname(output),{recursive:true});
 writeFileSync(output,csv,'utf8');
 const checked=[...current.values()].filter(r=>r[6]==='true').length;
