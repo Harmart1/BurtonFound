@@ -28,6 +28,9 @@ jobs:
           def report(lines):
               target.write_text("\n".join(lines)+"\n",encoding="utf-8")
               print("Wrote sanitized carrier readiness report; no secret values, account IDs or tokens are logged.")
+              for line in lines:
+                  if line.startswith("|") or line.startswith("**Audit unavailable"):
+                      print(line)
           prefix=[
             "# Burton & Found — carrier configuration audit",
             "",
