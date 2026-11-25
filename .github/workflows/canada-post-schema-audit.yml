@@ -18,7 +18,9 @@ jobs:
           s=Path('/tmp/cp-rating.yaml').read_text()
           lines=s.splitlines()
           print("HEAD:", '\\n'.join(lines[:38]))
-          for needle in ('/prices','Get Rates','mailingScenario','originPostalCode','expectedMailingDate','customerNumber','parcelCharacteristics','priceQuotes','serviceCode','serviceName'):
+          print('=== REQUEST AND RESPONSE SAMPLE (lines 31..165)')
+          print('\\n'.join(f"{j+1}: {lines[j]}" for j in range(30,min(len(lines),165))))
+          for needle in ('/prices','mailingScenario','priceQuotes','priceQuote','priceDetails','price','serviceCode','serviceName','expectedDeliveryDate','due','serviceStandard','parcelCharacteristics'):
             matches=[i for i,line in enumerate(lines) if needle.lower() in line.lower()]
             print('===',needle,'matches',len(matches))
             for i in matches[:2]:
