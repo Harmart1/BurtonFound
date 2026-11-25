@@ -1,4 +1,4 @@
-# Current Cloudflare Workers deployment (November 6, 2026)
+> **Current carrier launch update — November 25, 2026:** The current Cloudflare **Worker** release supports Canada Post's 2026 JSON/OAuth Rating API as the default, FedEx Rates & Transit Times, and Canada/U.S. shipping with explicit U.S. customs gates. See [CARRIER_LAUNCH_CA_US.md](CARRIER_LAUNCH_CA_US.md). Older instructions in this document describing the Canada Post integration as legacy-only, or requiring a new Cloudflare Pages project, are historical and superseded by the current Worker setup. Real rates still require carrier credentials and verified packed measurements; live payments remain disabled.\n\n# Current Cloudflare Workers deployment (November 6, 2026)
 
 The supplied live hostname is **https://burtonfound.timharmar.workers.dev** (Cloudflare Workers, not Cloudflare Pages). A read-only GitHub runner probe confirmed the storefront HTTP 200 but `/api/health` HTTP 404: the currently deployed Worker has static assets but not the expected API.
 
