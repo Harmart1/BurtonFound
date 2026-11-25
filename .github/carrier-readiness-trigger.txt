@@ -1,2 +1,3 @@
 2026-11-25 — Run read-only carrier configuration audit against the existing Burton & Found Cloudflare Worker. No settings to change.
 2026-11-25 — Rerun after initializing encrypted signing key; verify present and all commerce flags disabled.
+2026-11-25 — Confirm after safe production deploy that encrypted quote-signing key persists and payment flags remain disabled.
