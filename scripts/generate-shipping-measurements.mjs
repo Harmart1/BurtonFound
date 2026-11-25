@@ -2,9 +2,9 @@
 /* Regenerate a measurement worksheet from every current website SKU.
  * No weight/size is inferred; all new rows remain unverified.
  * Existing measured CSV rows and custom combined-cart keys are preserved. */
-import {readFileSync,writeFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
-import {resolve} from 'node:path';
+import {resolve,dirname} from 'node:path';
 
 const root=resolve(import.meta.dirname,'..');
 const existing=resolve(root,'SHIPPING_PACKAGE_MEASUREMENTS.csv');
@@ -59,6 +59,7 @@ for(const [sku,values] of previous)if(!current.has(sku))current.set(sku,values);
 const printable=s=>'"'+String(s??'').replaceAll('"','""')+'"';
 const csv=[headings,...[...current.values()].sort((a,b)=>a[0].localeCompare(b[0]))]
   .map(row=>row.map(printable).join(',')).join('\\n')+'\\n';
+mkdirSync(dirname(output),{recursive:true});
 writeFileSync(output,csv,'utf8');
 const checked=[...current.values()].filter(r=>r[6]==='true').length;
 console.log('Generated',output,'from',inventory.length,'catalogue products;',checked,'rows previously verified; new rows are unverified.');
