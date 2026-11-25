@@ -1,0 +1,26 @@
+name: Temporary Canada Post Rating OpenAPI schema audit
+on:
+  push:
+    branches: [canada-us-live-carrier-readiness-2026-11-25]
+    paths: [.github/workflows/canada-post-schema-audit.yml]
+permissions:
+  contents: read
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download public Canada Post Rating OpenAPI and inspect keys
+        run: |
+          curl --fail --location --silent --show-error --max-time 30 'https://developer-developpeur.canadapost-postescanada.ca/devportal-portaildesdeveloppeurs/download/4632/document' -o /tmp/cp-rating.yaml
+          echo "Downloaded official Rating OpenAPI bytes: $(wc -c </tmp/cp-rating.yaml)"
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('/tmp/cp-rating.yaml').read_text()
+          lines=s.splitlines()
+          print("HEAD:", '\\n'.join(lines[:38]))
+          for needle in ('/prices','Get Rates','mailingScenario','originPostalCode','expectedMailingDate','customerNumber','parcelCharacteristics','priceQuotes','serviceCode','serviceName'):
+            matches=[i for i,line in enumerate(lines) if needle.lower() in line.lower()]
+            print('===',needle,'matches',len(matches))
+            for i in matches[:2]:
+              print('\\n'.join(f"{j+1}: {lines[j]}" for j in range(max(0,i-4),min(len(lines),i+13))))
+          PY
