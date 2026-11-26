@@ -1,0 +1,57 @@
+name: Burton & Found account email readiness
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        description: "Audit only, repair URL/auth settings, or install approved custom SMTP"
+        options: [audit, repair, repair-and-smtp]
+        default: audit
+        required: true
+  pull_request:
+    paths:
+      - '.github/workflows/account-email-readiness.yml'
+      - 'scripts/auth-config.py'
+      - 'scripts/auth-public-probe.py'
+      - 'tests/auth_config_test.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/account-email-readiness.yml'
+  schedule:
+    - cron: '19 15 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-auth-config
+  cancel-in-progress: false
+jobs:
+  public-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tests/auth_config_test.py
+      - run: python3 scripts/auth-public-probe.py
+  management:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit or apply owner-authorized authentication settings
+        env:
+          BF_SUPABASE_MANAGEMENT_TOKEN: ${{ secrets.BF_SUPABASE_MANAGEMENT_TOKEN }}
+          BF_SMTP_HOST: ${{ secrets.BF_SMTP_HOST }}
+          BF_SMTP_USER: ${{ secrets.BF_SMTP_USER }}
+          BF_SMTP_PASSWORD: ${{ secrets.BF_SMTP_PASSWORD }}
+          BF_SMTP_FROM: ${{ secrets.BF_SMTP_FROM }}
+          BF_SMTP_PORT: ${{ secrets.BF_SMTP_PORT }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          case "$MODE" in
+            audit) python3 scripts/auth-config.py ;;
+            repair) python3 scripts/auth-config.py --apply ;;
+            repair-and-smtp) python3 scripts/auth-config.py --apply --smtp ;;
+            *) exit 1 ;;
+          esac

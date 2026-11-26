@@ -8,12 +8,12 @@ function inspect(href){
  const access=f.get('access_token')||'';
  return {callback:error||!!access||q.has('code')||q.has('token_hash'),recovery:type==='recovery',error,access};
 }
-function accountUrl(href){return new URL('/account.html',href).href;}
+function accountUrl(href){return new URL('/account',href).href;}
 function forward(href){
  const u=new URL(href),s=inspect(href);
- if(!s.callback||u.pathname==='/account.html')return null;
+ if(!s.callback||['/account','/account/','/account.html'].includes(u.pathname))return null;
  // Only forward explicit Supabase callback parameters; never an arbitrary URL.
- const target=new URL('/account.html',u.origin);
+ const target=new URL('/account',u.origin);
  for(const k of ['code','type','token_hash','error','error_code','error_description'])if(u.searchParams.has(k))target.searchParams.set(k,u.searchParams.get(k));
  target.hash=u.hash;
  return target.href;
