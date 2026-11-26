@@ -8,6 +8,12 @@ on:
         options: [audit, repair, repair-and-smtp]
         default: audit
         required: true
+  pull_request:
+    paths:
+      - '.github/workflows/account-email-readiness.yml'
+      - 'scripts/auth-config.py'
+      - 'scripts/auth-public-probe.py'
+      - 'tests/auth_config_test.py'
   push:
     branches: [main]
     paths:
