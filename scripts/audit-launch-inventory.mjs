@@ -23,7 +23,9 @@ for(const file of sources){
 }
 const products=vm.window.BURTON_DATA?.inventory;
 if(!Array.isArray(products)||products.length!==229)throw Error('Unexpected storefront inventory: audit catalogue changes first');
-const site=new URL(JSON.parse(readFileSync(resolve(root,'wrangler.jsonc'),'utf8')).vars.MARKETING_SITE_URL);
+const vars=JSON.parse(readFileSync(resolve(root,'wrangler.jsonc'),'utf8')).vars;
+const sellerEmailUnset=/sellerEmail\s*:\s*["']\s*["']/.test(readFileSync(resolve(root,'public/config.js'),'utf8'));
+const site=new URL(vars.MARKETING_SITE_URL);
 if(site.protocol!=='https:')throw Error('Expected HTTPS storefront');
 const bySku=new Map();
 for(const p of products){
@@ -138,7 +140,19 @@ const report=[
  line('Unverified storefront products marked available in backend',api===null?'Unknown':counts.unverifiedAndAvailable),
  '',
  ...(liveError?['**Live stock check failed:** '+liveError+'; do not conclude that absent database records were found.','']:[]),
- '## Seller review workflow',
+ '## Other launch prerequisites (static source-code checks)',
+ '',
+ '| Prerequisite | Static configuration |','|---|---|',
+ line('Seller enquiry email',sellerEmailUnset?'Not configured in public/config.js':'Present in public/config.js — delivery untested'),
+ line('Live checkout feature',vars.LIVE_CHECKOUT_ENABLED==='true'?'Enabled (requires approval)':'Disabled'),
+ line('Stripe payout verification flag',vars.STRIPE_PAYOUTS_VERIFIED==='true'?'Owner-approved flag — Stripe status not independently checked':'Not approved'),
+ line('Tax approval',vars.TAX_CONFIGURATION_APPROVED==='true'?'Approved flag — legal status not independently checked':'Not approved'),
+ line('Customer carrier quote feature',vars.CARRIER_QUOTES_ENABLED==='true'?'Enabled (requires actual verified rates)':'Disabled'),
+ line('Public search indexing',vars.MARKETING_INDEXING_APPROVED==='true'?'Approved':'Disabled'),
+ '',
+ 'Note: these are GitHub configuration defaults. The running Cloudflare environment and Stripe account need separate checks.',
+ '',
+'## Seller review workflow',
  '',
  '1. Open the accompanying **launch-inventory-review.csv** and inspect the flagged SKUs.',
  '2. Physically verify originals, dimensions, condition, saleable quantity and whether any item is part of a bundle.',
