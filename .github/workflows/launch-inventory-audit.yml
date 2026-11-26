@@ -1,0 +1,37 @@
+name: Burton & Found weekly launch inventory review (read-only)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 13 * * 1'
+  push:
+    branches: [main]
+    paths:
+      - .github/launch-readiness-trigger.txt
+
+permissions:
+  contents: read
+
+jobs:
+  launch-stock-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Check out website catalogue
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reconcile published product SKUs against live public inventory API
+        run: |
+          node scripts/audit-launch-inventory.mjs
+          cat marketing-output/launch-inventory-reconciliation.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload launch inventory review workbook and report (no secrets)
+        uses: actions/upload-artifact@v4
+        with:
+          name: burtonfound-launch-inventory-review
+          path: |
+            marketing-output/launch-inventory-review.csv
+            marketing-output/launch-inventory-reconciliation.md
+          if-no-files-found: error
+          retention-days: 30
