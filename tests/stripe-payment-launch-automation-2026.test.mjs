@@ -11,12 +11,12 @@ const base='https://burtonfound.timharmar.workers.dev';
 
 test('payout verification gate blocks Stripe live checkout independently of approvals',()=>{
  const env={SUPABASE_URL:'https://unit.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',
-  STRIPE_SECRET_KEY:'sk_live_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',
+  STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_live_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',
   SHIPPING_STANDARD_CA_CENTS:'1995',LIVE_CHECKOUT_ENABLED:'true',
   LIVE_PAYMENTS_APPROVED:'true',TAX_CONFIGURATION_APPROVED:'true'};
  assert.equal(secure(env),false);
  assert.equal(secure({...env,STRIPE_PAYOUTS_VERIFIED:'false'}),false);
- assert.equal(secure({...env,STRIPE_SECRET_KEY:'sk_test_fixture'}),true,'Sandbox test mode must not require payouts enabled');
+ assert.equal(secure({...env,STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_test_fixture'}),true,'Sandbox test mode must not require payouts enabled');
 });
 test('current production configuration cannot activate payments or falsely verify payouts',()=>{
  const vars=JSON.parse(source('wrangler.jsonc')).vars;
