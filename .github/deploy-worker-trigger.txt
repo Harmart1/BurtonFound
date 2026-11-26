@@ -1,1 +1,1 @@
-2026-11-25 — deploy checkout recovery and webhook byte limit; all payment and carrier quote approvals remain disabled.
+2026-11-25 — deploy owner bookkeeping and inventory reporting with sandbox fulfillment safeguards; payments and live quotes stay disabled.
