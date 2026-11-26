@@ -20,7 +20,7 @@ function stats(){
  $('statAttention').textContent=orders.filter(o=>o.fulfillment_status==='needs_attention'||o.payment_status==='review').length;
 }
 function render(){
- stats();const display=filtered();$('count').textContent=`Showing ${display.length} of ${orders.length} recent orders`;
+ stats();const display=filtered();if($('orderSort')?.value==='priority'&&window.BURTON_OPERATIONS)display.sort((a,b)=>window.BURTON_OPERATIONS.priority(a)-window.BURTON_OPERATIONS.priority(b)||String(a.created_at).localeCompare(String(b.created_at)));$('count').textContent=`Showing ${display.length} of ${orders.length} recent orders (latest 100; use Business reports for date-range export)`;
  $('orders').innerHTML=display.map(o=>`<article class="order" data-id="${esc(o.id)}">
  <div class="top"><h2>Order ${esc(o.id.slice(0,8))}</h2><strong>${dollars(o.total_cents)} CAD</strong></div>
  <p>${esc(new Date(o.created_at).toLocaleString('en-CA'))} · Payment: ${esc(o.payment_status)} · <strong>Fulfillment: ${esc(o.fulfillment_status)}</strong></p>
@@ -36,7 +36,7 @@ function render(){
  <div class="order-actions"><button class="secondary" type="button" data-action="packing">Print packing slip</button><a class="secondary" href="https://www.canadapost-postescanada.ca/cpc/en/small-business/snap-ship.page" target="_blank" rel="noopener noreferrer">Canada Post Snap Ship ↗</a><a class="secondary" href="https://www.fedex.com/en-ca/shipping/ship-online.html" target="_blank" rel="noopener noreferrer">FedEx Ship Manager ↗</a><button class="secondary" type="button" data-action="address">Copy address</button><button class="secondary" type="button" data-action="email">Prepare update email</button><button class="secondary" type="button" data-action="history">View change history</button></div>
  <div class="history" hidden></div></article>`).join('')||'<div class="help">No orders match these filters</div>';
 }
-async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Paid orders only');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
+async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Recent order records, including review and test records');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness();loadHolds()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
 async function loadReadiness(){
  const el=$('readinessResults');if(!el)return;
  el.textContent='Checking connected services…';
@@ -80,7 +80,7 @@ function exportCsv(){
 }
 $('reload').addEventListener('click',refresh);
 $('refreshReadiness').addEventListener('click',loadReadiness);$('exportCsv').addEventListener('click',exportCsv);
-$('statusFilter').addEventListener('change',render);$('orderSearch').addEventListener('input',render);
+$('orderSort')?.addEventListener('change',render);$('statusFilter').addEventListener('change',render);$('orderSearch').addEventListener('input',render);
 $('orders').addEventListener('submit',async e=>{
  if(!e.target.matches('form.form'))return;e.preventDefault();
  const o=orders.find(r=>r.id===e.target.closest('.order')?.dataset.id),f=new FormData(e.target),button=e.target.querySelector('[type="submit"]');if(!o)return;
