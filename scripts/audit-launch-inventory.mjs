@@ -11,6 +11,7 @@ import {runInNewContext} from 'node:vm';
 const root=resolve(import.meta.dirname,'..');
 const outDir=resolve(root,process.env.BF_LAUNCH_OUTPUT_DIR||'marketing-output');
 const offline=process.argv.includes('--offline');
+const fixtureArg=process.argv.find(x=>x.startsWith('--fixture='));
 const sources=[
  'products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js',
  'old-hollywood-products.js','coke-new-products.js','coke-archive-singles.js',
@@ -31,7 +32,11 @@ for(const p of products){
  bySku.set(p.sku,p);
 }
 let api=null,liveError=null;
-if(!offline){
+if(fixtureArg){
+ const json=JSON.parse(readFileSync(resolve(fixtureArg.slice('--fixture='.length)),'utf8'));
+ if(json.configured!==true||!Array.isArray(json.items))throw Error('Invalid local test fixture');
+ api=json.items;
+}else if(!offline){
  try{
   const response=await fetch(new URL('/api/catalog',site),{
    headers:{Accept:'application/json','User-Agent':'BurtonFound-LaunchAudit/1.0'},
@@ -116,6 +121,7 @@ const report=[
  '',
  'Generated from the storefront JavaScript and '+
  (offline?'**offline-only** reference data. Database not queried.':
+ fixtureArg?'a **local test fixture**, not a live database.':
  api===null?'an attempted live public /api/catalog query which was **unavailable**.':'the live public /api/catalog stock view.'),
  '',
  '**This is a review worksheet, not proof of physical possession or saleability. No stock, prices or payments were changed.**',
