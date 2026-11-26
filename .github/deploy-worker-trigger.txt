@@ -1,1 +1,1 @@
-2026-11-25 — deploy collector discovery, opt-in saved-find recommendations and stock-aware watchlist; preview-only checkout preserved.
+2026-11-25 — deploy account recovery and registration repair; preview-only commerce preserved.
