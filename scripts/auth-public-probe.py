@@ -20,7 +20,7 @@ def main():
     assert settings.get("external",{}).get("email") is True,"Email auth provider not enabled"
     assert settings.get("disable_signup") is False,"Signup disabled or not verified"
     assert settings.get("mailer_autoconfirm") is False,"Confirmation disabled or not verified"
-    page=get(BASE+"/account.html").decode()
+    page=get(BASE+"/account").decode()
     for marker in ['id="signInForm"','id="signUpForm"','id="forgotForm"','id="resendForm"','id="recoveryForm"','auth-callback.js']:
         assert marker in page,"Missing deployed account feature: "+marker
     assert 'finishRecovery' in get(BASE+"/account-core.js").decode()

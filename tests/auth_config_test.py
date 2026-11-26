@@ -5,7 +5,7 @@ class ConfigTest(unittest.TestCase):
     def test_repair_preserves_other_redirects(self):
         patch=m.make_patch({"site_url":"http://localhost:3000","uri_allow_list":"https://example.invalid/callback","mailer_autoconfirm":True})
         self.assertEqual(patch["site_url"],m.SITE)
-        self.assertEqual(patch["uri_allow_list"],"https://example.invalid/callback,"+m.CALLBACK)
+        self.assertEqual(patch["uri_allow_list"],"https://example.invalid/callback,"+m.CALLBACK+","+m.LEGACY_CALLBACK)
         self.assertIs(patch["mailer_autoconfirm"],False)
         self.assertNotIn("smtp_pass",patch)
     def test_no_overwrite_custom_domain(self):
@@ -16,6 +16,6 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(patch["smtp_port"],587)
         self.assertIs(patch["mailer_autoconfirm"],False)
     def test_idempotent(self):
-        cfg={"site_url":m.SITE,"uri_allow_list":m.CALLBACK,"external_email_enabled":True,"disable_signup":False,"mailer_autoconfirm":False,"mailer_secure_email_change_enabled":True}
+        cfg={"site_url":m.SITE,"uri_allow_list":m.CALLBACK+","+m.LEGACY_CALLBACK,"external_email_enabled":True,"disable_signup":False,"mailer_autoconfirm":False,"mailer_secure_email_change_enabled":True}
         self.assertEqual(m.make_patch(cfg),{})
 if __name__=="__main__":unittest.main()

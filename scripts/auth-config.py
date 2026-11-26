@@ -5,7 +5,8 @@ import argparse, json, os, re, sys, urllib.request, urllib.error
 from urllib.parse import urlsplit
 REF="nyvdrgpcwfasajyncnhi"
 SITE="https://burtonfound.timharmar.workers.dev"
-CALLBACK=SITE+"/account.html"
+CALLBACK=SITE+"/account"
+LEGACY_CALLBACK=SITE+"/account.html"
 ENDPOINT="https://api.supabase.com/v1/projects/"+REF+"/config/auth"
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):
@@ -46,7 +47,8 @@ def make_patch(cfg,apply_smtp=False,environ=None):
             raise ValueError("Different configured Site URL detected; review in dashboard before overwriting.")
         patch["site_url"]=SITE
     allowed=redirects(cfg)
-    if CALLBACK not in allowed:patch["uri_allow_list"]=",".join([*allowed,CALLBACK])
+    missing=[x for x in (CALLBACK,LEGACY_CALLBACK) if x not in allowed]
+    if missing:patch["uri_allow_list"]=",".join([*allowed,*missing])
     for k,v in {"external_email_enabled":True,"disable_signup":False,"mailer_autoconfirm":False,"mailer_secure_email_change_enabled":True}.items():
         if cfg.get(k) is not v:patch[k]=v
     if apply_smtp:

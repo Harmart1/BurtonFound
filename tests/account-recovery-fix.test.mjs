@@ -9,9 +9,12 @@ runInNewContext(read('auth-callback.js'),context);
 const C=context.window.BURTON_AUTH_CALLBACK;
 test('callback routing preserves recovery tokens only on same origin and ignores normal navigation',()=>{
  assert.equal(C.forward(host+'/#shop'),null);
- assert.equal(C.forward(host+'/#access_token=fixture&type=recovery'),host+'/account.html#access_token=fixture&type=recovery');
- assert.equal(C.forward(host+'/?code=fixture&next=https://example.invalid'),host+'/account.html?code=fixture');
- assert.equal(C.accountUrl(host+'/account.html#signup'),host+'/account.html');
+ assert.equal(C.forward(host+'/account#access_token=fixture&type=recovery'),null);
+ assert.equal(C.forward(host+'/account.html#access_token=fixture&type=recovery'),null);
+ assert.equal(C.forward(host+'/account/#access_token=fixture&type=recovery'),null);
+ assert.equal(C.forward(host+'/#access_token=fixture&type=recovery'),host+'/account#access_token=fixture&type=recovery');
+ assert.equal(C.forward(host+'/?code=fixture&next=https://example.invalid'),host+'/account?code=fixture');
+ assert.equal(C.accountUrl(host+'/account.html#signup'),host+'/account');
  assert.equal(C.inspect(host+'/account.html#error_code=otp_expired&type=recovery').error,true);
 });
 function setup(href,session,event){

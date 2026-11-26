@@ -23,7 +23,7 @@
   let callbackAccess=callback.access;callback.access='';
   const recoveryState=()=>recovery;
   const recoveryChange=state=>{recovery=state;emit('recovery-state',{state});};
-  const redirectTo=()=>window.BURTON_AUTH_CALLBACK?.accountUrl(location.href)||new URL('/account.html',location.href).href;
+  const redirectTo=()=>window.BURTON_AUTH_CALLBACK?.accountUrl(location.href)||new URL('/account',location.href).href;
   function scrubCallback(){if(!callback.callback)return;try{history.replaceState(null,'',redirectTo());}catch{}}
   const fail=message=>{throw new Error(message)};
   const demandAuth=()=>{if(!client||!user)fail('Sign in to save this information to your account.');};
