@@ -31,12 +31,13 @@
   };
   const isCheckoutReady=()=>checkoutReady&&bag.length&&!bagNeedsVerification()&&!bagHasOverlappingUnits()&&bag.every(id=>!bySku.get(id)?.cmsOnly&&bySku.get(id)?.stockState!=='unavailable');
   async function loadLiveStatus(){
+    window.BURTON_DISCOVERY_VIEW?.setStock(null);
     try {
       const health=await fetch('/api/health',{cache:'no-store'});
       if(health.ok){const v=await health.json();checkoutMode=v.checkout||'preview_only';shippingMode=v.shippingMode||'flat_rate';checkoutReady=['test_mode','live_mode','configured'].includes(checkoutMode);allowedShippingCountries=Array.isArray(v.shippingCountries)?v.shippingCountries:['CA'];const menu=$('shipCountry');if(menu){for(const opt of menu.options){opt.disabled=!allowedShippingCountries.includes(opt.value);}if(!allowedShippingCountries.includes(menu.value)){menu.value=allowedShippingCountries.find(c=>[...menu.options].some(o=>o.value===c))||'CA';}}}else{checkoutReady=false;checkoutMode='preview_only';}
       const res=await fetch('/api/catalog',{cache:'no-store'});
       if(res.ok){const v=await res.json();if(v.configured&&Array.isArray(v.items)){
-        inventoryConnected=true;for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly||needsVerification(p))continue;
+        window.BURTON_DISCOVERY_VIEW?.setStock(v);inventoryConnected=true;for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly||needsVerification(p))continue;
           if(Number.isInteger(row.price_cents))p.price=row.price_cents/100;
           p.stockState=row.available?'available':'unavailable';
         }
@@ -141,10 +142,10 @@
     const units=new Set(p.catalogIds||[sku]);
     const conflict=bag.map(id=>bySku.get(id)).find(existing=>existing&&(existing.catalogIds||[existing.sku]).some(unit=>units.has(unit)));
     if(conflict){toast('A selected item is already included in '+conflict.title+'. Remove that item or set first.');return;}
-    bag.push(sku);saveBag();renderProducts();renderCart();
+    bag.push(sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();
     toast('A good find! Added to your paper bag.');
   }
-  function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();}
+  function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();}
   function openCart(){
     if($('cartDrawer').classList.contains('open'))return;
     const active=document.activeElement;
@@ -238,6 +239,7 @@
     const availability=p.cmsOnly?'Not yet listed':p.stockState==='unavailable'?'Sold or reserved':needsVerification(p)?'Purchase request available':checkoutReady?'In stock · checked at checkout':'Available · enquire to arrange purchase';
     const priceQualifier=p.cmsOnly?'<small>CAD · ENQUIRE</small>':needsVerification(p)?'<small>CAD · ASKING PRICE</small>':hollywood?'<small>CAD · ASKING PRICE</small>':'<small>CAD · ORIGINAL PRINTED PAPER</small>';
     $('productDetails').innerHTML=`<div class="detail-media"><img class="detail-hero-img" id="detailHeroImage" src="${safe(imgs[selectedImage])}" alt="${safe(p.shortDescription)}" width="1050" height="1394"><button type="button" class="detail-zoom" id="detailZoom" aria-label="Enlarge photograph of ${safe(p.title)}">⤢ View larger photo</button><div class="detail-strip">${imgs.length>1?imgs.map((img,i)=>`<button type="button" class="thumb-btn ${i===selectedImage?'active':''}" data-thumb="${i}" aria-pressed="${i===selectedImage}" aria-label="View photograph ${i+1}"><img src="${safe(img)}" alt="Photo ${i+1}"></button>`).join(''):''}</div></div><div class="detail-copy"><p class="eyebrow small">${safe(headerLabel)}</p><h2>${safe(p.title)}</h2><div class="detail-price">${p.cmsOnly&&p.draftDuplicate?'Alternate scan · not separately priced':money(p.price)} ${priceQualifier}</div><p class="detail-intro">${safe(p.shortDescription).replace(/[.\s]+$/,'')}.</p>${extra}<dl class="detail-grid"><div><dt>DATE / PERIOD</dt><dd>${dateLabel}</dd></div><div><dt>CONDITION</dt><dd>${safe(p.condition)}</dd></div><div><dt>PHYSICAL FORMAT</dt><dd>${safe(p.edition)}</dd></div><div><dt>AVAILABILITY</dt><dd>${availability}</dd></div></dl><div class="detail-note"><strong>CONDITION DETAILS.</strong> ${safe(p.conditionNotes||p.condition||'Condition information available on request.')} Measurements and reverse-side photographs may be requested.</div><div class="detail-purchase"><a class="detail-product-link" href="${safe(window.BURTON_PRODUCT_LINKS?.[p.sku]||'index.html?item='+encodeURIComponent(p.sku)+'#shop')}">View &amp; share product page ↗</a><button class="detail-watch" type="button" data-watch="${safe(p.sku)}" aria-pressed="${!!window.BURTON_ACCOUNT?.isWatching?.(p.sku)}">${window.BURTON_ACCOUNT?.isWatching?.(p.sku)?'♥ Watching this find':'♡ Add to watchlist'}</button><button type="button" class="btn btn-dark detail-add" id="detailAdd" ${p.cmsOnly||bag.includes(p.sku)||p.stockState==='unavailable'?'disabled':''}>${p.cmsOnly?'Awaiting stock verification':p.stockState==='unavailable'?'Currently unavailable':bag.includes(p.sku)?'Already in your paper bag':'Add to the paper bag'} <span>↗</span></button><p class="detail-smallprint">${p.cmsOnly?'This is an editorial product listing with a suggested price. Authentication, dimensions, exact condition, quantity and any overlapping scans must be confirmed before sale.':needsVerification(p)?'View the pictured design and ask about paper condition, size or printing history. Adding to your bag does not take payment.':hollywood?'Review the listed date, format and condition details for this piece.':'Actual vintage magazine advertisements shown; sold unframed.'} ${p.cmsOnly?'Save this find to your watchlist to revisit it.':'Request confirmation of condition, shipping, and availability before paying.'}</p></div></div>`;
+    const related=document.createElement('section');related.id='relatedFinds';related.className='bf-related-finds';related.hidden=true;$('productDetails').querySelector('.detail-copy')?.append(related);window.BURTON_DISCOVERY_VIEW?.showRelated(p);
     $('productDialog').showModal();renderDetailImage();
   }
   function info(section){
