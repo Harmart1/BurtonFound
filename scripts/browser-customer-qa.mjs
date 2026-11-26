@@ -104,7 +104,7 @@ try{
      assert((await page.locator('#productGrid .product-card').count())>0);
      const card=page.locator('#productGrid [data-sku="CC-010"]');await card.waitFor({state:'attached'});
      await card.locator('[data-view]').first().click();await visible(page,'#productDialog');await page.locator('#productClose').click();await hidden(page,'#productDialog');
-     await card.locator('[data-add]').click();await visible(page,'#cartDrawer');await page.waitForFunction(()=>document.querySelector('#cartCount')?.textContent.trim()==='1');await page.locator('#cartClose').click();
+     await card.locator('[data-add]').click();await page.waitForFunction(()=>document.querySelector('#cartCount')?.textContent.trim()==='1');await page.locator('#cartOpen').click();await visible(page,'#cartDrawer');await page.locator('#cartClose').click();
      assert((await page.evaluate(()=>window.__bfCalls)).length===0,'Guest browsing must not call auth');
    });
  }
