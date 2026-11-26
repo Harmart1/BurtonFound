@@ -37,7 +37,7 @@ test('real-money carrier checkout requires explicit production rate verification
   LIVE_CHECKOUT_ENABLED:'true',LIVE_PAYMENTS_APPROVED:'true',TAX_CONFIGURATION_APPROVED:'true'
  };
  assert.equal(secure(env),false,'Do not accept live money merely because a carrier API key was entered');
- assert.equal(secure({...env,CANADA_POST_PRODUCTION_VERIFIED:'true'}),true,'An otherwise approved configuration may proceed only after verified rates');
+ assert.equal(secure({...env,CANADA_POST_PRODUCTION_VERIFIED:'true'}),false,'Verified carrier rates alone cannot bypass outstanding payout verification');
  assert.equal(secure({...env,CANADA_POST_PRODUCTION_VERIFIED:'true',LIVE_PAYMENTS_APPROVED:'false'}),false);
  const endpoint=read('functions/api/shipping-quotes.js');
  assert.match(endpoint,/CANADA_POST_PRODUCTION_VERIFIED/);
