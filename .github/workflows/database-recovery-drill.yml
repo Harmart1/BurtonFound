@@ -1,0 +1,56 @@
+name: Burton & Found synthetic database recovery drill
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '41 15 * * 1'
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'tests/recovery/**'
+      - '.github/workflows/database-recovery-drill.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'tests/recovery/**'
+      - '.github/workflows/database-recovery-drill.yml'
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-synthetic-recovery
+  cancel-in-progress: false
+jobs:
+  synthetic-restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      db:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: synthetic-fixture-only
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild application schema, dump and restore synthetic records
+        env:
+          FIXTURE_CONTAINER: ${{ job.services.db.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$FIXTURE_CONTAINER"
+          docker exec "$FIXTURE_CONTAINER" createdb -U postgres bf_source
+          docker exec "$FIXTURE_CONTAINER" createdb -U postgres bf_restored
+          docker exec -i "$FIXTURE_CONTAINER" psql -X -v ON_ERROR_STOP=1 -U postgres -d bf_source < tests/recovery/bootstrap.sql
+          for file in supabase/migrations/*.sql; do
+            docker exec -i "$FIXTURE_CONTAINER" psql -X -v ON_ERROR_STOP=1 -U postgres -d bf_source < "$file"
+          done
+          docker exec -i "$FIXTURE_CONTAINER" psql -X -v ON_ERROR_STOP=1 -U postgres -d bf_source < tests/recovery/seed.sql
+          docker exec "$FIXTURE_CONTAINER" pg_dump -U postgres -Fc -f /tmp/bf-synthetic.dump bf_source
+          docker exec "$FIXTURE_CONTAINER" pg_restore --exit-on-error -U postgres -d bf_restored /tmp/bf-synthetic.dump
+          docker exec -i "$FIXTURE_CONTAINER" psql -X -v ON_ERROR_STOP=1 -U postgres -d bf_restored < tests/recovery/verify.sql
+          docker exec "$FIXTURE_CONTAINER" rm /tmp/bf-synthetic.dump
+          printf '%s\n' '## Synthetic database recovery drill: PASS' 'Repository migrations, fixture order, stock overlap, RLS, privileged grants and webhook idempotency survived a real PostgreSQL dump/restore.' 'No production connection, private records, secrets, or backup artifact.' >> "$GITHUB_STEP_SUMMARY"
