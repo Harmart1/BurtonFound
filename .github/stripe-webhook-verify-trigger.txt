@@ -1,1 +1,2 @@
 Run safe non-payment signed Stripe webhook connectivity test. No checkout, no orders, no inventory changes. 2026-11-09
+2026-11-25 — Retry non-payment signed Stripe webhook ping; do not create orders or charges.
