@@ -24,3 +24,13 @@ marketing-output/
 
 # Ephemeral read-only inventory snapshot for weekly marketing drafts
 marketing-stock-snapshot.json
+
+# Database backup material must never enter this public repository
+*.dump
+*.tar.age
+*.partial
+bf-private-*/
+roles.sql
+schema.sql
+data.sql
+MANIFEST.sha256
