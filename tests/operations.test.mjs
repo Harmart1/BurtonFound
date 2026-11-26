@@ -7,14 +7,14 @@ import {onRequestGet as history} from '../functions/api/admin/fulfillment-histor
 const base='https://burton-testing.pages.dev';
 const userId='7d572d4c-bfaa-4ecf-ac4f-5c37b5b4c201';
 const orderId='fc8372d7-bca2-4d63-bfaa-4c577a8eb9db';
-const env={SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_testing',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_testing',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',SHIPPING_STANDARD_CA_CENTS:'1495',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true'};
+const env={SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_testing',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_testing',STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',SHIPPING_STANDARD_CA_CENTS:'1495',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true'};
 const res=(data)=>new Response(JSON.stringify(data),{status:200,headers:{'content-type':'application/json'}});
 const req=(payload,headers={})=>new Request(base+'/api/admin/fulfill',{method:'POST',headers:{origin:base,authorization:'Bearer fake-validated-session',...headers},body:JSON.stringify(payload)});
 const valid={id:orderId,status:'shipped',carrier:'Canada Post',tracking_number:'1234567890123456'};
 test('Stripe test checkout mode is distinguished from live or disabled checkout',async()=>{
  assert.equal((await (await health({env})).json()).checkout,'test_mode');
- assert.equal((await (await health({env:{...env,STRIPE_SECRET_KEY:'sk_live_testing'}})).json()).checkout,'preview_only');
- assert.equal((await (await health({env:{...env,STRIPE_SECRET_KEY:'sk_live_testing',LIVE_PAYMENTS_APPROVED:'true'}})).json()).checkout,'preview_only');
+ assert.equal((await (await health({env:{...env,STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_live_testing'}})).json()).checkout,'preview_only');
+ assert.equal((await (await health({env:{...env,STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_live_testing',LIVE_PAYMENTS_APPROVED:'true'}})).json()).checkout,'preview_only');
  assert.equal((await (await health({env:{...env,TAX_CONFIGURATION_APPROVED:'false'}})).json()).checkout,'preview_only');
 });
 test('shipping updates reject unauthenticated users before database access',async()=>{
