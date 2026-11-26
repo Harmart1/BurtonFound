@@ -21,6 +21,7 @@ jobs:
           node-version: "22"
       - name: Check software tests
         run: |
+          npm run build:marketing
           npm run check:deploy
           npm test
       - name: Probe deployed account settings and reject unauthenticated admin access
