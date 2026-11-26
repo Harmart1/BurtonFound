@@ -5,7 +5,7 @@ import {runInNewContext} from 'node:vm';
 const context={window:{}};runInNewContext(readFileSync(new URL('../public/discovery-core.js',import.meta.url),'utf8'),context);
 const D=context.window.BURTON_DISCOVERY;
 const p=(sku,collection,ids=[sku],extra={})=>({sku,collection,catalogIds:ids,price:25,year:1940,type:'original',tags:['Cinema'],title:sku,...extra});
-const items=[p('OH-001','hollywood'),p('OH-002','hollywood'),p('OH-003','hollywood'),p('OH-SET','hollywood',['OH-001','OH-002'],{type:'bundle'}),p('VA-001','automobiles',undefined,{requiresVerification:true}),p('CC-001','coca-cola')];
+const items=[p('OH-001','hollywood'),p('OH-002','hollywood'),p('OH-003','hollywood'),p('OH-SET','hollywood',['OH-001','OH-002'],{type:'bundle'}),p('VA-001','automobiles',undefined,{requiresVerification:true}),p('CC-001','coca-cola',undefined,{tags:['Beverages'],year:1965})];
 const stock=D.stockMap({configured:true,items:[{sku:'OH-001',available:true,price_cents:3000},{sku:'OH-002',available:false,price_cents:2500},{sku:'OH-003',available:true,price_cents:2000}]});
 test('recommendations exclude sold items, saved SKU, overlapping bundles and unrelated enquiry designs',()=>{const r=D.recommendations(items,[items[0]],stock);assert.equal(r.length,1);assert.equal(r[0].p.sku,'OH-003');assert.equal(r[0].state.price,20);});
 test('stock unavailable is not inferred as sold; verification is never overridden by feed',()=>{assert.equal(D.state(items[0],null).kind,'unknown');assert.equal(D.state(items[1],stock).kind,'unavailable');assert.equal(D.state(items[4],D.stockMap({configured:true,items:[{sku:'VA-001',available:true,price_cents:999}]})).kind,'enquiry');assert.equal(D.stockMap({configured:true,items:[{sku:'A',available:'true',price_cents:3}]}),null);});

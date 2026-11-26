@@ -4,7 +4,7 @@
 const D=window.BURTON_DISCOVERY,A=window.BURTON_ACCOUNT,$=id=>document.getElementById(id);
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n);
-let stock=null,selected=null;
+let stock=null,selected=null,lastUser=null;
 const products=()=>window.BURTON_DATA?.inventory||[];
 function image(p){const raw=String(p.image||'');return /^assets\/images\/[a-z0-9/_ .-]+\.(webp|jpe?g|png)$/i.test(raw)?raw:'';}
 function tile(r){
@@ -18,9 +18,9 @@ function related(){
 }
 function saved(){
  const host=$('savedFindsShelf');if(!host)return;
- if(A?.isLoading?.()){host.hidden=true;$('savedFindsList').replaceChildren();$('savedFindsRecommendations').replaceChildren();return;}
+ if(A?.isLoading?.()){host.hidden=true;if($('savedFindsJump'))$('savedFindsJump').hidden=true;$('savedFindsList').replaceChildren();$('savedFindsRecommendations').replaceChildren();return;}
  const ids=A?.watchedSkus?.()||[],rows=D.watchlist(products(),ids,stock);
- host.hidden=!rows.length;
+ host.hidden=!rows.length;if($('savedFindsJump')){$('savedFindsJump').hidden=!rows.length;$('savedFindsJump').textContent='Saved finds ('+rows.length+') ↓';}
  $('savedFindsSummary').textContent=(A?.user?.()?'Your account':'Saved in this browser')+' · '+rows.length+' saved '+(rows.length===1?'find':'finds')+' · '+rows.filter(x=>x.state.kind==='unavailable').length+' sold or reserved. Saving does not reserve an item.';
  $('savedFindsList').innerHTML=rows.slice(0,6).map(tile).join('');
  $('savedFindsMore').textContent=rows.length>6?'Showing the first six of '+rows.length+' saved finds. Open your collector account to manage the full watchlist.':'';
@@ -28,7 +28,7 @@ function saved(){
  $('savedFindsRecommendations').innerHTML=recs.length?'<h3>Based on your saved finds</h3><div class="bf-find-grid">'+recs.map(tile).join('')+'</div>':'';
 }
 window.BURTON_DISCOVERY_VIEW=Object.freeze({setStock:body=>{stock=D.stockMap(body);related();saved();},showRelated:p=>{selected=p;related();},clearRelated:()=>{selected=null;},renderSaved:saved});
-document.addEventListener('bf:watch-change',saved);document.addEventListener('bf:auth-change',()=>{if(!A?.user?.())$('savedFindsPersonal')&&($('savedFindsPersonal').checked=false);saved();});
+document.addEventListener('bf:watch-change',saved);document.addEventListener('bf:auth-change',()=>{const next=A?.user?.()?.id||null;if(next!==lastUser){if($('savedFindsPersonal'))$('savedFindsPersonal').checked=false;lastUser=next;}saved();});
 document.addEventListener('bf:bag-sync',()=>{related();saved();});
 document.addEventListener('DOMContentLoaded',()=>{$('savedFindsPersonal')?.addEventListener('change',saved);saved();},{once:true});
 })();

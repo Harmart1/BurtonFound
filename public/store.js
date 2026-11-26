@@ -145,7 +145,7 @@
     bag.push(sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();
     toast('A good find! Added to your paper bag.');
   }
-  function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();}
+  function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();}
   function openCart(){
     if($('cartDrawer').classList.contains('open'))return;
     const active=document.activeElement;
