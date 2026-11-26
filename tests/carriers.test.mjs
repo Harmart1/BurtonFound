@@ -76,11 +76,12 @@ test('shipping quote endpoint returns real mocked carrier quotes and signed sele
 });
 test('Stripe checkout accepts signed carrier rate but ignores forged browser amount',async()=>{
  const token=await signQuote(env,goodRate());const old=globalThis.fetch;let form;
- const backend={...env,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_test',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true',CANADA_POST_API_MODE:'legacy',CANADA_POST_USERNAME:'x',CANADA_POST_PASSWORD:'y'};
+ const backend={...env,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_test',STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true',CANADA_POST_API_MODE:'legacy',CANADA_POST_USERNAME:'x',CANADA_POST_PASSWORD:'y'};
  globalThis.fetch=async(url,init)=>{
   if(url.includes('rpc/bf_hold_cart'))return new Response(JSON.stringify({id:'40b9bf73-7d03-48cc-8d51-907d039175b8',lines:[{sku:'OH-003',title:'Marlene Dietrich Portrait',price_cents:3995}]}));
   if(url.includes('rpc/bf_bind_stripe_session'))return new Response('true');
-  if(url.includes('api.stripe.com')){form=new URLSearchParams(init.body);return new Response(JSON.stringify({id:'cs_test_abcdefgh',url:'https://checkout.stripe.com/c/pay/cs_test_abcdefgh'}));}
+  if(url.includes('api.stripe.com/v1/account'))return new Response(JSON.stringify({id:'acct_1SN2j92NSH96TjSa'}));
+   if(url.includes('api.stripe.com')){form=new URLSearchParams(init.body);return new Response(JSON.stringify({id:'cs_test_abcdefgh',url:'https://checkout.stripe.com/c/pay/cs_test_abcdefgh'}));}
   throw Error('Unexpected fetch URL: '+url);
  };
  try {
@@ -93,13 +94,13 @@ test('Stripe checkout accepts signed carrier rate but ignores forged browser amo
  }finally{globalThis.fetch=old}
 });
 test('invalid or absent signed quote never creates Stripe cart reservation',async()=>{
- const backend={...env,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true',CANADA_POST_API_MODE:'legacy',CANADA_POST_USERNAME:'x',CANADA_POST_PASSWORD:'y'};
+ const backend={...env,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true',CANADA_POST_API_MODE:'legacy',CANADA_POST_USERNAME:'x',CANADA_POST_PASSWORD:'y'};
  const r=await checkout({request:fakeReq('/api/checkout',{skus:['OH-003']}),env:backend});
  assert.equal(r.status,400);
 });
 
 test('live checkout activation requires at least one owner-verified parcel profile',()=>{
- const base={...env,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',STRIPE_SECRET_KEY:'sk_test_test',STRIPE_WEBHOOK_SECRET:'whsec_test',TAX_CONFIGURATION_APPROVED:'true',LIVE_CHECKOUT_ENABLED:'true',CANADA_POST_API_MODE:'legacy',CANADA_POST_USERNAME:'legacy',CANADA_POST_PASSWORD:'legacy',CANADA_POST_SANDBOX:'true'};
+ const base={...env,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_test_test',STRIPE_WEBHOOK_SECRET:'whsec_test',TAX_CONFIGURATION_APPROVED:'true',LIVE_CHECKOUT_ENABLED:'true',CANADA_POST_API_MODE:'legacy',CANADA_POST_USERNAME:'legacy',CANADA_POST_PASSWORD:'legacy',CANADA_POST_SANDBOX:'true'};
  assert.equal(hasVerifiedPackages(base),true);assert.equal(secure(base),true);
  const unverified={...base,SHIPPING_PACKAGES_JSON:JSON.stringify({'OH-003':{...pack,verified:false}})};
  assert.equal(hasVerifiedPackages(unverified),false);assert.equal(secure(unverified),false);

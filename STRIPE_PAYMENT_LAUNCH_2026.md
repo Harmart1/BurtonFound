@@ -2,6 +2,10 @@
 
 **Status:** Code is prepared for Stripe-hosted Checkout; the deployed Worker **must remain preview-only**. Never authorize live funds from this document or automatically alter tax registration, payout details or personal identity verification.
 
+## Additional runtime Stripe merchant protection
+
+The Checkout server now requires `STRIPE_EXPECTED_ACCOUNT_ID=acct_1SN2j92NSH96TjSa` (a **public account identifier**, not a secret), and securely calls Stripe `GET /v1/account` **before placing a physical inventory hold**. A missing, revoked, or mismatched Stripe key fails closed with HTTP 503 without creating a charge, checkout session, or reservation. This protects against an accidental key copied from a different merchant account. This check runs again for each attempted checkout, but does not itself approve payments, tax settings, merchant payouts or real inventory. The public health endpoint also treats missing expected-merchant configuration as preview-only.
+
 ## Safe automated steps implemented
 
 - A repeatable [read-only payment audit](.github/workflows/stripe-payment-readiness.yml) runs against the existing Cloudflare Worker and the configured GitHub Actions **test-only** Stripe key. It reports only encrypted-credential presence, disabled payment gates, and whether a test key belongs to Burton & Found. It probes the live website to verify checkout refuses creation. It does not create charges, tax registrations or webhook endpoints.

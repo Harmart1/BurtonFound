@@ -38,7 +38,7 @@
       'Review item-by-item inventory',links.stock),
    item('stripe','Stripe test credentials','attention',
       v?.stripe?.sandboxKeyPresent&&v?.stripe?.webhookSigningKeyPresent
-       ?'A test API key and webhook secret are present. Their pairing and the API key’s validity must be checked separately.'
+       ?'A test API key and webhook secret are present. Their pairing and the API key’s validity must be checked separately. Expected merchant ID: '+(v.stripe.expectedMerchantConfigured?'configured':'missing')+'.'
        :'The test API key or webhook signing secret is missing; presence alone does not verify live payment readiness.',
       'Run safe Stripe readiness audit',links.test),
    item('payouts','Stripe identity & payouts',payoutFlag?'review':'attention',

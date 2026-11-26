@@ -12,6 +12,22 @@ export async function onRequestPost({request,env}){
   let ship=amount(env.SHIPPING_STANDARD_CA_CENTS),express=amount(env.SHIPPING_EXPRESS_CA_CENTS),quote=null;
   if(liveShipping){try{quote=await verifyQuote(env,body?.shipping_quote,skus);ship=quote.amount_cents;express=null;}catch(e){return error(400,e.message)}}
   if(ship===null)return error(503,'Shipping price is not configured');
+  // Never reserve one-of-a-kind stock or create a Checkout session using credentials
+  // belonging to a different Stripe merchant. Validate with Stripe itself, not
+  // just the key's sk_test_/sk_live_ prefix. Account IDs are public identifiers.
+  const expectedMerchant=String(env.STRIPE_EXPECTED_ACCOUNT_ID||'').trim();
+  if(!/^acct_[A-Za-z0-9]{10,64}$/.test(expectedMerchant))
+    return error(503,'Payment merchant verification is not configured. No payment has been taken.');
+  try{
+    const activeMerchant=await stripe(env,'account',null,'GET');
+    if(activeMerchant?.id!==expectedMerchant){
+      console.error('Checkout blocked: Stripe merchant verification mismatch');
+      return error(503,'Payment merchant verification is unavailable. No payment has been taken.');
+    }
+  }catch{
+    console.error('Checkout blocked: Stripe merchant credentials could not be verified');
+    return error(503,'Payment merchant verification is unavailable. No payment has been taken.');
+  }
   const user=await verifiedUser(request,env);
   let hold=null,session=null;
   try{
