@@ -1,0 +1,39 @@
+name: Browser customer journey QA (synthetic)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'public/**'
+      - 'scripts/browser-customer-qa.mjs'
+      - '.github/workflows/browser-customer-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - 'scripts/browser-customer-qa.mjs'
+      - '.github/workflows/browser-customer-qa.yml'
+  schedule:
+    - cron: '41 14 * * 2'
+permissions:
+  contents: read
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate public pages
+        run: npm run build:marketing
+      - name: Install pinned browser test library outside the repository
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/bf-browser" --ignore-scripts --no-fund --no-audit --save-exact playwright-core@1.56.1
+          echo "BF_BROWSER_MODULE=$RUNNER_TEMP/bf-browser/node_modules/playwright-core" >> "$GITHUB_ENV"
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          test -n "$chrome" || { echo "No browser on runner"; exit 1; }
+          echo "BF_CHROME_PATH=$chrome" >> "$GITHUB_ENV"
+      - name: Exercise account and shopping interactions in isolated desktop and mobile browsers
+        run: node scripts/browser-customer-qa.mjs
