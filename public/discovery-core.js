@@ -42,6 +42,7 @@ function recommendations(products,seeds,stock,limit=4,extraExcluded=[]){
  }
  scored.sort((a,b)=>b.score-a.score||a.p.sku.localeCompare(b.p.sku));
  const result=[];
+ if(!selected.length)return result;
  for(const r of scored){if(result.some(x=>overlap(x.p,r.p)))continue;result.push(r);if(result.length>=limit)break;}
  return result;
 }

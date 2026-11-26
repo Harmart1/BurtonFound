@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {runInNewContext} from 'node:vm';
+import {readFileSync} from 'node:fs';
+const ctx={window:{}};for(const path of ['discovery-core.js','gift-compare.js'])runInNewContext(readFileSync(new URL('../public/'+path,import.meta.url),'utf8'),ctx);
+const D=ctx.window.BURTON_DISCOVERY,G=ctx.window.BURTON_GIFT_CORE;
+const p=(sku,collection,extra={})=>({sku,collection,title:sku,price:25,type:'original',catalogIds:[sku],...extra});
+const items=[p('A','coca-cola'),p('B','coca-cola'),p('S','coca-cola',{type:'bundle',catalogIds:['A','B']}),p('V','automobiles',{requiresVerification:true}),p('U','hollywood'),p('D','hollywood',{cmsOnly:true}),p('X','hollywood')];
+const stock=D.stockMap({configured:true,items:[{sku:'A',available:true,price_cents:3000},{sku:'B',available:false,price_cents:1000},{sku:'S',available:true,price_cents:4000},{sku:'V',available:true,price_cents:1000},{sku:'X',available:true,price_cents:10000}]});
+test('gift suggestions honor actual current price, stock, format and shared units',()=>{const r=G.giftMatches(items,stock,{budget:35});assert.equal(r.length,1);assert.equal(r[0].p.sku,'A');assert.equal(r[0].state.price,30);assert.equal(G.giftMatches(items,stock,{budget:29}).length,0);assert.equal(G.giftMatches(items,stock,{budget:50,format:'bundle'})[0].p.sku,'S');assert.equal(G.giftMatches(items,stock,{budget:50}).length,1);});
+test('unverified and unknown stock require explicit inclusion, never sold or CMS previews',()=>{const r=G.giftMatches(items,stock,{budget:50,includeEnquiry:true});assert.ok(r.some(x=>x.p.sku==='V'&&x.state.kind==='enquiry'));assert.ok(r.some(x=>x.p.sku==='U'&&x.state.kind==='unknown'));assert.ok(!r.some(x=>['B','D','X'].includes(x.p.sku)));assert.equal(G.giftMatches(items,stock,{interest:'automobiles',budget:50}).length,0);});
+test('comparison is capped at three, warns about shared originals, and shows sold status',()=>{const r=G.comparison(items,['A','S','B','V','A'],stock);assert.equal(r.rows.length,3);assert.equal(r.conflicts.length,2);assert.equal(r.rows[2].state.kind,'unavailable');});
+test('zero saved choices do not trigger generic personalization',()=>{assert.equal(D.recommendations(items,[],stock).length,0);});

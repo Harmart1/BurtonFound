@@ -27,7 +27,7 @@ function saved(){
  const recs=$('savedFindsPersonal').checked?D.recommendations(products(),rows.map(x=>x.p),stock,4,A?.getLocalBag?.()||[]):[];
  $('savedFindsRecommendations').innerHTML=recs.length?'<h3>Based on your saved finds</h3><div class="bf-find-grid">'+recs.map(tile).join('')+'</div>':'';
 }
-window.BURTON_DISCOVERY_VIEW=Object.freeze({setStock:body=>{stock=D.stockMap(body);related();saved();},showRelated:p=>{selected=p;related();},clearRelated:()=>{selected=null;},renderSaved:saved});
+window.BURTON_DISCOVERY_VIEW=Object.freeze({setStock:body=>{stock=D.stockMap(body);related();saved();window.BURTON_GIFT_COMPARE?.setStock(stock);},showRelated:p=>{selected=p;related();},clearRelated:()=>{selected=null;},renderSaved:saved});
 document.addEventListener('bf:watch-change',saved);document.addEventListener('bf:auth-change',()=>{const next=A?.user?.()?.id||null;if(next!==lastUser){if($('savedFindsPersonal'))$('savedFindsPersonal').checked=false;lastUser=next;}saved();});
 document.addEventListener('bf:bag-sync',()=>{related();saved();});
 document.addEventListener('DOMContentLoaded',()=>{$('savedFindsPersonal')?.addEventListener('change',saved);saved();},{once:true});
