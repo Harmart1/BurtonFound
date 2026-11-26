@@ -53,7 +53,7 @@ jobs:
           assert account.get("supabasePublishableKey")==public_key
           assert "supabaseSecretKey" not in account
           status,catalog=get(base+"/api/catalog")
-          assert status==200 and catalog.get("configured") is True and len(catalog.get("items",[]))==22
+          assert status==200 and catalog.get("configured") is True and isinstance(catalog.get("items"),list) and len(catalog["items"])>=22,"Live catalogue must include at least the original 22 base listings"
           for path,expect in [("/api/account-orders",401),("/api/admin/me",403),("/api/admin/readiness",403),("/api/admin/orders",403),("/api/admin/holds",403),("/api/admin/fulfillment-history?order_id=00000000-0000-0000-0000-000000000000",403)]:
               actual,_=get(base+path)
               assert actual==expect,"Authentication guard regression for "+path+" (HTTP "+str(actual)+")"
@@ -76,7 +76,7 @@ jobs:
           auto_confirm=auth.get("mailer_autoconfirm")
           if auto_confirm is not None:
               print("Email confirmation bypass enabled:",bool(auto_confirm))
-          print("All deployed API guards passed: unauthenticated customer/admin calls blocked, 22 products available, Stripe checkout disabled.")
+          print("All deployed API guards passed: unauthenticated customer/admin calls blocked, live database SKUs",len(catalog["items"]),"and Stripe checkout disabled.")
           print("NOTE: Auth Site URL, redirect allowlist and custom SMTP deliverability require authenticated Dashboard configuration checks.")
           PY
       - name: Verify private Supabase Auth Admin API accessibility without displaying users
