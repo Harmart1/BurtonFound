@@ -21,6 +21,8 @@ import {onRequestPost as cmsManage} from '../functions/api/cms/manage.js';
 import {onRequestPost as cmsTeam} from '../functions/api/cms/team.js';
 import {onRequestPost as cmsMedia} from '../functions/api/cms/media.js';
 
+import {commerceProtection} from './commerce-protection.js';
+
 const routes = {
   '/api/health': {GET: health},
   '/api/public-account-config': {GET: publicAccountConfig},
@@ -61,7 +63,11 @@ export default {
     if(!methods)return response('API endpoint not found',404);
     const handler=methods[request.method];
     if(!handler)return response('Method not allowed',405,{allow:Object.keys(methods).join(', ')});
-    try {return await handler({request,env,ctx});}
+    try {
+      const blocked=await commerceProtection(request,env,path);
+      if(blocked)return blocked;
+      return await handler({request,env,ctx});
+    }
     catch(e){
       console.error('API failure',path,e?.message||'unknown');
       return response('Service temporarily unavailable',503);

@@ -1,9 +1,9 @@
+import {boundedJson} from '../_lib/bounded-json.js';
 import {json,error,checkSameOrigin} from '../_lib/core.js';
 import {destination,parcelFor,canadaPostRates,fedexRates,signQuote,mailingDate,safeQuoteError} from '../_lib/shipping.js';
 export async function onRequestPost({request,env}){
  if(!checkSameOrigin(request))return error(403,'Invalid request origin');
- if(Number(request.headers.get('content-length')||0)>4500)return error(413,'Request too large');
- let body;try{body=await request.json()}catch{return error(400,'Invalid shipping request')}
+ let body;try{body=await boundedJson(request,4500)}catch(e){return e.status===413?error(413,'Request too large'):error(400,'Invalid shipping request')}
  const skus=body?.skus;
  if(!Array.isArray(skus)||!skus.length||skus.length>12||skus.some(s=>typeof s!=='string'||!/^[A-Z0-9-]{2,24}$/.test(s))||new Set(skus).size!==skus.length)return error(400,'Invalid shopping bag');
  // Carrier APIs are a billable/resource-sensitive server capability; never expose them

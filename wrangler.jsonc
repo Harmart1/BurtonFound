@@ -30,5 +30,23 @@
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_xGxEm5fncVZbHUhepQSpSg_3n7vnsbA",
     "MARKETING_SITE_URL": "https://burtonfound.timharmar.workers.dev",
     "MARKETING_INDEXING_APPROVED": "false"
-  }
+  },
+  "ratelimits": [
+    {
+      "name": "BF_CHECKOUT_LIMIT",
+      "namespace_id": "814296101",
+      "simple": {
+        "limit": 8,
+        "period": 60
+      }
+    },
+    {
+      "name": "BF_QUOTE_LIMIT",
+      "namespace_id": "814296102",
+      "simple": {
+        "limit": 24,
+        "period": 60
+      }
+    }
+  ]
 }
