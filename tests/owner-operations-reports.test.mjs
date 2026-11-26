@@ -33,3 +33,5 @@ test('inventory flags missing, mismatched, unverified available and database-onl
 test('operations interface retains owner workspace and defaults to live-only report',()=>{
  const html=readFileSync(new URL('../public/admin/orders.html',import.meta.url),'utf8');assert.match(html,/id="ledgerMode"><option value="live"/);assert.match(html,/id="stockExport"/);assert.match(html,/operations-core.js/);
 });
+
+test('recent order actions visibly distinguish non-live records',()=>{const source=readFileSync(new URL('../public/admin/admin.js',import.meta.url),'utf8');const route=readFileSync(new URL('../functions/api/admin/orders.js',import.meta.url),'utf8');assert.match(source,/SANDBOX — do not ship/);assert.match(source,/No customer email from a sandbox or unknown record/);assert.match(route,/record_mode/);});
