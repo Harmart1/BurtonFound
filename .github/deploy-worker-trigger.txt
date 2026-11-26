@@ -1,1 +1,1 @@
-2026-11-25 — deploy extensionless account callback fix; preview-only commerce preserved.
+2026-11-25 — deploy Stripe webhook mode and payment safeguards; preview-only commerce preserved.
