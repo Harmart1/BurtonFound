@@ -11,17 +11,41 @@ export function shippingMismatch(metadata,address,amount){
  if(expected.bf_ship_city&&normalizeCity(a.city)!==normalizeCity(expected.bf_ship_city))return true;
  return false;
 }
+const checkoutEvents=new Set(['checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','checkout.session.expired']);
+const validId=(value,prefix)=>typeof value==='string'&&value.startsWith(prefix)&&/^[A-Za-z0-9_]+$/.test(value)&&value.length>prefix.length&&value.length<=255;
+const cents=n=>Number.isSafeInteger(n)&&n>=0;
+export function classifyStripeEvent(evt,env){
+ const mode=env.STRIPE_WEBHOOK_MODE;
+ if(!['test','live'].includes(mode))return {error:'Webhook mode is not configured',status:503};
+ if(!validId(evt?.id,'evt_')||typeof evt?.type!=='string'||typeof evt?.livemode!=='boolean')return {error:'Unsupported event payload',status:400};
+ if(evt.livemode!==(mode==='live'))return {error:'Stripe event mode mismatch',status:400};
+ if(evt.account!=null&&evt.account!==env.STRIPE_EXPECTED_ACCOUNT_ID)return {error:'Stripe merchant mismatch',status:400};
+ if(!checkoutEvents.has(evt.type))return {action:'ignore'};
+ const session=evt.data?.object;
+ if(!validId(session?.id,'cs_'+mode+'_')||session.livemode!==evt.livemode||session.object!=='checkout.session'||session.mode!=='payment')return {error:'Invalid checkout session identity or mode',status:400};
+ if(evt.type==='checkout.session.completed'||evt.type==='checkout.session.async_payment_succeeded'){
+  // An ordinary completed event can precede a delayed payment; leave inventory reserved.
+  if(evt.type==='checkout.session.completed'&&session.status==='complete'&&session.payment_status==='unpaid')return {action:'ignore'};
+  const shipping=session.shipping_cost?.amount_total??0;
+  if(session.status!=='complete'||session.payment_status!=='paid'||session.currency!=='cad'||!cents(session.amount_total)||session.amount_total===0||!cents(shipping)||shipping>session.amount_total||!validId(session.payment_intent,'pi_'))return {error:'Checkout payment is not confirmed or totals are invalid',status:400};
+  return {action:'paid',session};
+ }
+ if(session.payment_status!=='unpaid'||session.status!==(evt.type==='checkout.session.expired'?'expired':'complete'))return {error:'Checkout release event is not an unpaid terminal session',status:400};
+ return {action:'release',session};
+}
 export async function onRequestPost({request,env}){
   if(!env.STRIPE_WEBHOOK_SECRET||!env.SUPABASE_SECRET_KEY)return error(503,'Webhook is not configured');
   let payload;try{payload=await boundedText(request,300000)}catch(e){return e.status===413?error(413,'Event too large'):error(400,'Malformed webhook');}
   if(!await verifyStripe(payload,request.headers.get('Stripe-Signature'),env.STRIPE_WEBHOOK_SECRET))return error(400,'Invalid Stripe webhook signature');
   let evt;try{evt=JSON.parse(payload)}catch{return error(400,'Malformed webhook')}
-  const session=evt?.data?.object;
-  if(!/^evt_/.test(evt.id||'')||!/^cs_(test|live)_/.test(session?.id||''))return error(400,'Unsupported event payload');
+  const result=classifyStripeEvent(evt,env);
+  if(result.error)return error(result.status,result.error);
+  if(result.action==='ignore')return json({received:true});
+  const session=result.session;
   try{
-    if((evt.type==='checkout.session.completed'&&session.payment_status==='paid')||evt.type==='checkout.session.async_payment_succeeded'){
+    if(result.action==='paid'){
       const shipping=session.collected_information?.shipping_details||session.shipping_details||{};
-      const result=await rpc(env,'bf_mark_checkout_paid',{p_session_id:session.id,p_event_id:evt.id,p_amount:session.amount_total,p_currency:session.currency||'cad',p_email:session.customer_details?.email||session.customer_email||null,p_shipping:shipping,p_payment_intent:typeof session.payment_intent==='string'?session.payment_intent:null,p_shipping_cents:session.shipping_cost?.amount_total||0});
+      const result=await rpc(env,'bf_mark_checkout_paid',{p_session_id:session.id,p_event_id:evt.id,p_amount:session.amount_total,p_currency:session.currency,p_email:session.customer_details?.email||session.customer_email||null,p_shipping:shipping,p_payment_intent:session.payment_intent,p_shipping_cents:session.shipping_cost?.amount_total||0});
       if(result?.status==='review')console.error('MANUAL REVIEW REQUIRED: possible inventory conflict on Stripe session',session.id);
       const expected=session.metadata||{};const actual=shipping.address||session.customer_details?.address||{};
       if(expected.bf_ship_carrier){await rpc(env,'bf_record_shipping_selection',{p_session_id:session.id,p_carrier:expected.bf_ship_carrier,p_service:expected.bf_ship_service||'',p_eta:expected.bf_ship_eta||null});}
@@ -29,7 +53,7 @@ export async function onRequestPost({request,env}){
         await rpc(env,'bf_flag_shipping_mismatch',{p_session_id:session.id,p_reason:'Payment received but the Stripe delivery address or shipping amount differs from the quoted destination. Hold fulfillment and contact customer to confirm before shipping.'});
         console.error('SHIPPING REVIEW REQUIRED: quote differs from Stripe checkout destination',session.id);
       }
-    }else if(evt.type==='checkout.session.expired'||evt.type==='checkout.session.async_payment_failed'){
+    }else if(result.action==='release'){
       await rpc(env,'bf_expire_stripe_session',{p_session_id:session.id,p_event_id:evt.id});
     }
     return json({received:true});

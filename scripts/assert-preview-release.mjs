@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 export const expectedPreviewVars=Object.freeze({
  LIVE_CHECKOUT_ENABLED:'false',
+ STRIPE_WEBHOOK_MODE:'test',
  LIVE_PAYMENTS_APPROVED:'false',
  STRIPE_PAYOUTS_VERIFIED:'false',
  TAX_CONFIGURATION_APPROVED:'false',

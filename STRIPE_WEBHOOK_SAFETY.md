@@ -1,0 +1,7 @@
+# Stripe webhook safety and settlement integrity
+
+The webhook requires an explicit STRIPE_WEBHOOK_MODE (test in ordinary preview releases). Signed events must match that mode; Checkout session object type, session prefix, livemode, payment mode and optional connected account identity must agree. Unrelated authenticated events do not write inventory. Completed but unpaid sessions stay reserved. Only a complete, paid CAD checkout with a positive integer amount, valid payment intent and consistent shipping amount can mark an order paid. Only unpaid terminal expiration or asynchronous failure events can release a hold. Database idempotency and inventory overlap checks remain in place.
+
+The mode is independent of the checkout enable flag, so a future deliberate live deployment can pause new checkout while continuing to receive legitimate previously initiated live payments. Do not switch the webhook mode or signing secret until existing test sessions are reconciled and live release is expressly approved. Configure matching merchant, key and webhook mode; never reuse the test signing secret for live events. Non-checkout signed connection probes do not mutate orders.
+
+Regression tests exercise valid test and live fixture classification, mode mismatch, malformed payment state, currency, amount, unpaid expiration, and signed non-payment events. These are synthetic tests, not a real Stripe payment or a claim of production readiness.
