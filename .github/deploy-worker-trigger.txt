@@ -1,1 +1,1 @@
-2026-11-25 — deploy owner bookkeeping and inventory reporting with sandbox fulfillment safeguards; payments and live quotes stay disabled.
+2026-11-25 — deploy validated owner analytics and batch packing preparation; payments and carrier quotes remain disabled.
