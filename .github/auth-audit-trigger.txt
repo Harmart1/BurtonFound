@@ -9,3 +9,4 @@ Read-only GoTrue administrative API permission preflight using encrypted GitHub 
 2026-11-09 Read-only encrypted owner account readiness check; no privilege changes.
 2026-11-09 Verify new authenticated owner launch readiness endpoint; unchanged Supabase and Stripe access guards.
 2026-11-25 — Rerun read-only auth and RLS audit against 131-SKU expanded database. No owner privileges granted.
+2026-11-25 — Rerun after building generated website assets before validation; read-only auth/RLS review, no privileges or payments changed.
