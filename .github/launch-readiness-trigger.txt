@@ -1,0 +1,1 @@
+2026-11-25 — First read-only launch inventory audit: reconcile all 229 storefront SKUs with current public backend; check payment lock, admin authentication and forged webhook handling. No payment or stock changes.
