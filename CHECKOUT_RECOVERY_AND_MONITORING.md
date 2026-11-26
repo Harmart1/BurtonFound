@@ -1,0 +1,9 @@
+# Checkout recovery and automated public monitoring
+
+The checkout handler now preserves physical stock when a Stripe creation attempt has an ambiguous outcome (including a network timeout), and only releases a creating hold after no session was attempted or the exact Stripe session was confirmed expired and unpaid. If a known session could not be expired or bound, the handler attempts to attach it for owner reconciliation, never releases inventory, and does not send the customer a checkout URL. A creating hold with no known session remains blocked pending manual investigation; do not simply delete it. Search Stripe for the hold reference in the appropriate merchant environment, confirm whether payment or a session exists, and reconcile through reviewed owner procedures. This favors avoiding double sales over automatic release. No new database schema or stock changes are made.
+
+Webhook request bodies now have a real 300,000-byte streaming limit before signature verification. Raw text is not reserialized before verifying the Stripe signature.
+
+The public deployment smoke workflow runs daily and on demand. It checks the homepage, preview-only payment status, customer account configuration, public inventory and rejection of unauthenticated admin/CMS requests. It uses public GET requests only; it cannot create checkout sessions, charge customers, change stock or expose credentials. Failures are recorded in GitHub Actions. Configure GitHub Actions failure notifications in your account if desired; this workflow does not promise delivery to a business email. Rework the preview-only health expectation as part of an approved future commercial release.
+
+Full Stripe sandbox purchases, provider credentials, actual stock and parcel measurements, and a reviewed production launch are still required.

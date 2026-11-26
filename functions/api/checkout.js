@@ -29,7 +29,7 @@ export async function onRequestPost({request,env}){
     return error(503,'Payment merchant verification is unavailable. No payment has been taken.');
   }
   const user=await verifiedUser(request,env);
-  let hold=null,session=null;
+  let hold=null,session=null,creationAttempted=false;
   try{
     hold=await rpc(env,'bf_hold_cart',{p_skus:skus,p_customer_id:user?.id||null});
     if(!hold?.id||!Array.isArray(hold.lines))throw Error(hold?.error||'Those originals are not currently available');
@@ -47,14 +47,34 @@ export async function onRequestPost({request,env}){
     if(quote){args['metadata[bf_ship_country]']=quote.to.country;args['metadata[bf_ship_postal]']=quote.to.postal;args['metadata[bf_ship_city]']=quote.to.city;args['metadata[bf_ship_state]']=quote.to.state||'';args['metadata[bf_ship_carrier]']=quote.carrier;args['metadata[bf_ship_service]']=quote.code;args['metadata[bf_ship_amount]']=String(quote.amount_cents);args['metadata[bf_ship_date]']=quote.ship_date;if(quote.eta)args['metadata[bf_ship_eta]']=quote.eta;}
     if(express!==null){args['shipping_options[1][shipping_rate_data][type]']='fixed_amount';args['shipping_options[1][shipping_rate_data][fixed_amount][currency]']='cad';args['shipping_options[1][shipping_rate_data][fixed_amount][amount]']=String(express);args['shipping_options[1][shipping_rate_data][display_name]']='Express shipping · Canada';}
     if(env.STRIPE_AUTOMATIC_TAX==='true')args['automatic_tax[enabled]']='true';
+    creationAttempted=true;
     session=await stripe(env,'checkout/sessions',args,'POST',{'Idempotency-Key':`bf-checkout-${hold.id}`});
     if(!/^cs_(test|live)_/.test(session.id)||!/^https:\/\/checkout\.stripe\.com\//.test(session.url||''))throw Error('Stripe did not return a usable checkout URL');
-    await rpc(env,'bf_bind_stripe_session',{p_hold_id:hold.id,p_session_id:session.id});
+    if(await rpc(env,'bf_bind_stripe_session',{p_hold_id:hold.id,p_session_id:session.id})!==true)
+      throw Error('Checkout reservation could not be bound');
     return json({url:session.url,session_id:session.id});
   }catch(e){
     console.error('Checkout could not start',e.message);
-    if(session?.id){try{await stripe(env,`checkout/sessions/${session.id}/expire`,{},'POST')}catch{}}
-    if(hold?.id){try{await rpc(env,'bf_release_hold',{p_hold_id:hold.id})}catch{}}
+    // A network timeout is not proof that Stripe failed to create a session.
+    // Preserve the original until no session was attempted or Stripe itself
+    // confirms the exact session expired unpaid. Never release an ambiguous hold.
+    let safeToRelease=!creationAttempted;
+    if(creationAttempted&&/^cs_(test|live)_[A-Za-z0-9_]{12,160}$/.test(session?.id||'')){
+      try{
+        const expired=await stripe(env,`checkout/sessions/${session.id}/expire`,{},'POST');
+        safeToRelease=expired?.id===session.id&&expired.status==='expired'&&expired.payment_status==='unpaid';
+      }catch{}
+    }
+    if(hold?.id&&safeToRelease){try{await rpc(env,'bf_release_hold',{p_hold_id:hold.id})}catch{}}
+    if(hold?.id&&!safeToRelease){
+      // If the session is known, attempt to attach it for owner reconciliation.
+      // This cannot release inventory; an existing reserved hold stays intact.
+      if(/^cs_(test|live)_[A-Za-z0-9_]{12,160}$/.test(session?.id||'')){
+        try{await rpc(env,'bf_bind_stripe_session',{p_hold_id:hold.id,p_session_id:session.id})}catch{}
+      }
+      console.error('Checkout needs owner reconciliation; reservation retained',hold.id);
+      return error(503,'Checkout could not be confirmed. Please contact the store before trying again.');
+    }
     const sold=/not available|reserved|sold|overlap|unknown/i.test(e.message);
     return error(sold?409:503,sold?'An item is no longer available. Please refresh your bag.':'Checkout could not start. No payment was taken.');
   }

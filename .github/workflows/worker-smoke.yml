@@ -2,47 +2,63 @@ name: Verify Burton & Found public deployment
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '27 14 * * *'
   push:
+    branches: [main]
     paths:
       - .github/workflows/worker-smoke.yml
 
 permissions:
   contents: read
 
+concurrency:
+  group: burtonfound-public-smoke
+  cancel-in-progress: false
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
-      - name: Verify public storefront and API without credentials
+      - name: Verify public storefront, inventory and private API boundaries
         shell: bash
         run: |
-          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess,sys,os
           base="https://burtonfound.timharmar.workers.dev"
-          for path in "/" "/api/health" "/api/public-account-config"; do
-            out="$(mktemp)"
-            echo "Checking ${base}${path}"
-            code="$(curl -L -sS --max-time 20 --retry 1 -o "$out" -w '%{http_code}' "${base}${path}")" || {
-              echo "::error::Could not connect to ${base}${path}"
-              exit 1
-            }
-            echo "HTTP ${code}"
-            if [[ "$code" != "200" ]]; then
-              echo "::error::Unexpected status ${code} for ${path}"
-              exit 1
-            fi
-            if [[ "$path" == "/api/health" ]]; then
-              python3 - "$out" <<'PY'
-          import json, sys
-          with open(sys.argv[1]) as f:
-              data=json.load(f)
-          print('Service:',data.get('service'), '| Checkout:',data.get('checkout'))
-          if data.get('service') != 'Burton & Found':
-              raise SystemExit('Unexpected API: not the Burton & Found backend')
-          if data.get('checkout') not in ('preview_only','test_mode'):
-              raise SystemExit('UNSAFE: public API is not in preview/test payment mode')
+          checks=[]
+          def get(path):
+              p=subprocess.run(["curl","--silent","--show-error","--max-time","20","--retry","1","-w","\n%{http_code}",base+path],capture_output=True,timeout=50)
+              if p.returncode: raise RuntimeError("Connection failed")
+              raw,code=p.stdout.rsplit(b"\n",1)
+              return int(code),raw
+          def check(label,path,expected,validator):
+              try:
+                  status,body=get(path)
+                  ok=status==expected and bool(validator(body))
+              except Exception: ok=False
+              checks.append((label,ok))
+          def health(b):
+              j=json.loads(b)
+              return j.get("service")=="Burton & Found" and j.get("checkout")=="preview_only" and j.get("currency")=="CAD"
+          def stock(b):
+              j=json.loads(b)
+              rows=j.get("items")
+              return j.get("configured") is True and isinstance(rows,list) and bool(rows) and all(isinstance(x.get("sku"),str) and isinstance(x.get("available"),bool) and type(x.get("price_cents")) is int for x in rows)
+          def account(b):
+              j=json.loads(b)
+              return j.get("configured") is True
+          check("Homepage HTML","/",200,lambda b:b"Burton" in b and b"<html" in b.lower() and b"cf-chl-" not in b.lower())
+          check("Checkout remains preview-only","/api/health",200,health)
+          check("Public account configuration","/api/public-account-config",200,account)
+          check("Public inventory feed","/api/catalog",200,stock)
+          check("Private orders protected","/api/admin/orders",403,lambda b:bool(json.loads(b).get("error")))
+          check("Private readiness protected","/api/admin/readiness",403,lambda b:bool(json.loads(b).get("error")))
+          check("Private CMS studio protected","/api/cms/studio",403,lambda b:bool(json.loads(b).get("error")))
+          lines=["## Daily public storefront check","","| Check | Result |","|---|---|"]+["| "+name+" | "+("PASS" if ok else "FAIL")+" |" for name,ok in checks]
+          report="\n".join(lines)+"\n"
+          print(report)
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as out:out.write(report)
+          if not all(ok for _,ok in checks):sys.exit("One or more storefront checks failed; see summary.")
           PY
-            fi
-            rm -f "$out"
-          done
-          echo "Public smoke check passed; no payments attempted."

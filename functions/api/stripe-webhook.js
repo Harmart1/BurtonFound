@@ -1,3 +1,4 @@
+import {boundedText} from '../_lib/bounded-json.js';
 import {error,json,rpc,verifyStripe} from '../_lib/core.js';
 import {cleanPostal} from '../_lib/shipping.js';
 export const normalizeCity=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
@@ -12,8 +13,7 @@ export function shippingMismatch(metadata,address,amount){
 }
 export async function onRequestPost({request,env}){
   if(!env.STRIPE_WEBHOOK_SECRET||!env.SUPABASE_SECRET_KEY)return error(503,'Webhook is not configured');
-  const payload=await request.text();
-  if(payload.length>300000)return error(413,'Event too large');
+  let payload;try{payload=await boundedText(request,300000)}catch(e){return e.status===413?error(413,'Event too large'):error(400,'Malformed webhook');}
   if(!await verifyStripe(payload,request.headers.get('Stripe-Signature'),env.STRIPE_WEBHOOK_SECRET))return error(400,'Invalid Stripe webhook signature');
   let evt;try{evt=JSON.parse(payload)}catch{return error(400,'Malformed webhook')}
   const session=evt?.data?.object;
