@@ -1,1 +1,1 @@
-2026-11-25 — deploy validated owner analytics and batch packing preparation; payments and carrier quotes remain disabled.
+2026-11-25 — deploy collector discovery, opt-in saved-find recommendations and stock-aware watchlist; preview-only checkout preserved.
