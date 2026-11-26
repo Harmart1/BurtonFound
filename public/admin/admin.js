@@ -42,6 +42,7 @@ async function loadReadiness(){
  el.textContent='Checking connected services…';
  try{
   const v=await request('/api/admin/readiness');
+  if(window.BURTON_LAUNCH_READINESS?.render){window.BURTON_LAUNCH_READINESS.render(v,el,esc);return;}
   const rows=[
    {title:'Supabase inventory',good:v.supabase?.connected===true,detail:v.supabase?.connected?`${v.supabase.listings} listings · ${v.supabase.available} currently available`:'Private catalogue connection unavailable'},
    {title:'Stripe sandbox',good:v.stripe?.sandboxKeyPresent===true&&v.stripe?.webhookSigningKeyPresent===true,detail:'Test API key and webhook signing key'},
