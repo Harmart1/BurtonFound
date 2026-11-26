@@ -26,6 +26,32 @@ jobs:
         run: |
           node scripts/audit-launch-inventory.mjs
           cat marketing-output/launch-inventory-reconciliation.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify public payment and private-admin safety gates (no charges)
+        run: |
+          python3 - <<'PY'
+          import json,subprocess
+          base="https://burtonfound.timharmar.workers.dev"
+          def call(path,method="GET",body=None,headers=None):
+              args=["curl","--silent","--show-error","--max-time","20","-w","\n%{http_code}"]
+              if method!="GET":args+=["-X",method]
+              for k,v in (headers or {}).items():args+=["-H",k+": "+v]
+              if body is not None:args+=["--data-binary","@-"]
+              p=subprocess.run(args+[base+path],input=body,capture_output=True,timeout=25)
+              if p.returncode:raise AssertionError("Deployed API unavailable")
+              raw,status=p.stdout.decode().rsplit("\n",1)
+              return int(status.strip()),json.loads(raw)
+          status,health=call("/api/health")
+          assert status==200 and health.get("checkout")=="preview_only","Store must reject all live payments"
+          status,_=call("/api/checkout","POST",b'{"skus":["OH-003"]}',
+                        {"origin":base,"content-type":"application/json"})
+          assert status==503,"Checkout must remain disabled: no Stripe session permitted"
+          status,_=call("/api/admin/orders")
+          assert status==403,"Unauthenticated admin access should be rejected"
+          status,_=call("/api/stripe-webhook","POST",b'{"id":"evt_bad","type":"checkout.session.completed"}',
+                        {"Stripe-Signature":"t=1,v1=invalid","content-type":"application/json"})
+          assert status==400,"Forged webhook must be rejected"
+          print("PASS: checkout locked, admin unauthorized, forged Stripe webhook rejected; no charges or orders created")
+          PY
       - name: Upload launch inventory review workbook and report (no secrets)
         uses: actions/upload-artifact@v4
         with:
