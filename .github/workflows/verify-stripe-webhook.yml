@@ -27,6 +27,7 @@ jobs:
           endpoint="https://burtonfound.timharmar.workers.dev/api/stripe-webhook"
           body=json.dumps({
               "id":"evt_bf_connection_probe",
+              "livemode":False,
               "type":"bf.integration.ping",
               "data":{"object":{"id":"cs_test_bf_connection_probe","payment_status":"unpaid"}}
           },separators=(",",":")).encode()

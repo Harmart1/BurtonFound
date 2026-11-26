@@ -47,8 +47,8 @@ test('read-only Stripe audit never posts to Stripe or writes Worker settings',()
 test('signed synthetic Stripe payment confirms paid order through existing idempotent database RPC',async()=>{
  const secret='whsec_fixture_secret',ts=Math.floor(Date.now()/1000);
  const evt={
-  id:'evt_sample_payment_test',type:'checkout.session.completed',
-  data:{object:{id:'cs_test_synthetic_payment_example',payment_status:'paid',
+  id:'evt_sample_payment_test',livemode:false,type:'checkout.session.completed',
+  data:{object:{id:'cs_test_synthetic_payment_example',object:'checkout.session',livemode:false,mode:'payment',status:'complete',payment_intent:'pi_fixture',payment_status:'paid',
    amount_total:6300,currency:'cad',customer_details:{email:'buyer@example.test'},
    shipping_cost:{amount_total:1305},metadata:{bf_ship_country:'CA',bf_ship_postal:'K1A0B1',bf_ship_city:'Ottawa',bf_ship_state:'ON',bf_ship_carrier:'Canada Post',bf_ship_service:'DOM.EP',bf_ship_amount:'1305'},
    collected_information:{shipping_details:{address:{country:'CA',postal_code:'K1A0B1',city:'Ottawa',state:'ON'},name:'Synthetic Buyer'}}}}
@@ -66,7 +66,7 @@ test('signed synthetic Stripe payment confirms paid order through existing idemp
   return new Response(JSON.stringify({status:'paid'}),{status:200,headers:{'content-type':'application/json'}});
  };
  try{
-  const env={SUPABASE_URL:'https://unit.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_unit',STRIPE_WEBHOOK_SECRET:secret};
+  const env={SUPABASE_URL:'https://unit.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_unit',STRIPE_WEBHOOK_SECRET:secret,STRIPE_WEBHOOK_MODE:'test'};
   const result=await webhook({request:request(body,'t='+ts+',v1='+sig),env});
   assert.equal(result.status,200);
   assert.deepEqual(rpc.map(x=>x.name),['bf_mark_checkout_paid','bf_record_shipping_selection']);
