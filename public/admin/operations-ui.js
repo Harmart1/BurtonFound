@@ -13,7 +13,7 @@ function download(text,name){
 }
 const today=new Date().toISOString().slice(0,10);
 $('ledgerTo').value=today;$('ledgerFrom').value=today.slice(0,7)+'-01';
-function clearLedger(){ledgerResult=null;$('ledgerExport').disabled=true;$('ledgerResult').textContent='Choose a period and load the report.';}
+function clearLedger(){window.dispatchEvent(new Event('burton:ledger-clear'));ledgerResult=null;$('ledgerExport').disabled=true;$('ledgerResult').textContent='Choose a period and load the report.';}
 for(const id of ['ledgerFrom','ledgerTo','ledgerMode'])$(id).addEventListener('change',clearLedger);
 $('ledgerForm').addEventListener('submit',async e=>{
  e.preventDefault();clearLedger();$('ledgerResult').textContent='Loading private order records…';$('ledgerLoad').disabled=true;
@@ -24,6 +24,7 @@ $('ledgerForm').addEventListener('submit',async e=>{
   const r=O.ledger(d.orders,mode);ledgerResult={...r,from,to,mode};
   $('ledgerResult').textContent=(mode==='live'?'LIVE order records':mode.toUpperCase()+' records — NOT business revenue')+' · '+r.rows+' records · '+r.paid+' valid paid · '+r.review+' review · '+r.refunded+' refunded status · '+r.invalid+' inconsistent totals · '+r.excluded+' other-mode records excluded. Recorded paid-order gross '+money(r.gross)+' · Items '+money(r.subtotal)+' · Shipping '+money(r.shipping)+' · Unclassified difference '+money(r.other)+'. Not net payouts, tax liability, or a completed ledger.';
   $('ledgerExport').disabled=false;
+  window.dispatchEvent(new CustomEvent('burton:ledger-loaded',{detail:{orders:d.orders,mode,from,to}}));
  }catch(ex){$('ledgerResult').textContent=ex.message;}finally{$('ledgerLoad').disabled=false;}
 });
 $('ledgerExport').addEventListener('click',()=>{if(ledgerResult)download(ledgerResult.csv,'burton-found-'+ledgerResult.mode+'-orders-'+ledgerResult.from+'-to-'+ledgerResult.to+'.csv');});
