@@ -8,7 +8,7 @@ import {onRequestGet as adminOrders} from '../functions/api/admin/orders.js';
 globalThis.crypto ||= webcrypto;
 const base='https://burton-example.pages.dev';
 const req=(items,options={})=>new Request(base+'/api/checkout',{method:'POST',headers:{origin:base,'content-type':'application/json',...options.headers},body:JSON.stringify(items)});
-const env={SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_test',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',SHIPPING_STANDARD_CA_CENTS:'1225',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true'};
+const env={SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_test',STRIPE_SECRET_KEY:'sk_test_testing',STRIPE_WEBHOOK_SECRET:'whsec_testing',SHIPPING_STANDARD_CA_CENTS:'1225',STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true'};
 const json=(value)=>new Response(JSON.stringify(value),{status:200,headers:{'content-type':'application/json'}});
 
 test('payment remains disabled until all secrets and owner tax sign-off are present',async()=>{
@@ -26,6 +26,7 @@ test('checkout ignores forged client prices and uses database canonical price',a
  globalThis.fetch=async (url,init)=>{
   if(url.includes('/rest/v1/rpc/bf_hold_cart')){rpcCount++;return json({id:'40b9bf73-7d03-48cc-8d51-907d039175b8',lines:[{sku:'OH-003',title:'Marlene Dietrich Portrait',price_cents:3995}]});}
   if(url.includes('/rest/v1/rpc/bf_bind_stripe_session'))return json(true);
+  if(url.includes('api.stripe.com/v1/account'))return json({id:'acct_1SN2j92NSH96TjSa'});
   if(url.includes('api.stripe.com')){stripeForm=new URLSearchParams(init.body);return json({id:'cs_test_abcdefghijklmnopqrst',url:'https://checkout.stripe.com/c/pay/cs_test_abcdefghijklmnopqrst'});}
   throw Error('Unexpected URL '+url);
  };
