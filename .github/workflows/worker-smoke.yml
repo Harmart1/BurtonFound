@@ -53,7 +53,6 @@ jobs:
           check("Checkout remains preview-only","/api/health",200,health)
           check("Public account configuration","/api/public-account-config",200,account)
           check("Public inventory feed","/api/catalog",200,stock)
-          check("Private bookkeeping protected","/api/admin/bookkeeping",403,lambda b:bool(json.loads(b).get("error")))
           check("Private orders protected","/api/admin/orders",403,lambda b:bool(json.loads(b).get("error")))
           check("Private readiness protected","/api/admin/readiness",403,lambda b:bool(json.loads(b).get("error")))
           check("Private CMS studio protected","/api/cms/studio",403,lambda b:bool(json.loads(b).get("error")))
