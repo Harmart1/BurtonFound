@@ -1,11 +1,11 @@
+import {boundedJson} from '../_lib/bounded-json.js';
 import {verifyQuote} from '../_lib/shipping.js';
 import {json,error,secure,checkSameOrigin,rpc,db,stripe,safeReturnUrl,verifiedUser} from '../_lib/core.js';
 const amount=(v)=>/^\d{1,8}$/.test(String(v||''))?Number(v):null;
 export async function onRequestPost({request,env}){
   if(!checkSameOrigin(request))return error(403,'Invalid checkout origin');
   if(!secure(env))return error(503,'Secure checkout is not configured. No payment has been taken.');
-  if(Number(request.headers.get('content-length')||0)>8192)return error(413,'Checkout request too large');
-  let body;try{body=await request.json()}catch{return error(400,'Invalid shopping bag')}
+  let body;try{body=await boundedJson(request,8192)}catch(e){return e.status===413?error(413,'Checkout request too large'):error(400,'Invalid shopping bag')}
   const skus=body?.skus;
   if(!Array.isArray(skus)||!skus.length||skus.length>12||skus.some(s=>typeof s!=='string'||!/^[A-Z0-9-]{2,24}$/.test(s))||new Set(skus).size!==skus.length)return error(400,'Invalid or duplicate item IDs');
   const liveShipping=env.SHIPPING_MODE==='live_carrier';
