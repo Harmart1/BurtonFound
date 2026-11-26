@@ -34,7 +34,7 @@ jobs:
       - run: python3 tests/auth_config_test.py
       - run: python3 scripts/auth-public-probe.py
   management:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'Owner authorized updated token auth repair 2026-11-25'))
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -47,7 +47,7 @@ jobs:
           BF_SMTP_PASSWORD: ${{ secrets.BF_SMTP_PASSWORD }}
           BF_SMTP_FROM: ${{ secrets.BF_SMTP_FROM }}
           BF_SMTP_PORT: ${{ secrets.BF_SMTP_PORT }}
-          MODE: ${{ github.event_name == 'push' && 'repair' || inputs.mode }}
+          MODE: ${{ inputs.mode }}
         run: |
           case "$MODE" in
             audit) python3 scripts/auth-config.py ;;
