@@ -1,0 +1,33 @@
+name: Audit Stripe payment readiness (read only)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/stripe-payment-readiness-trigger.txt
+
+permissions:
+  contents: read
+
+jobs:
+  read-only-payment-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Checkout existing store
+        uses: actions/checkout@v4
+      - name: Check deployed Worker, safe checkout gates and Stripe test credential presence
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STRIPE_TEST_KEY: ${{ secrets.BF_STRIPE_TEST_SECRET_KEY }}
+          STRIPE_TEST_WEBHOOK: ${{ secrets.BF_STRIPE_TEST_WEBHOOK_SECRET }}
+        run: python3 scripts/audit_stripe_payment_setup.py
+      - name: Upload no-secrets readiness checklist
+        uses: actions/upload-artifact@v4
+        with:
+          name: burtonfound-stripe-payment-readiness
+          path: stripe-payment-readiness-report.md
+          retention-days: 30
+          if-no-files-found: error

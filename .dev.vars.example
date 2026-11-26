@@ -1,6 +1,8 @@
 # Local Cloudflare Pages development only. Copy to .dev.vars and fill credentials locally.
 # Never commit .dev.vars or upload private keys to the public directory.
 LIVE_CHECKOUT_ENABLED="false"
+LIVE_PAYMENTS_APPROVED="false"
+STRIPE_PAYOUTS_VERIFIED="false"
 TAX_CONFIGURATION_APPROVED="false"
 CARRIER_QUOTES_ENABLED="false"
 SHIPPING_MODE="flat_rate"
