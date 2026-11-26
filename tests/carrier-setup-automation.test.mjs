@@ -28,7 +28,7 @@ test('shipping quote signing key setup is idempotent and requires three disabled
 test('real-money carrier checkout requires explicit production rate verification',()=>{
  const env={
   SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_test',
-  STRIPE_SECRET_KEY:'sk_live_synthetic_fixture',STRIPE_WEBHOOK_SECRET:'whsec_synthetic_fixture',
+  STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',STRIPE_SECRET_KEY:'sk_live_synthetic_fixture',STRIPE_WEBHOOK_SECRET:'whsec_synthetic_fixture',
   SHIPPING_MODE:'live_carrier',SHIPPING_ALLOWED_COUNTRIES:'CA,US',
   CARRIER_QUOTES_ENABLED:'true',SHIPPING_QUOTE_SECRET:'an-ephemeral-fixture-strong-enough-12345678',
   SHIPPING_PACKAGES_JSON:JSON.stringify({'OH-003':{verified:true,weightKg:.35,lengthCm:33,widthCm:26,heightCm:4}}),
