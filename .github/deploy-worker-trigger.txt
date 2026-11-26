@@ -1,1 +1,1 @@
-2026-11-25 — deploy validated preview release with commerce rate limits; all payment and quote approvals remain off.
+2026-11-25 — deploy checkout recovery and webhook byte limit; all payment and carrier quote approvals remain disabled.
