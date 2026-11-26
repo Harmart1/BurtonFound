@@ -20,10 +20,10 @@ function stats(){
  $('statAttention').textContent=orders.filter(o=>o.fulfillment_status==='needs_attention'||o.payment_status==='review').length;
 }
 function render(){
- stats();const display=filtered();$('count').textContent=`Showing ${display.length} of ${orders.length} recent orders`;
+ stats();const display=filtered();if($('orderSort')?.value==='priority'&&window.BURTON_OPERATIONS)display.sort((a,b)=>window.BURTON_OPERATIONS.priority(a)-window.BURTON_OPERATIONS.priority(b)||String(a.created_at).localeCompare(String(b.created_at)));$('count').textContent=`Showing ${display.length} of ${orders.length} recent orders (latest 100; use Business reports for date-range export)`;
  $('orders').innerHTML=display.map(o=>`<article class="order" data-id="${esc(o.id)}">
  <div class="top"><h2>Order ${esc(o.id.slice(0,8))}</h2><strong>${dollars(o.total_cents)} CAD</strong></div>
- <p>${esc(new Date(o.created_at).toLocaleString('en-CA'))} · Payment: ${esc(o.payment_status)} · <strong>Fulfillment: ${esc(o.fulfillment_status)}</strong></p>
+ <p>${esc(new Date(o.created_at).toLocaleString('en-CA'))} · Record: ${esc(o.record_mode==='live'?'LIVE':o.record_mode==='test'?'SANDBOX — do not ship':'UNKNOWN — verify before shipping')} · Payment: ${esc(o.payment_status)} · <strong>Fulfillment: ${esc(o.fulfillment_status)}</strong></p>
  <div class="items">${(o.item_lines||[]).map(p=>`<div>${esc(p.title)} (${esc(p.sku)}) · ${dollars(p.price_cents)}</div>`).join('')}</div>
  <dl><div><dt>Customer</dt><dd>${esc(o.customer_name||'Not provided')}\n${esc(o.email||'No email')}</dd></div>
  <div><dt>Delivery address</dt><dd>${esc(address(o))}</dd></div><div><dt>Shipping charged</dt><dd>${dollars(o.shipping_cents)}<br>Requested: ${esc(o.selected_shipping_carrier||'Not recorded')} ${esc(o.selected_shipping_service||'')}${o.selected_shipping_eta?'<br>Carrier estimate '+esc(o.selected_shipping_eta):''}${o.shipping_review_reason?'<br>REVIEW: '+esc(o.shipping_review_reason):''}</dd></div>
@@ -33,10 +33,10 @@ function render(){
  <label>Tracking number<input name="tracking" value="${esc(o.tracking_number||'')}" maxlength="100" autocomplete="off"></label>
  <button type="submit">Save status</button></form>
  ${o.shipping_review_reason&&!o.shipping_review_resolved_at?`<div class="shipping-review-alert"><strong>Shipping address/price mismatch · fulfillment blocked</strong><p>${esc(o.shipping_review_reason)}</p><p>Confirm the paid amount in Stripe, obtain the customer's correct address, recheck the carrier's actual postage, and obtain consent or refund if necessary. This control cannot override an inventory conflict.</p><label>Owner resolution note <textarea data-review-note rows="3" maxlength="1000" placeholder="Describe verified address, postage amount, customer consent and whether a refund is required"></textarea></label><button class="resolve-review" type="button" data-action="resolve-shipping">Record review and unblock shipment</button></div>`:''}
- <div class="order-actions"><button class="secondary" type="button" data-action="packing">Print packing slip</button><a class="secondary" href="https://www.canadapost-postescanada.ca/cpc/en/small-business/snap-ship.page" target="_blank" rel="noopener noreferrer">Canada Post Snap Ship ↗</a><a class="secondary" href="https://www.fedex.com/en-ca/shipping/ship-online.html" target="_blank" rel="noopener noreferrer">FedEx Ship Manager ↗</a><button class="secondary" type="button" data-action="address">Copy address</button><button class="secondary" type="button" data-action="email">Prepare update email</button><button class="secondary" type="button" data-action="history">View change history</button></div>
+ <div class="order-actions">${o.record_mode!=='live'?'<strong>Non-live or unknown record — no real shipment or customer contact.</strong>':''}<button class="secondary" type="button" data-action="packing">Print packing slip</button>${o.record_mode==='live'?'<a class="secondary" href="https://www.canadapost-postescanada.ca/cpc/en/small-business/snap-ship.page" target="_blank" rel="noopener noreferrer">Canada Post Snap Ship ↗</a><a class="secondary" href="https://www.fedex.com/en-ca/shipping/ship-online.html" target="_blank" rel="noopener noreferrer">FedEx Ship Manager ↗</a>':''}<button class="secondary" type="button" data-action="address">Copy address</button><button class="secondary" type="button" data-action="email">Prepare update email</button><button class="secondary" type="button" data-action="history">View change history</button></div>
  <div class="history" hidden></div></article>`).join('')||'<div class="help">No orders match these filters</div>';
 }
-async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Paid orders only');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
+async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Recent order records, including review and test records');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness();loadHolds()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
 async function loadReadiness(){
  const el=$('readinessResults');if(!el)return;
  el.textContent='Checking connected services…';
@@ -73,20 +73,20 @@ function packingSlip(o){
 function csvCell(v){let s=String(v??'').replaceAll('\r',' ').replaceAll('\n',' ');if(/^[\s]*[=+\-@\t]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"'}
 function exportCsv(){
  if(!orders.length)return status('No orders to export');
- const cols=['Order ID','Created','Payment status','Fulfillment','Customer','Email','Items','Subtotal CAD','Shipping CAD','Total CAD','Delivery address','Carrier','Tracking'];
- const data=filtered().map(o=>[o.id,o.created_at,o.payment_status,o.fulfillment_status,o.customer_name,o.email,(o.item_lines||[]).map(p=>p.sku+' - '+p.title).join('; '),(o.subtotal_cents/100).toFixed(2),(o.shipping_cents/100).toFixed(2),(o.total_cents/100).toFixed(2),address(o),o.carrier,o.tracking_number]);
+ const cols=['Order ID','Created','Record mode','Payment status','Fulfillment','Customer','Email','Items','Subtotal CAD','Shipping CAD','Total CAD','Delivery address','Carrier','Tracking'];
+ const data=filtered().map(o=>[o.id,o.created_at,o.record_mode||'unknown',o.payment_status,o.fulfillment_status,o.customer_name,o.email,(o.item_lines||[]).map(p=>p.sku+' - '+p.title).join('; '),(o.subtotal_cents/100).toFixed(2),(o.shipping_cents/100).toFixed(2),(o.total_cents/100).toFixed(2),address(o),o.carrier,o.tracking_number]);
  const csv='\ufeff'+[cols,...data].map(r=>r.map(csvCell).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`burton-found-orders-${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  status('Private order register downloaded. Store it securely; it contains customer personal information.');
 }
 $('reload').addEventListener('click',refresh);
 $('refreshReadiness').addEventListener('click',loadReadiness);$('exportCsv').addEventListener('click',exportCsv);
-$('statusFilter').addEventListener('change',render);$('orderSearch').addEventListener('input',render);
+$('orderSort')?.addEventListener('change',render);$('statusFilter').addEventListener('change',render);$('orderSearch').addEventListener('input',render);
 $('orders').addEventListener('submit',async e=>{
  if(!e.target.matches('form.form'))return;e.preventDefault();
  const o=orders.find(r=>r.id===e.target.closest('.order')?.dataset.id),f=new FormData(e.target),button=e.target.querySelector('[type="submit"]');if(!o)return;
  button.disabled=true;try{
   const v=await request('/api/admin/fulfill',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:o.id,status:f.get('status'),carrier:f.get('carrier'),tracking_number:f.get('tracking')})});
-  Object.assign(o,v.order);status('Shipment status saved. Remember to send the customer update manually.');render();
+  const mode=o.record_mode;Object.assign(o,v.order);delete o.stripe_session_id;o.record_mode=mode;status('Shipment status saved. Remember to send the customer update manually.');render();
  }catch(ex){status(ex.message)}finally{button.disabled=false}
 });
 $('orders').addEventListener('click',async e=>{
@@ -97,13 +97,13 @@ $('orders').addEventListener('click',async e=>{
    if(note.length<20)return status('Enter a detailed review note (20 characters minimum)');
    if(!confirm('I verified this paid order, available physical items, customer shipping address and final postage; continue?'))return;
    btn.disabled=true;
-   try{const d=await request('/api/admin/review-shipping',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:o.id,note})});Object.assign(o,d.order);status(d.notice||'Shipping review recorded');render();}
+   try{const d=await request('/api/admin/review-shipping',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:o.id,note})});const mode=o.record_mode;Object.assign(o,d.order);delete o.stripe_session_id;o.record_mode=mode;status(d.notice||'Shipping review recorded');render();}
    catch(err){status(err.message);btn.disabled=false;}
    break;
   }
-  case 'packing':packingSlip(o);break;
-  case 'address':try{await navigator.clipboard.writeText(address(o));status('Delivery address copied')}catch{status('Clipboard unavailable; select and copy the address manually')}break;
-  case 'email':if(o.email)customerEmail(o);else status('No email address on this order');break;
+  case 'packing':if(o.record_mode!=='live')return status('Do not print real packing slips for sandbox or unknown orders.');packingSlip(o);break;
+  case 'address':if(o.record_mode!=='live')return status('Do not copy delivery addresses for sandbox or unknown orders.');try{await navigator.clipboard.writeText(address(o));status('Delivery address copied')}catch{status('Clipboard unavailable; select and copy the address manually')}break;
+  case 'email':if(o.record_mode!=='live')return status('No customer email from a sandbox or unknown record.');if(o.email)customerEmail(o);else status('No email address on this order');break;
   case 'history':{
    const box=btn.closest('.order').querySelector('.history');if(!box.hidden){box.hidden=true;break;}
    box.textContent='Loading change history…';box.hidden=false;
