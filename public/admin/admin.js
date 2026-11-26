@@ -20,6 +20,7 @@ function stats(){
  $('statAttention').textContent=orders.filter(o=>o.fulfillment_status==='needs_attention'||o.payment_status==='review').length;
 }
 function render(){
+ window.dispatchEvent(new Event('burton:orders-changed'));
  stats();const display=filtered();if($('orderSort')?.value==='priority'&&window.BURTON_OPERATIONS)display.sort((a,b)=>window.BURTON_OPERATIONS.priority(a)-window.BURTON_OPERATIONS.priority(b)||String(a.created_at).localeCompare(String(b.created_at)));$('count').textContent=`Showing ${display.length} of ${orders.length} recent orders (latest 100; use Business reports for date-range export)`;
  $('orders').innerHTML=display.map(o=>`<article class="order" data-id="${esc(o.id)}">
  <div class="top"><h2>Order ${esc(o.id.slice(0,8))}</h2><strong>${dollars(o.total_cents)} CAD</strong></div>

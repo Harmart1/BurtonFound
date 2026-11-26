@@ -6,7 +6,7 @@ export async function onRequestGet({request,env}){
   const q=new URL(request.url).searchParams,from=q.get('from'),to=q.get('to');
   if(!date(from)||!date(to)||from>to||Date.parse(to)-Date.parse(from)>366*86400000)return error(400,'Choose a valid UTC date range of up to 367 days');
   const end=new Date(Date.parse(to)+86400000).toISOString();
-  const fields='id,created_at,stripe_session_id,payment_intent,subtotal_cents,shipping_cents,total_cents,payment_status,fulfillment_status';
+  const fields='id,created_at,stripe_session_id,payment_intent,subtotal_cents,shipping_cents,total_cents,payment_status,fulfillment_status,item_lines';
   // Deliberately bounded, no customer names, emails or addresses. Reject a
   // truncated export rather than silently present it as a full accounting period.
   const rows=[];
@@ -21,7 +21,8 @@ export async function onRequestGet({request,env}){
   const orders=rows.map(r=>({
    id:r.id,created_at:r.created_at,stripe_session_id:r.stripe_session_id,payment_intent:r.payment_intent,
    subtotal_cents:r.subtotal_cents,shipping_cents:r.shipping_cents,total_cents:r.total_cents,
-   payment_status:r.payment_status,fulfillment_status:r.fulfillment_status
+   payment_status:r.payment_status,fulfillment_status:r.fulfillment_status,
+   item_lines:Array.isArray(r.item_lines)?r.item_lines.map(x=>({sku:x?.sku,price_cents:x?.price_cents})):null
   }));
   return json({from,to,timezone:'UTC',orders});
  }catch{ return error(503,'Bookkeeping report temporarily unavailable');}

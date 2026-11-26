@@ -7,3 +7,9 @@ The inventory button compares the current 229-listing catalogue with the live pu
 All new API reads require owner authorization. No new service, database migration, payment activation, or carrier charges.
 
 The recent order dashboard labels live, sandbox and unknown records. It withholds carrier links, real packing-slip printing, delivery address copying and customer-email drafting for non-live/unknown records; fulfillment status changes remain available for controlled sandbox testing. The existing filtered order-register export now includes the record mode. Daily monitoring of the new private endpoint is enabled only after deployment, avoiding a premature 404 check.
+
+## Sales analytics and batch packing
+
+Load the bookkeeping report to generate monthly gross, average order value, collection and SKU item subtotals. Select live only for business use. Excludes refunded/review orders and inconsistent totals, separates non-live modes, and reports unallocated item subtotal if recorded lines do not reconcile. Current catalogue grouping may differ from historic classification. Sales counts represent listing lines, not physical units or conversion rates. The export is not a substitute for Stripe payout/tax reconciliation.
+
+Batch packing uses the most recent 100 order records, not all historical orders. The pick list includes live paid processing/packed records only, blocks unresolved reviews, unverified/missing catalogue components and conflicting physical unit IDs within and across candidate orders. No customer names, addresses or emails are printed. Verify the actual paid order and original objects, shipping address, final postage and availability before dispatch. Refresh before use; browser snapshots cannot guarantee changes made elsewhere are reflected. No inventory or fulfillment records are updated by print/export. Daily public checks now also verify unauthenticated bookkeeping access is rejected.
