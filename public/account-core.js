@@ -17,6 +17,14 @@
   const emit=(name,detail={})=>document.dispatchEvent(new CustomEvent('bf:'+name,{detail}));
   let client=null,user=null,profile=null,addresses=[],saved=[],watches=new Set(sanitizeSkus(read(keyWatch,[])));
   let loading=false,connectError='',initPromise=null,cartTimer=null,authSequence=0;
+  // Capture callback state before Supabase removes the URL fragment.
+  const callback=window.BURTON_AUTH_CALLBACK?.inspect(location.href)||{recovery:false,error:false,access:''};
+  let recovery=callback.error?'error':callback.recovery?'pending':'none';
+  let callbackAccess=callback.access;callback.access='';
+  const recoveryState=()=>recovery;
+  const recoveryChange=state=>{recovery=state;emit('recovery-state',{state});};
+  const redirectTo=()=>window.BURTON_AUTH_CALLBACK?.accountUrl(location.href)||new URL('/account.html',location.href).href;
+  function scrubCallback(){if(!callback.callback)return;try{history.replaceState(null,'',redirectTo());}catch{}}
   const fail=message=>{throw new Error(message)};
   const demandAuth=()=>{if(!client||!user)fail('Sign in to save this information to your account.');};
   const check=({error,data})=>{if(error)throw error;return data;};
@@ -33,8 +41,9 @@
   async function loadUser(sessionUser){
     const seq=++authSequence;
     if(!sessionUser){
-      user=null;profile=null;addresses=[];saved=[];localWatches();syncShopBag([]);tell();return;
+      user=null;profile=null;addresses=[];saved=[];loading=false;localWatches();syncShopBag([]);tell();return;
     }
+    if(user?.id!==sessionUser.id){profile=null;addresses=[];saved=[];watches=new Set();}
     user=sessionUser;
     loading=true;tell();
     try{
@@ -98,25 +107,36 @@
           // Subscribe before session recovery, or a password-reset redirect can be missed.
           client.auth.onAuthStateChange((event,session)=>{
             if(!['SIGNED_IN','SIGNED_OUT','USER_UPDATED','PASSWORD_RECOVERY','INITIAL_SESSION'].includes(event))return;
+            // Record the recovery event synchronously, outside asynchronous profile loading.
+            if(event==='PASSWORD_RECOVERY'&&session?.user&&session?.access_token){recovery='ready';callbackAccess='';}
+            if(event==='SIGNED_OUT'&&recovery==='ready')recovery='error';
             // Avoid calls into Supabase's auth API while the auth callback holds the lock.
             setTimeout(()=>{
               if(event==='SIGNED_OUT')loadUser(null);
               else if(session?.user && (session.user.id!==user?.id || event==='SIGNED_IN'))loadUser(session.user);
               else if(session?.user){user=session.user;tell();}
-              if(event==='PASSWORD_RECOVERY')emit('password-recovery');
+              if(event==='PASSWORD_RECOVERY')emit('recovery-state',{state:recovery});
             },0);
           });
           const {data,error}=await client.auth.getSession();if(error)throw error;
+          if(recovery==='pending'){
+            // A pre-existing session alone is not proof of a valid recovery link.
+            if(callbackAccess&&data?.session?.access_token===callbackAccess&&data.session.user)recovery='ready';
+            else recovery='error';
+          }
+          callbackAccess='';scrubCallback();
           if(data?.session?.user && data.session.user.id!==user?.id)await loadUser(data.session.user);
-        }catch(e){connectError=e.message||'Connection failed';emit('account-error',{message:connectError});}
+          emit('recovery-state',{state:recovery});
+        }catch(e){connectError=e.message||'Connection failed';if(recovery==='pending'){recovery='error';callbackAccess='';scrubCallback();}emit('account-error',{message:connectError});}
       }
-      tell();return {configured:readyToConnect,connected:!!client,user};
+      if(recovery==='pending'){recovery='error';callbackAccess='';scrubCallback();}
+      tell();emit('recovery-state',{state:recovery});return {configured:readyToConnect,connected:!!client,user};
     })();return initPromise;
   }
   async function signUp({email,password,fullName}){
     await init();if(!client)fail('Live registration is not enabled yet. The store owner must connect a secure account service.');
-    const redirectTo=new URL('account.html',document.baseURI).href;
-    const response=await client.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:redirectTo,data:{full_name:fullName.trim()}}});check(response);
+    const callbackUrl=redirectTo();
+    const response=await client.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:callbackUrl,data:{full_name:fullName.trim()}}});check(response);
     if(response.data?.session?.user)await loadUser(response.data.session.user);
     return {needsConfirmation:!response.data?.session};
   }
@@ -130,7 +150,10 @@
     demandAuth();check(await client.auth.signOut({scope:'local'}));await loadUser(null);
     try{localStorage.removeItem(keyCart);}catch{}
   }
-  async function forgotPassword(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resetPasswordForEmail(email,{redirectTo:new URL('account.html',location.href).href}));}
+  async function forgotPassword(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resetPasswordForEmail(String(email).trim(),{redirectTo:redirectTo()}));}
+  async function resendConfirmation(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resend({type:'signup',email:String(email).trim(),options:{emailRedirectTo:redirectTo()}}));}
+  async function finishRecovery(password){if(recovery!=='ready'||!client||!user)fail('Request a fresh reset link before changing your password.');if(typeof password!=='string'||password.length<10)fail('Choose a password with at least 10 characters.');check(await client.auth.updateUser({password}));recovery='none';callbackAccess='';try{await client.auth.signOut({scope:'local'});}catch{}await loadUser(null);scrubCallback();emit('recovery-state',{state:recovery});}
+  async function cancelRecovery(){recovery='none';callbackAccess='';if(client&&user){check(await client.auth.signOut({scope:'local'}));await loadUser(null);}scrubCallback();emit('recovery-state',{state:recovery});}
   async function updatePassword(password){demandAuth();check(await client.auth.updateUser({password}));}
   async function updateEmail(email){demandAuth();check(await client.auth.updateUser({email:email.trim()}));}
   async function updateProfile(data){demandAuth();
@@ -183,7 +206,7 @@
   }
   async function deleteMyAccount(){demandAuth();check(await client.rpc('delete_my_account'));try{await client.auth.signOut({scope:'local'});}catch{}await loadUser(null);localStorage.removeItem(keyCart);}
   async function authToken(){if(!client||!user)return null;const {data,error}=await client.auth.getSession();return error?null:data?.session?.access_token||null;}
-  const API={authToken,init,ready:()=>initPromise||init(),configured:()=>readyToConnect,connected:()=>!!client,connectionError:()=>connectError,isLoading:()=>loading,user:()=>user,profile:()=>profile,addresses:()=>[...addresses],savedCarts:()=>user?[...saved]:guestCarts(),isWatching:sku=>watches.has(sku),watchedSkus:()=>[...watches],watchCount:()=>watches.size,toggleWatch,signUp,signIn,signOut,forgotPassword,updatePassword,updateEmail,updateProfile,saveAddress,deleteAddress,saveActiveBag,saveNamedBag,deleteNamedBag,restoreBag,exportData,deleteMyAccount,getLocalBag,getInventory:()=>[...items]};
+  const API={authToken,init,recoveryState,finishRecovery,cancelRecovery,resendConfirmation,ready:()=>initPromise||init(),configured:()=>readyToConnect,connected:()=>!!client,connectionError:()=>connectError,isLoading:()=>loading,user:()=>user,profile:()=>profile,addresses:()=>[...addresses],savedCarts:()=>user?[...saved]:guestCarts(),isWatching:sku=>watches.has(sku),watchedSkus:()=>[...watches],watchCount:()=>watches.size,toggleWatch,signUp,signIn,signOut,forgotPassword,updatePassword,updateEmail,updateProfile,saveAddress,deleteAddress,saveActiveBag,saveNamedBag,deleteNamedBag,restoreBag,exportData,deleteMyAccount,getLocalBag,getInventory:()=>[...items]};
   window.BURTON_ACCOUNT=API;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

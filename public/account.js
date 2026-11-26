@@ -7,7 +7,7 @@
   const money=v=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(v||0);
   let demo=false,showAuth='signin',activePanel='overview',demoWatches=new Set(['CC-010','OH-003']),demoBag=['OH-003'],demoSaved=[{id:'demo-one',title:'Silver screen & radio favourites',item_skus:['CC-010','OH-003'],created_at:new Date().toISOString()}],demoAddresses=[],demoProfile={full_name:'Sample Collector',age_range:'',interests:['Classic Hollywood'],newsletter_opt_in:false};
   let renderTimer=0,toastTimer=0,watchStock=null,stockRequest=0;
-  const inAccount=()=>!!A.user()||demo;
+  const inAccount=()=>A.recoveryState()==='none'&&(!!A.user()||demo);
   const profile=()=>demo?demoProfile:A.profile()||{};
   const addresses=()=>demo?demoAddresses:A.addresses();
   const watches=()=>demo?[...demoWatches]:A.watchedSkus();
@@ -17,9 +17,9 @@
   function notice(message,ok=false){const el=$('authMessage');el.textContent=message;el.classList.toggle('success',ok);}
   function flash(message){const el=$('accountToast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3400);}
   function dashboardNotice(message){$('dashboardMessage').textContent=message;window.setTimeout(()=>{if($('dashboardMessage').textContent===message)$('dashboardMessage').textContent='';},6500);}
-  const error=e=>{const msg=e?.message||'Something went wrong. Please try again.';if(inAccount())dashboardNotice(msg);else notice(msg);};
+  const error=e=>{const code=e?.code||'',raw=e?.message||'Something went wrong. Please try again.';const msg=code==='invalid_credentials'?'Email or password did not match. If you already have an account, use Forgot your password.':code==='email_not_confirmed'?'Verify your address first, or request a new confirmation email.':code==='over_email_send_rate_limit'||code==='over_request_rate_limit'?'Too many requests. Wait before trying again; use the most recent email link.':code==='email_address_not_authorized'?'The store email service is not yet configured for this address. Contact Burton & Found for assistance.':raw;if(inAccount())dashboardNotice(msg);else notice(msg);};
   function safeAccountHash(view){try{history.replaceState(null,'','#'+view)}catch{}}
-  function setAuthView(v){showAuth=v;for(const [k,id] of [['signin','signInForm'],['signup','signUpForm'],['forgot','forgotForm']])$(id).hidden=k!==v;$('tabSignIn').setAttribute('aria-selected',String(v==='signin'));$('tabSignUp').setAttribute('aria-selected',String(v==='signup'));notice('');}
+  function setAuthView(v){showAuth=v;const reset=A.recoveryState()!=='none';$('authTabs').hidden=reset;$('recoveryPanel').hidden=!reset;for(const [k,id] of [['signin','signInForm'],['signup','signUpForm'],['forgot','forgotForm'],['resend','resendForm']])$(id).hidden=reset||k!==v;$('tabSignIn').setAttribute('aria-selected',String(v==='signin'));$('tabSignUp').setAttribute('aria-selected',String(v==='signup'));notice('');}
   function showPanel(name,pushHash=true){const allow=['overview','watchlist','bags','profile','addresses','orders','preferences'];activePanel=allow.includes(name)?name:'overview';document.querySelectorAll('[data-panel]').forEach(btn=>{const on=btn.dataset.panel===activePanel;btn.classList.toggle('active',on);btn.setAttribute('aria-current',on?'page':'false');});document.querySelectorAll('.account-panel').forEach(s=>s.classList.toggle('active',s.id===`panel-${activePanel}`));if(pushHash)history.replaceState(null,'','#'+activePanel);}
   async function refreshOwnerLink(){
     const link=$('ownerConsoleLink');if(!link)return;
@@ -35,6 +35,9 @@
     }catch{/* Private owner access may be unavailable; ordinary accounts still work. */}
   }
   function changeView(){
+    const reset=A.recoveryState();
+    if(reset!=='none'){$('accountAccess').hidden=false;$('accountDashboard').hidden=true;setAuthView(showAuth);$('recoveryForm').hidden=reset!=='ready';$('recoveryStatus').textContent=reset==='ready'?'Recovery link verified. Enter and confirm a new password below.':reset==='pending'?'Checking your secure recovery link…':'This link could not be verified or has expired. Return to sign in and request a fresh password-reset link.';return;}
+    $('recoveryPanel').hidden=true;$('authTabs').hidden=false;
     const on=inAccount();if(demo)$('ownerConsoleLink').hidden=true;$('accountAccess').hidden=on;$('accountDashboard').hidden=!on;
     if(on){$('demoRibbon').hidden=!demo;$('dashboardEyebrow').textContent=demo?'COLLECTOR ACCOUNT INTERACTIVE TOUR':'THE COLLECTOR’S CABINET · MY ACCOUNT';const p=profile();const n=(p.full_name||A.user()?.user_metadata?.full_name||'Collector').split(' ')[0];$('dashboardTitle').innerHTML=`Welcome back, <em>${safe(n)}.</em>`;$('accountIdentity').textContent=demo?'SAMPLE COLLECTOR':A.user()?.email||'MEMBER';renderAll();showPanel(location.hash.replace('#','')||activePanel,false);}
     else{const connected=A.connected();$('accountSetupBanner').hidden=connected;$('startDemo').hidden=connected;if(!connected){const span=$('accountSetupBanner').querySelector('span');if(span)span.textContent=A.configured()?'Account connection is temporarily unavailable. No registration or sign-in has occurred. Please try again later.':'Customer accounts are not activated yet. Sign-in and registration will work after the store owner connects Supabase; no account is created in preview mode.';}}
@@ -84,12 +87,17 @@
 
     $('tabSignIn').addEventListener('click',()=>{setAuthView('signin');safeAccountHash('signin')});
     $('tabSignUp').addEventListener('click',()=>{setAuthView('signup');safeAccountHash('signup')});
-    $('forgotButton').addEventListener('click',()=>setAuthView('forgot'));
+    $('forgotButton').addEventListener('click',()=>{const email=$('signInForm').elements.namedItem('email').value;setAuthView('forgot');$('forgotForm').elements.namedItem('email').value=email;});
+    $('resendButton').addEventListener('click',()=>{const email=$('signInForm').elements.namedItem('email').value;setAuthView('resend');$('resendForm').elements.namedItem('email').value=email;});
+    $('resendBack').addEventListener('click',()=>setAuthView('signin'));
+    $('resendForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,done=waitFor(f,f.querySelector('[type=submit]'));notice('Requesting confirmation…');try{await A.resendConfirmation(f.elements.namedItem('email').value);notice('If confirmation is required and email delivery is available, a new link will be sent. Check spam or try signing in if already verified.',true);}catch(ex){error(ex)}finally{done()}});
+    $('recoveryCancel').addEventListener('click',async()=>{try{await A.cancelRecovery();setAuthView('forgot');changeView();notice('Enter your account email to request a new reset link.');}catch(ex){error(ex)}});
+    $('recoveryForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,done=waitFor(f,f.querySelector('[type=submit]'));const data=new FormData(f);if(data.get('password')!==data.get('confirm_password')){notice('Passwords do not match.');done();return;}try{await A.finishRecovery(data.get('password'));f.reset();setAuthView('signin');changeView();notice('Password changed successfully. Sign in using your new password.',true);}catch(ex){error(ex)}finally{done()}});
     $('backSignIn').addEventListener('click',()=>setAuthView('signin'));
     $('startDemo').addEventListener('click',()=>{demo=true;changeView();showPanel('overview');flash('Sample collector account opened. Nothing here is a real registered account.');});
     $('signInForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,done=waitFor(f,f.querySelector('[type=submit]'));notice('Signing in…');try{await A.signIn({email:f.elements.namedItem('email').value,password:f.elements.namedItem('password').value});f.reset();changeView();notice('');}catch(ex){error(ex)}finally{done()}});
-    $('signUpForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,done=waitFor(f,f.querySelector('[type=submit]'));const data=new FormData(f);if(data.get('password')!==data.get('confirm_password')){notice('Passwords do not match.');done();return}notice('Creating your account…');try{const result=await A.signUp({email:data.get('email'),password:data.get('password'),fullName:data.get('full_name')});if(result.needsConfirmation){notice('Check your email to verify your address, then sign in. If you do not see it, check spam.',true);setAuthView('signin');notice('Check your email for a verification link, then return to sign in.',true);}else{f.reset();changeView();}}catch(ex){error(ex)}finally{done()}});
-    $('forgotForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,done=waitFor(f,f.querySelector('[type=submit]'));try{await A.forgotPassword(f.email.value);notice('If this email is registered, a recovery link is on its way.',true);}catch(ex){error(ex)}finally{done()}});
+    $('signUpForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,done=waitFor(f,f.querySelector('[type=submit]'));const data=new FormData(f);if(data.get('password')!==data.get('confirm_password')){notice('Passwords do not match.');done();return}notice('Creating your account…');try{const result=await A.signUp({email:data.get('email'),password:data.get('password'),fullName:data.get('full_name')});if(result.needsConfirmation){f.reset();setAuthView('signin');$('signInForm').elements.namedItem('email').value=data.get('email');notice('If this address is new and eligible, check your email or spam for a confirmation link. If you already registered, sign in or use Forgot your password. You can also request a fresh confirmation email.',true);}else{f.reset();changeView();}}catch(ex){error(ex)}finally{done()}});
+    $('forgotForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,done=waitFor(f,f.querySelector('[type=submit]'));notice('Requesting secure reset link…');try{await A.forgotPassword(f.elements.namedItem('email').value);notice('Request accepted. If the account exists and email delivery is available, a reset link will be sent. Check spam, then open the newest link and set a new password.',true);}catch(ex){error(ex)}finally{done()}});
     $('signOutButton').addEventListener('click',async()=>{if(demo){demo=false;demoWatches=new Set(['CC-010','OH-003']);demoBag=['OH-003'];changeView();history.replaceState(null,'','account.html');flash('You left the sample account.');return}try{await A.signOut();changeView();history.replaceState(null,'','account.html');flash('You are signed out. Your account data stays saved.');}catch(ex){error(ex)}});
     document.querySelectorAll('[data-panel]').forEach(btn=>btn.addEventListener('click',()=>showPanel(btn.dataset.panel)));
     document.querySelectorAll('[data-go]').forEach(btn=>btn.addEventListener('click',()=>showPanel(btn.dataset.go)));
@@ -109,9 +117,9 @@
     document.addEventListener('bf:account-change',()=>{if(!demo&&A.user())changeView()});
     document.addEventListener('bf:watch-change',()=>{if(!demo&&A.user())renderAll()});
     document.addEventListener('bf:account-error',e=>error(new Error(e.detail?.message||'Account data could not load.')));
-    document.addEventListener('bf:password-recovery',()=>{if(A.user())changeView();showPanel('preferences');flash('Recovery link accepted. Choose a new password in Security settings.');const input=$('passwordForm')?.elements.namedItem('password');if(input){input.scrollIntoView({block:'center',behavior:'smooth'});input.focus({preventScroll:true});}});
+    document.addEventListener('bf:recovery-state',()=>{changeView();if(A.recoveryState()==='ready')$('recoveryForm').elements.namedItem('password').focus();});
     window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(!inAccount()&&(k==='signin'||k==='signup')){setAuthView(k);return;}if(k.startsWith('watchlist')||['overview','bags','profile','addresses','orders','preferences'].includes(k))showPanel(k,false)});
-    A.ready().then(()=>{changeView();refreshOwnerLink();const route=location.hash.slice(1);if(!inAccount())setAuthView(route==='signup'?'signup':'signin');}).catch(error);
+    A.ready().then(()=>{changeView();refreshOwnerLink();const route=location.hash.slice(1);if(A.recoveryState()!=='none'){changeView();return;}if(!inAccount())setAuthView(route==='signup'?'signup':'signin');}).catch(error);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
