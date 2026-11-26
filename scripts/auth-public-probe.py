@@ -1,11 +1,16 @@
 """Public read-only checks against deployed account UI and actual Auth settings."""
-import json, urllib.request, sys
+import json, subprocess, sys
 BASE="https://burtonfound.timharmar.workers.dev"
 PROJECT="https://nyvdrgpcwfasajyncnhi.supabase.co"
 def get(url,headers=None):
-    with urllib.request.urlopen(urllib.request.Request(url,headers=headers or {}),timeout=20) as r:
-        if r.status!=200:raise RuntimeError("Unexpected public response.")
-        return r.read()
+    cmd=["curl","--silent","--show-error","--max-time","20","--retry","1","-w","\\n%{http_code}"]
+    for k,v in (headers or {}).items():cmd.extend(["-H",k+": "+v])
+    result=subprocess.run(cmd+[url],capture_output=True,timeout=50)
+    label=url.split("/")[-1] or "homepage"
+    if result.returncode:raise RuntimeError("Public request failed: "+label)
+    raw,status=result.stdout.rsplit(b"\n",1)
+    if status!=b"200":raise RuntimeError("Public request "+label+" returned HTTP "+status.decode("ascii"))
+    return raw
 def main():
     cfg=json.loads(get(BASE+"/api/public-account-config"))
     assert cfg.get("configured") is True and cfg.get("supabaseUrl")==PROJECT
@@ -25,4 +30,5 @@ def main():
 if __name__=="__main__":
     try:main()
     except AssertionError as e:sys.exit(str(e))
+    except RuntimeError as e:sys.exit(str(e))
     except Exception:sys.exit("Public authentication probe failed; no email sent and no account created.")
