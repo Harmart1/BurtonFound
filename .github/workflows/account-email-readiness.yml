@@ -55,33 +55,3 @@ jobs:
             repair-and-smtp) python3 scripts/auth-config.py --apply --smtp ;;
             *) exit 1 ;;
           esac
-
-  token-diagnostic:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'One-time Supabase authorization diagnostic 2026-11-25'
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - name: Check access to only the Burton and Found project and auth configuration
-        env:
-          BF_SUPABASE_MANAGEMENT_TOKEN: ${{ secrets.BF_SUPABASE_MANAGEMENT_TOKEN }}
-        run: |
-          python3 - <<'PY'
-          import os, urllib.request, urllib.error
-          token=os.environ.get("BF_SUPABASE_MANAGEMENT_TOKEN","").strip()
-          if not token:
-              print("Management token not available.")
-              raise SystemExit(1)
-          class NoRedirect(urllib.request.HTTPRedirectHandler):
-              def redirect_request(self,*a,**kw): return None
-          opener=urllib.request.build_opener(NoRedirect())
-          origin="https://api.supabase.com/v1/projects/nyvdrgpcwfasajyncnhi"
-          for label,suffix in [("Exact project metadata",""),("Hosted Auth settings","/config/auth")]:
-              try:
-                  request=urllib.request.Request(origin+suffix,headers={"Authorization":"Bearer "+token,"Accept":"application/json"})
-                  with opener.open(request,timeout=20) as response:
-                      print(label+": HTTP "+str(response.status))
-              except urllib.error.HTTPError as e:
-                  print(label+": HTTP "+str(e.code))
-              except Exception:
-                  print(label+": connection failed")
-          PY
