@@ -36,7 +36,7 @@
   }
   function changeView(){
     const reset=A.recoveryState();
-    if(reset!=='none'){$('accountAccess').hidden=false;$('accountDashboard').hidden=true;setAuthView(showAuth);$('recoveryForm').hidden=reset!=='ready';$('recoveryStatus').textContent=reset==='ready'?'Recovery link verified. Enter and confirm a new password below.':reset==='pending'?'Checking your secure recovery link…':'This link could not be verified or has expired. Return to sign in and request a fresh password-reset link.';return;}
+    if(reset!=='none'){$('accountAccess').hidden=false;$('accountDashboard').hidden=true;if($('recoveryPanel').hidden)setAuthView(showAuth);$('recoveryForm').hidden=reset!=='ready';$('recoveryStatus').textContent=reset==='ready'?'Recovery link verified. Enter and confirm a new password below.':reset==='pending'?'Checking your secure recovery link…':'This link could not be verified or has expired. Return to sign in and request a fresh password-reset link.';return;}
     $('recoveryPanel').hidden=true;$('authTabs').hidden=false;
     const on=inAccount();if(demo)$('ownerConsoleLink').hidden=true;$('accountAccess').hidden=on;$('accountDashboard').hidden=!on;
     if(on){$('demoRibbon').hidden=!demo;$('dashboardEyebrow').textContent=demo?'COLLECTOR ACCOUNT INTERACTIVE TOUR':'THE COLLECTOR’S CABINET · MY ACCOUNT';const p=profile();const n=(p.full_name||A.user()?.user_metadata?.full_name||'Collector').split(' ')[0];$('dashboardTitle').innerHTML=`Welcome back, <em>${safe(n)}.</em>`;$('accountIdentity').textContent=demo?'SAMPLE COLLECTOR':A.user()?.email||'MEMBER';renderAll();showPanel(location.hash.replace('#','')||activePanel,false);}

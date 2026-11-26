@@ -31,14 +31,14 @@ test('Supabase SDK is pinned and recovery callback attaches before session inspe
  const page=readFileSync(new URL('../public/account.js',import.meta.url),'utf8');
  assert.match(src,/@supabase\/supabase-js@2\.119\.0/);
  assert.ok(src.indexOf('client.auth.onAuthStateChange(')<src.indexOf('client.auth.getSession()'));
- assert.match(src,/resetPasswordForEmail\(email,\{redirectTo:new URL\('account\.html',location\.href\)\.href\}/);
+ assert.match(src,/resetPasswordForEmail\(String\(email\)\.trim\(\),\{redirectTo:redirectTo\(\)\}/);
  assert.match(src,/event==='PASSWORD_RECOVERY'/);
- assert.match(page,/bf:password-recovery/);
+ assert.match(page,/bf:recovery-state/);
  assert.match(page,/elements\.namedItem\('password'\)/);
 });
 
 test('account sign-up and password reset use one allowlisted callback path without custom fragment redirects',()=>{
  const src=readFileSync(new URL('../public/account-core.js',import.meta.url),'utf8');
- assert.match(src,/emailRedirectTo:redirectTo/);
+ assert.match(src,/emailRedirectTo:callbackUrl/);
  assert.ok(!src.includes("new URL('account.html#security'"));
 });

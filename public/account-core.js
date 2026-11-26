@@ -130,6 +130,7 @@
         }catch(e){connectError=e.message||'Connection failed';if(recovery==='pending'){recovery='error';callbackAccess='';scrubCallback();}emit('account-error',{message:connectError});}
       }
       if(recovery==='pending'){recovery='error';callbackAccess='';scrubCallback();}
+      if(recovery==='error'){callbackAccess='';scrubCallback();}
       tell();emit('recovery-state',{state:recovery});return {configured:readyToConnect,connected:!!client,user};
     })();return initPromise;
   }
