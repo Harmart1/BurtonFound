@@ -28,3 +28,20 @@ button.secondary{background:#fff;color:#243b38;border:1px solid #7a8c86}
 .readiness-row small{font-size:.88rem;color:var(--ui-muted,#52665b);line-height:1.45}
 .readiness-state{font-weight:750;font-size:.78rem;letter-spacing:.02em;color:var(--ui-ink,#263a35);text-transform:uppercase}
 .readiness-note{font-size:.9rem;color:var(--ui-muted,#52665b)}
+
+
+/* Launch command center — private, read-only and usable on phones. */
+.launch-overview{border:1px solid var(--ui-line,#c6d1c6);background:var(--ui-surface,#fff);color:var(--ui-ink,#263a35);padding:1.15rem 1.25rem;border-radius:9px;margin:1rem 0}
+.launch-overview strong{display:block;font:normal 1.28rem Georgia,serif}
+.launch-overview p{margin:.35rem 0 .15rem}
+.launch-overview .launch-small{font-size:.84rem;color:var(--ui-muted,#52665b);line-height:1.55}
+.launch-actions{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;margin:1.1rem 0}
+.launch-actions a,.readiness-row a{color:var(--ui-link,#245d51);font-weight:700;text-underline-offset:3px}
+.launch-actions a{padding:.65rem .2rem}
+.launch-actions button{font-size:.86rem}
+.launch-actions span{font-size:.84rem;color:var(--ui-muted,#52665b)}
+.launch-state-attention{color:var(--ui-ink,#263a35)}
+.launch-state-review{color:var(--ui-muted,#52665b)}
+.readiness-row a{font-size:.89rem;margin-top:auto}
+.readiness-row{gap:.5rem}
+@media(max-width:650px){.launch-actions{align-items:stretch;flex-direction:column}.launch-actions>*{width:100%}.launch-actions a{padding:.45rem 0}.readiness-grid{grid-template-columns:1fr}}
