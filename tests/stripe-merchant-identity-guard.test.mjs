@@ -47,7 +47,7 @@ test('checkout refuses missing or malformed expected merchant without outbound r
  try{
   const result=await checkout({request:req(),env:{...env,STRIPE_EXPECTED_ACCOUNT_ID:''}});
   assert.equal(result.status,503);
-  assert.match((await result.json()).error,/identity is not configured/);
+  assert.match((await result.json()).error,/merchant verification is not configured/);
  }finally{globalThis.fetch=prev;}
 });
 test('production config pins correct, public Stripe merchant identity without enabling payments',()=>{
