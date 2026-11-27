@@ -174,12 +174,12 @@
     return data;
   }
   async function signOut(){
-    demandAuth();check(await client.auth.signOut({scope:'local'}));await loadUser(null);
+    if(!client||!user)fail('Sign in first.');check(await client.auth.signOut({scope:'local'}));await loadUser(null);
     // A sign-out must not delete an independently saved guest cart.
   }
   async function forgotPassword(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resetPasswordForEmail(String(email).trim(),{redirectTo:redirectTo()}));}
   async function resendConfirmation(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resend({type:'signup',email:String(email).trim(),options:{emailRedirectTo:redirectTo()}}));}
-  async function finishRecovery(password){if(recovery!=='ready'||!client||!user)fail('Request a fresh reset link before changing your password.');if(typeof password!=='string'||password.length<10)fail('Choose a password with at least 10 characters.');check(await client.auth.updateUser({password}));recovery='none';callbackAccess='';try{check(await client.auth.signOut({scope:'local'}));}catch{recovery='error';emit('recovery-state',{state:recovery});fail('Password changed, but secure sign-out failed. Close the recovery session before signing in again.');}await loadUser(null);scrubCallback();emit('recovery-state',{state:recovery});}
+  async function finishRecovery(password){if(recovery!=='ready'||!client||!user)fail('Request a fresh reset link before changing your password.');if(typeof password!=='string'||password.length<10)fail('Choose a password with at least 10 characters.');check(await client.auth.updateUser({password}));callbackAccess='';try{check(await client.auth.signOut({scope:'local'}));}catch{recovery='error';emit('recovery-state',{state:recovery});fail('Password changed, but secure sign-out failed. Close the recovery session before signing in again.');}recovery='none';await loadUser(null);scrubCallback();emit('recovery-state',{state:recovery});}
   async function cancelRecovery(){if(client&&user){check(await client.auth.signOut({scope:'local'}));}recovery='none';callbackAccess='';await loadUser(null);scrubCallback();emit('recovery-state',{state:recovery});}
   async function updatePassword(password){demandAuth();check(await client.auth.updateUser({password}));}
   async function updateEmail(email){demandAuth();check(await client.auth.updateUser({email:email.trim()}));}

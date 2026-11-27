@@ -24,14 +24,14 @@
   async function refreshOwnerLink(){
     const link=$('ownerConsoleLink');if(!link)return;
     link.hidden=true;
-    const current=A.user();
-    if(demo||!current)return;
+    const current=A.user(),version=A.sessionVersion();
+    if(demo||!current||A.recoveryState()!=='none')return;
     try{
       const token=await A.authToken();if(!token)return;
       const res=await fetch('/api/admin/me',{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
       if(!res.ok)return;
       const result=await res.json();
-      if(result.admin===true && A.user()?.id===current.id && !demo)link.hidden=false;
+      if(result.admin===true && A.user()?.id===current.id && A.sessionVersion()===version && A.recoveryState()==='none' && !demo)link.hidden=false;
     }catch{/* Private owner access may be unavailable; ordinary accounts still work. */}
   }
   function changeView(){
@@ -113,7 +113,7 @@
     $('passwordForm').addEventListener('submit',async e=>{e.preventDefault();if(demo){dashboardNotice('Password changes require a real account.');return}try{await A.updatePassword(e.currentTarget.elements.namedItem('password').value);flash('Password updated.');e.currentTarget.reset();}catch(ex){error(ex)}});
     $('exportAccount').addEventListener('click',async()=>{if(demo){dashboardNotice('The sample account contains no actual account records to export.');return}try{const blob=await A.exportData(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='burton-found-my-account.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);flash('Your account information was downloaded.');}catch(ex){error(ex)}});
     $('deleteAccount').addEventListener('click',async()=>{if(demo){dashboardNotice('The sample account does not exist online. Nothing to delete.');return}if(!confirm('Delete your Burton & Found account and its saved data permanently? This cannot be undone.'))return;const typed=prompt('Type DELETE to confirm permanent account deletion');if(typed!=='DELETE'){dashboardNotice('Account deletion cancelled.');return}try{await A.deleteMyAccount();changeView();flash('Your Burton & Found account was deleted.');}catch(ex){error(ex)}});
-    let lastWatchUser=null;document.addEventListener('bf:auth-change',()=>{const next=A.user()?.id||null;if(next!==lastWatchUser){++orderRequest;$('customerOrders').replaceChildren();$('ownerConsoleLink').hidden=true;$('addressForm').reset();$('addressFormHeading').textContent='Add a new address';$('cancelAddress').hidden=true;$('watchPersonal').checked=false;$('watchSearch').value='';$('watchAvailability').value='all';lastWatchUser=next;}if(!demo)changeView();refreshOwnerLink()});
+    let lastWatchUser=null;document.addEventListener('bf:auth-change',()=>{const next=A.user()?.id||null;if(next!==lastWatchUser){++orderRequest;for(const id of ['customerOrders','addressList','savedBagList','overviewWatch','overviewCart'])$(id)?.replaceChildren();for(const id of ['profileForm','emailForm','passwordForm','consentForm'])$(id)?.reset();$('accountIdentity').textContent='';$('ownerConsoleLink').hidden=true;$('addressForm').reset();$('addressFormHeading').textContent='Add a new address';$('cancelAddress').hidden=true;$('watchPersonal').checked=false;$('watchSearch').value='';$('watchAvailability').value='all';lastWatchUser=next;}if(!demo)changeView();refreshOwnerLink()});
     document.addEventListener('bf:account-change',()=>{if(!demo&&A.user())changeView()});
     document.addEventListener('bf:watch-change',()=>{if(!demo&&A.user())renderAll()});
     document.addEventListener('bf:account-error',e=>error(new Error(e.detail?.message||'Account data could not load.')));
