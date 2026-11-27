@@ -9,6 +9,8 @@ const {chromium}=require(process.env.BF_BROWSER_MODULE||'playwright-core');
 const root=resolve('public');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.json':'application/json','.woff2':'font/woff2'};
 const json=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
+const ownerRow={id:'fixture-refunded-order',created_at:'2026-11-27T00:00:00Z',stripe_session_id:'cs_live_fixture_refunded',payment_intent:'pi_fixture',payment_status:'refunded',fulfillment_status:'needs_attention',subtotal_cents:1000,shipping_cents:500,total_cents:1500,item_lines:[{sku:'CC-010',price_cents:1000}]};
+const ownerClean={...ownerRow,id:'fixture-paid-order',stripe_session_id:'cs_live_fixture_paid',payment_status:'paid',fulfillment_status:'processing'};
 const server=createServer(async(req,res)=>{
   try{
     const path=new URL(req.url,'http://127.0.0.1').pathname;
@@ -17,6 +19,14 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/catalog')return json(res,{configured:true,items:[{sku:'CC-010',price_cents:2495,available:true}]});
     if(path==='/api/health')return json(res,{service:'Burton & Found',checkout:'preview_only',currency:'CAD'});
     if(path==='/api/account-orders')return json(res,{orders:[]});
+    if(path.startsWith('/api/admin/')&&req.headers.authorization==='Bearer fixture-owner'){
+      if(path==='/api/admin/me')return json(res,{admin:true});
+      if(path==='/api/admin/orders')return json(res,{orders:[]});
+      if(path==='/api/admin/holds')return json(res,{holds:[]});
+      if(path==='/api/admin/bookkeeping')return json(res,{orders:[ownerRow,ownerClean]});
+      if(path==='/api/admin/stripe-reconciliation')return json(res,{from:'2026-11-01',to:'2026-11-30',mode:'live',excluded:0,notice:'Synthetic comparison only',rows:[{id:ownerRow.id,issues:['Refund reported — reconcile individual refund status and balance transactions'],refund_reported_cents:1500},{id:ownerClean.id,issues:['Disputed charge — manual review'],refund_reported_cents:0}]});
+      if(path==='/api/admin/readiness')return json(res,{checkout:'preview_only'});
+    }
     if(path==='/api/admin/me')return json(res,{error:'Fixture non-admin'},403);
     if(path.startsWith('/api/'))return json(res,{configured:false,products:[],collections:[],items:[]});
     if(path==='/account.html'){res.writeHead(307,{Location:'/account'});res.end();return;}
@@ -46,6 +56,7 @@ try{
        const fragment=new URLSearchParams(location.hash.slice(1));
        const valid=fragment.get('type')==='recovery'&&fragment.get('access_token')==='fixture-recovery';
        if(valid)session={user:account,access_token:'fixture-recovery'};
+       if(location.pathname==='/admin/orders.html'&&new URLSearchParams(location.search).get('owner_fixture')==='1')session={user:{...account,id:'fixture-owner'},access_token:'fixture-owner'};
        const log=(type,extra={})=>window.__bfCalls.push({type,...extra});
        const auth={
          onAuthStateChange(fn){listener=fn;return {data:{subscription:{unsubscribe(){}}}};},
@@ -120,6 +131,17 @@ try{
      assert.equal(await page.locator('img:not([alt])').count(),0);
      const metrics=await page.evaluate(()=>({resources:performance.getEntriesByType('resource').length,encodedBytes:performance.getEntriesByType('resource').reduce((n,r)=>n+r.encodedBodySize,0),domReadyMs:Math.round(performance.getEntriesByType('navigation')[0]?.domContentLoadedEventEnd||0)}));
      console.log('Local synthetic page measurements '+size+': '+JSON.stringify(metrics)+' (not real-user Core Web Vitals)');
+   });
+   await test(size+' private owner exception report and mode isolation',viewport,async page=>{
+     await page.goto(origin+'/admin/orders.html?owner_fixture=1');await visible(page,'#dashboard');
+     await page.locator('#ledgerFrom').fill('2026-11-01');await page.locator('#ledgerTo').fill('2026-11-30');
+     await page.locator('#ledgerLoad').click();await page.locator('#exceptionRows tr').first().waitFor({state:'visible'});
+     assert.equal(await page.locator('#exceptionRows tr').count(),1);assert.match(await page.locator('#exceptionRows').textContent(),/Local refunded status/);
+     await page.locator('#stripeCompare').click();await page.waitForFunction(()=>document.querySelectorAll('#exceptionRows tr').length===2);
+     assert.match(await page.locator('#exceptionRows').textContent(),/Disputed charge/);
+     await page.locator('#exceptionFilter').selectOption('review');assert.equal(await page.locator('#exceptionRows tr').count(),1);
+     await page.locator('#ledgerMode').selectOption('test');assert.equal(await page.locator('#exceptionRows tr').count(),0);
+     assert(await page.locator('#exceptionExport').isDisabled());
    });
    await test(size+' browse catalogue and guest shopping bag',viewport,async page=>{
      await page.goto(origin+'/#shop');await ready(page);await page.locator('#productGrid .product-card').first().waitFor({state:'visible'});
