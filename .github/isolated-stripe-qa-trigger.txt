@@ -1,1 +1,1 @@
-2026-11-27 — owner-approved isolated Stripe sandbox API lifecycle; preflight and test-only guard required.
+2026-11-27 — retry owner-authorized sandbox lifecycle using curl safety preflight; fail closed before transactions.
