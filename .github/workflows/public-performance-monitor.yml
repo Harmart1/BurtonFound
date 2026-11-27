@@ -1,0 +1,31 @@
+name: Public website performance snapshot
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '26 15 * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/public-performance-monitor.yml'
+      - 'scripts/monitor-public-performance.py'
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-public-performance
+  cancel-in-progress: false
+jobs:
+  public-performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Measure anonymous public HTTP endpoints
+        run: python3 scripts/monitor-public-performance.py
+      - name: Save performance snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-performance-snapshot
+          path: performance-output/
+          if-no-files-found: warn
+          retention-days: 30

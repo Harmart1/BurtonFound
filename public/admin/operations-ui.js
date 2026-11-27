@@ -4,16 +4,17 @@ const A=window.BURTON_ACCOUNT,O=window.BURTON_OPERATIONS,$=id=>document.getEleme
 const money=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n/100);
 let ledgerResult=null,stockResult=null,stripeResult=null,stripeSeq=0;
 async function ownerFetch(url){
- const token=await A.authToken?.();if(!token)throw Error('Sign in first');
+ const version=A.sessionVersion(),uid=A.user()?.id;
+ const token=await A.authToken?.();if(!token||A.sessionVersion()!==version||A.user()?.id!==uid)throw Error('Sign in again');
  const r=await fetch(url,{headers:{Authorization:'Bearer '+token},cache:'no-store'});
- const data=await r.json();if(!r.ok)throw Error(data.error||'Report unavailable');return data;
+ const data=await r.json();if(A.sessionVersion()!==version||A.user()?.id!==uid||A.recoveryState()!=='none')throw Error('Owner session changed');if(!r.ok)throw Error(data.error||'Report unavailable');return data;
 }
 function download(text,name){
  const u=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
 const today=new Date().toISOString().slice(0,10);
 $('ledgerTo').value=today;$('ledgerFrom').value=today.slice(0,7)+'-01';
-function clearStripe(){stripeSeq++;stripeResult=null;$('stripeCompare').disabled=true;$('stripeCompareExport').disabled=true;$('stripeCompareResult').textContent='Load a live or sandbox order report first.';$('stripeCompareIssues').replaceChildren();}
+function clearStripe(){stripeSeq++;stripeResult=null;window.dispatchEvent(new Event('burton:stripe-clear'));$('stripeCompare').disabled=true;$('stripeCompareExport').disabled=true;$('stripeCompareResult').textContent='Load a live or sandbox order report first.';$('stripeCompareIssues').replaceChildren();}
 function clearLedger(){clearStripe();window.dispatchEvent(new Event('burton:ledger-clear'));ledgerResult=null;$('ledgerExport').disabled=true;$('ledgerResult').textContent='Choose a period and load the report.';}
 for(const id of ['ledgerFrom','ledgerTo','ledgerMode'])$(id).addEventListener('change',clearLedger);
 $('ledgerForm').addEventListener('submit',async e=>{
@@ -36,6 +37,7 @@ $('stripeCompare').addEventListener('click',async()=>{
   const d=await ownerFetch('/api/admin/stripe-reconciliation?'+new URLSearchParams({from:current.from,to:current.to,mode:current.mode}));
   if(seq!==stripeSeq||current!==ledgerResult)return;
   stripeResult=d;
+  window.dispatchEvent(new CustomEvent('burton:stripe-compared',{detail:d}));
   const clean=d.rows.filter(r=>r.issues.length===0).length;
   $('stripeCompareResult').textContent=(d.mode==='test'?'SANDBOX — NOT business revenue. ':'LIVE records. ')+d.rows.length+' compared · '+clean+' without flagged differences · '+(d.rows.length-clean)+' require review · '+d.excluded+' other-mode records excluded. '+d.notice;
   for(const r of d.rows.filter(x=>x.issues.length)){const li=document.createElement('li');li.textContent=r.id+' — '+r.issues.join('; ');$('stripeCompareIssues').append(li);}

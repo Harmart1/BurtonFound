@@ -6,9 +6,10 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'
 const dollars=c=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format((Number(c)||0)/100);
 let orders=[];
 async function request(url,init={}){
- const t=await A.authToken?.();if(!t)throw Error('Sign in first');
+ const version=A.sessionVersion(),uid=A.user()?.id;
+ const t=await A.authToken?.();if(!t||A.sessionVersion()!==version||A.user()?.id!==uid)throw Error('Sign in again');
  const r=await fetch(url,{...init,headers:{Authorization:`Bearer ${t}`,...(init.headers||{})},cache:'no-store'});
- const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d;
+ const d=await r.json();if(A.sessionVersion()!==version||A.user()?.id!==uid||A.recoveryState()!=='none')throw Error('Owner session changed');if(!r.ok)throw Error(d.error||'Request failed');return d;
 }
 function address(o){const a=o.shipping_address?.address||{};return [o.shipping_address?.name||o.customer_name,a.line1,a.line2,[a.city,a.state,a.postal_code].filter(Boolean).join(', '),a.country].filter(Boolean).join('\n')}
 function status(text){$('status').textContent=text;}
@@ -128,5 +129,5 @@ $('holdsList').addEventListener('click',async e=>{
  catch(err){status(err.message);btn.disabled=false;}
 });
 
-A.init().then(()=>setTimeout(refresh,300)).catch(()=>{$('loginHelp').hidden=false;status('Accounts not connected')});
+A.init().then(()=>{const initial=A.user()?.id||null;const leave=()=>{if((A.user()?.id||null)!==initial||A.recoveryState?.()!=='none'){$('dashboard').hidden=true;$('dashboard').replaceChildren();location.replace('/account');}};document.addEventListener('bf:auth-change',leave);document.addEventListener('bf:recovery-state',leave);window.addEventListener('pageshow',e=>{if(e.persisted){$('dashboard').hidden=true;location.reload();}});setTimeout(refresh,300);}).catch(()=>{$('loginHelp').hidden=false;status('Accounts not connected')});
 })();
