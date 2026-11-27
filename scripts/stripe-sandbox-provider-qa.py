@@ -48,9 +48,10 @@ def main():
     # Guard against unintended other test destinations receiving Checkout events.
     endpoints,_=stripe("webhook_endpoints?limit=100")
     check(not endpoints.get("has_more"),"Webhook destinations exceed safe audit limit")
-    for e in endpoints.get("data",[]):
-        if e.get("status")=="enabled":
-            check(e.get("url")==APP+"/api/stripe-webhook","Unexpected enabled sandbox webhook destination; no test writes")
+    enabled=[e for e in endpoints.get("data",[]) if e.get("status")=="enabled"]
+    for e in enabled:
+        check(e.get("url")==APP+"/api/stripe-webhook","Unexpected enabled sandbox webhook destination; no test writes")
+    print("Enabled matching classic sandbox webhook endpoints: "+str(len(enabled))+"; actual delivery is not asserted")
     session=None
     try:
         session,_=stripe("checkout/sessions",{
@@ -66,8 +67,14 @@ def main():
             "shipping_options[0][shipping_rate_data][display_name]":"Synthetic QA shipping",
             "expires_at":str(int(time.time())+1860)
         },"session")
-        check(own(session,"cs_test_") and session.get("status")=="open" and session.get("currency")=="cad" and session.get("amount_total")==1500 and session.get("payment_status")=="unpaid" and str(session.get("url","")).startswith("https://checkout.stripe.com/"),"Unexpected checkout session state")
-        print("PASS real Stripe sandbox hosted Checkout Session created; CAD 15.00 including fixture shipping")
+        check(own(session,"cs_test_") and session.get("status")=="open" and session.get("currency")=="cad" and session.get("amount_subtotal")==1000 and session.get("amount_total") in (1000,1500) and session.get("payment_status")=="unpaid" and str(session.get("url","")).startswith("https://checkout.stripe.com/"),"Unexpected checkout session state")
+        options=session.get("shipping_options") or []
+        check(len(options)==1,"Synthetic checkout shipping option missing")
+        rate_id=options[0].get("shipping_rate","")
+        check(isinstance(rate_id,str) and re.fullmatch(r"shr_[A-Za-z0-9]+",rate_id),"Unexpected shipping rate reference")
+        rate,_=stripe("shipping_rates/"+rate_id)
+        check(rate.get("livemode") is False and rate.get("fixed_amount",{}).get("amount")==500 and rate.get("fixed_amount",{}).get("currency")=="cad","Synthetic shipping option price mismatch")
+        print("PASS real Stripe sandbox hosted Checkout Session created; CAD 10.00 subtotal and CAD 5.00 shipping option")
     finally:
         if session and own(session,"cs_test_") and session.get("status")=="open":
             expired,_=stripe("checkout/sessions/"+session["id"]+"/expire",{},"expire")
