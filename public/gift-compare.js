@@ -50,7 +50,14 @@ function toggle(sku){
  if(has(sku))selected=selected.filter(s=>s!==sku);
  else if(selected.length>=3){$('compareStatus').textContent='Three-item limit reached. Remove an item before adding another.';$('compareFinds').open=true;return;}
  else selected.push(sku);
+ const focused=document.activeElement;
+ const source=focused?.closest?.('#giftResults,#compareResults');
  refresh();
+ // Preserve keyboard focus when the action re-renders its own list.
+ if(source&&focused?.dataset?.compare===sku){
+  const replacement=[...source.querySelectorAll('[data-compare]')].find(b=>b.dataset.compare===sku);
+  if(replacement)replacement.focus();else $('compareClear')?.focus();
+ }
 }
 window.BURTON_GIFT_COMPARE=Object.freeze({has,refresh,setStock:s=>{stock=s;refresh();}});
 document.addEventListener('DOMContentLoaded',()=>{

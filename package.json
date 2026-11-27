@@ -7,7 +7,8 @@
     "test": "npm run build:marketing && node --test tests/*.test.mjs",
     "check:deploy": "node scripts/check-deploy.mjs",
     "build:marketing": "node scripts/build-marketing.mjs",
-    "shipping:worksheet": "node scripts/generate-shipping-measurements.mjs"
+    "shipping:worksheet": "node scripts/generate-shipping-measurements.mjs",
+    "audit:site": "node scripts/audit-full-site.mjs"
   },
   "description": "No runtime npm dependencies; Cloudflare Pages Functions use Web APIs and Supabase REST"
 }
