@@ -1,1 +1,1 @@
-Initial placeholder; no provider transaction authorization.
+2026-11-27 — owner-approved isolated Stripe sandbox API lifecycle; preflight and test-only guard required.
