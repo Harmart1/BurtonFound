@@ -6,7 +6,7 @@
   const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money=v=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(v||0);
   let demo=false,showAuth='signin',activePanel='overview',demoWatches=new Set(['CC-010','OH-003']),demoBag=['OH-003'],demoSaved=[{id:'demo-one',title:'Silver screen & radio favourites',item_skus:['CC-010','OH-003'],created_at:new Date().toISOString()}],demoAddresses=[],demoProfile={full_name:'Sample Collector',age_range:'',interests:['Classic Hollywood'],newsletter_opt_in:false};
-  let renderTimer=0,toastTimer=0,watchStock=null,stockRequest=0;
+  let renderTimer=0,toastTimer=0,watchStock=null,stockRequest=0,orderRequest=0;
   const inAccount=()=>A.recoveryState()==='none'&&(!!A.user()||demo);
   const profile=()=>demo?demoProfile:A.profile()||{};
   const addresses=()=>demo?demoAddresses:A.addresses();
@@ -24,19 +24,19 @@
   async function refreshOwnerLink(){
     const link=$('ownerConsoleLink');if(!link)return;
     link.hidden=true;
-    const current=A.user();
-    if(demo||!current)return;
+    const current=A.user(),version=A.sessionVersion();
+    if(demo||!current||A.recoveryState()!=='none')return;
     try{
       const token=await A.authToken();if(!token)return;
       const res=await fetch('/api/admin/me',{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
       if(!res.ok)return;
       const result=await res.json();
-      if(result.admin===true && A.user()?.id===current.id && !demo)link.hidden=false;
+      if(result.admin===true && A.user()?.id===current.id && A.sessionVersion()===version && A.recoveryState()==='none' && !demo)link.hidden=false;
     }catch{/* Private owner access may be unavailable; ordinary accounts still work. */}
   }
   function changeView(){
     const reset=A.recoveryState();
-    if(reset!=='none'){$('accountAccess').hidden=false;$('accountDashboard').hidden=true;if($('recoveryPanel').hidden)setAuthView(showAuth);$('recoveryForm').hidden=reset!=='ready';$('recoveryStatus').textContent=reset==='ready'?'Recovery link verified. Enter and confirm a new password below.':reset==='pending'?'Checking your secure recovery link…':'This link could not be verified or has expired. Return to sign in and request a fresh password-reset link.';return;}
+    if(reset!=='none'){++orderRequest;$('customerOrders').replaceChildren();$('ownerConsoleLink').hidden=true;$('accountAccess').hidden=false;$('accountDashboard').hidden=true;if($('recoveryPanel').hidden)setAuthView(showAuth);$('recoveryForm').hidden=reset!=='ready';$('recoveryStatus').textContent=reset==='ready'?'Recovery link verified. Enter and confirm a new password below.':reset==='pending'?'Checking your secure recovery link…':'This link could not be verified or has expired. Return to sign in and request a fresh password-reset link.';return;}
     $('recoveryPanel').hidden=true;$('authTabs').hidden=false;
     const on=inAccount();if(demo)$('ownerConsoleLink').hidden=true;$('accountAccess').hidden=on;$('accountDashboard').hidden=!on;
     if(on){$('demoRibbon').hidden=!demo;$('dashboardEyebrow').textContent=demo?'COLLECTOR ACCOUNT INTERACTIVE TOUR':'THE COLLECTOR’S CABINET · MY ACCOUNT';const p=profile();const n=(p.full_name||A.user()?.user_metadata?.full_name||'Collector').split(' ')[0];$('dashboardTitle').innerHTML=`Welcome back, <em>${safe(n)}.</em>`;$('accountIdentity').textContent=demo?'SAMPLE COLLECTOR':A.user()?.email||'MEMBER';renderAll();showPanel(location.hash.replace('#','')||activePanel,false);}
@@ -61,13 +61,13 @@
   function renderAddresses(){const a=addresses();$('addressList').innerHTML=a.length?a.map(v=>`<article class="address-card"><h3>${safe(v.label||'Address')}${v.is_default?' <small>· Preferred</small>':''}</h3><p>${safe(v.recipient)}<br>${safe(v.line1)}${v.line2?', '+safe(v.line2):''}<br>${safe(v.city)}, ${safe(v.region)} ${safe(v.postal_code)}<br>${safe(v.country)}</p><div class="address-actions"><button type="button" data-address-edit="${safe(v.id)}">Edit</button><button type="button" data-address-delete="${safe(v.id)}">Remove</button></div></article>`).join(''):'<div class="empty-shelf">No delivery addresses saved yet. Add one below whenever you’re ready.</div>';}
   function renderBags(){const current=bag();$('currentBagSummary').textContent=current.length?`${current.length} ${current.length===1?'item':'items'} · ${money(lookup(current).reduce((s,p)=>s+p.price,0))} CAD before shipping`:'Nothing selected yet. Add a find from the shop first.';$('savedBagList').innerHTML=saved().length?saved().map(s=>`<article class="saved-bag-card"><div><h4>${safe(s.title)}</h4><p>${s.item_skus?.length||0} ${(s.item_skus?.length||0)===1?'piece':'pieces'} · ${money(lookup(s.item_skus||[]).reduce((v,p)=>v+p.price,0))} CAD at current listed prices</p></div><div class="saved-bag-actions"><button data-restore="${safe(s.id)}" type="button">Restore bag ↗</button><button data-saved-delete="${safe(s.id)}" type="button">Delete</button></div></article>`).join(''):'<div class="empty-shelf">No named bags saved yet. Build a collection of your favourites, give it a name and it’ll live here.</div>';}
   async function renderOrders(){
-    const el=$('customerOrders');if(!el)return;
+    const el=$('customerOrders');if(!el)return;const seq=++orderRequest,version=A.sessionVersion(),id=A.user()?.id;const current=()=>seq===orderRequest&&version===A.sessionVersion()&&id===A.user()?.id&&A.recoveryState()==='none'&&!demo;
     if(demo){el.innerHTML='<div class="empty-shelf">Sample dashboard only · No real purchases or payment history</div>';return;}
     if(!A.user()){el.textContent='Sign in to see your paid orders';return;}
     el.textContent='Loading your orders…';
-    try{const token=await A.authToken();const response=await fetch('/api/account-orders',{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});const v=await response.json();if(!response.ok)throw Error(v.error||'Order service unavailable');
+    try{const token=await A.authToken();if(!token||!current())return;const response=await fetch('/api/account-orders',{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});const v=await response.json();if(!response.ok)throw Error(v.error||'Order service unavailable');if(!current())return;
       el.innerHTML=(v.orders||[]).map(o=>`<article class="saved-bag-card"><div><h4>Order ${safe(o.id.slice(0,8))} · ${safe(new Date(o.created_at).toLocaleDateString('en-CA'))}</h4><p>${(o.item_lines||[]).map(p=>safe(p.title)).join(', ')}</p><p>${money((o.total_cents||0)/100)} · ${safe(o.fulfillment_status)}${o.tracking_number?' · Tracking '+safe(o.tracking_number):''}</p></div></article>`).join('')||'<div class="empty-shelf">No paid orders are linked to this account yet. Guest checkout remains available.</div>';
-    }catch(e){el.textContent=e.message||'Order history unavailable. Check your payment receipt.';}
+    }catch(e){if(current())el.textContent=e.message||'Order history unavailable. Check your payment receipt.';}
   }
   function renderAll(){
     if(!inAccount())return;
@@ -113,7 +113,7 @@
     $('passwordForm').addEventListener('submit',async e=>{e.preventDefault();if(demo){dashboardNotice('Password changes require a real account.');return}try{await A.updatePassword(e.currentTarget.elements.namedItem('password').value);flash('Password updated.');e.currentTarget.reset();}catch(ex){error(ex)}});
     $('exportAccount').addEventListener('click',async()=>{if(demo){dashboardNotice('The sample account contains no actual account records to export.');return}try{const blob=await A.exportData(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='burton-found-my-account.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);flash('Your account information was downloaded.');}catch(ex){error(ex)}});
     $('deleteAccount').addEventListener('click',async()=>{if(demo){dashboardNotice('The sample account does not exist online. Nothing to delete.');return}if(!confirm('Delete your Burton & Found account and its saved data permanently? This cannot be undone.'))return;const typed=prompt('Type DELETE to confirm permanent account deletion');if(typed!=='DELETE'){dashboardNotice('Account deletion cancelled.');return}try{await A.deleteMyAccount();changeView();flash('Your Burton & Found account was deleted.');}catch(ex){error(ex)}});
-    let lastWatchUser=null;document.addEventListener('bf:auth-change',()=>{const next=A.user()?.id||null;if(next!==lastWatchUser){$('watchPersonal').checked=false;$('watchSearch').value='';$('watchAvailability').value='all';lastWatchUser=next;}if(!demo)changeView();refreshOwnerLink()});
+    let lastWatchUser=null;document.addEventListener('bf:auth-change',()=>{const next=A.user()?.id||null;if(next!==lastWatchUser){++orderRequest;for(const id of ['customerOrders','addressList','savedBagList','overviewWatch','overviewCart'])$(id)?.replaceChildren();for(const id of ['profileForm','emailForm','passwordForm','consentForm'])$(id)?.reset();$('accountIdentity').textContent='';$('ownerConsoleLink').hidden=true;$('addressForm').reset();$('addressFormHeading').textContent='Add a new address';$('cancelAddress').hidden=true;$('watchPersonal').checked=false;$('watchSearch').value='';$('watchAvailability').value='all';lastWatchUser=next;}if(!demo)changeView();refreshOwnerLink()});
     document.addEventListener('bf:account-change',()=>{if(!demo&&A.user())changeView()});
     document.addEventListener('bf:watch-change',()=>{if(!demo&&A.user())renderAll()});
     document.addEventListener('bf:account-error',e=>error(new Error(e.detail?.message||'Account data could not load.')));

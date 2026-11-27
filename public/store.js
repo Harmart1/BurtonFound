@@ -13,9 +13,9 @@
   let selectedProduct=null,selectedImage=0;
   let cartReturnFocus=null;
   let bag=[];
-  try {bag=JSON.parse(localStorage.getItem('burton_found_bag')||'[]');if(!Array.isArray(bag))bag=[];}catch{bag=[];}
+  try {bag=window.BURTON_ACCOUNT?.getLocalBag?.()||JSON.parse(localStorage.getItem('bf_guest_active_bag_v2')||'[]');if(!Array.isArray(bag))bag=[];}catch{bag=[];}
   bag=[...new Set(bag.filter(s=>bySku.has(s)&&!bySku.get(s)?.cmsOnly))];
-  const saveBag=(fromAccount=false)=>{shippingRequestId++;activeShippingQuote=null;liveOptions=[];const e=document.getElementById('shippingResults');if(e)e.textContent='Bag changed · Compare rates again for an accurate estimate';const t=document.getElementById('shippingEstimateTotal');if(t)t.hidden=true;try{localStorage.setItem('burton_found_bag',JSON.stringify(bag));}catch{}if(!fromAccount)window.BURTON_ACCOUNT?.saveActiveBag?.(bag);};
+  const saveBag=(fromAccount=false)=>{shippingRequestId++;activeShippingQuote=null;liveOptions=[];const e=document.getElementById('shippingResults');if(e)e.textContent='Bag changed · Compare rates again for an accurate estimate';const t=document.getElementById('shippingEstimateTotal');if(t)t.hidden=true;if(!fromAccount){if(window.BURTON_ACCOUNT?.saveActiveBag)window.BURTON_ACCOUNT.saveActiveBag(bag);else try{localStorage.setItem('bf_guest_active_bag_v2',JSON.stringify(bag));}catch{}}};
   window.BURTON_STORE_API={getBag:()=>[...bag],setBag:(next)=>{bag=[...new Set((next||[]).filter(id=>bySku.has(id)&&!bySku.get(id)?.cmsOnly))];saveBag(true);renderProducts();renderCart();}};
   let toastTimer;
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
