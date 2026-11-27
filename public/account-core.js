@@ -6,7 +6,7 @@
   'use strict';
   const cfg=window.BURTON_CONFIG||{};
   let readyToConnect=/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test((cfg.supabaseUrl||'').trim()) && /^(sb_publishable_[\w-]+|eyJ[\w.-]+)$/.test((cfg.supabasePublishableKey||'').trim());
-  const keyWatch='bf_guest_watches',keyBags='bf_guest_saved_bags',keyCart='burton_found_bag';
+  const keyWatch='bf_guest_watches',keyBags='bf_guest_saved_bags',keyCart='bf_guest_active_bag_v2';
   const items=window.BURTON_DATA?.inventory||[];
   const known=new Set(items.map(p=>p.sku));
   const eligibleForBag=new Set(items.filter(p=>!p.cmsOnly).map(p=>p.sku));
@@ -16,7 +16,7 @@
   const write=(key,v)=>{try{localStorage.setItem(key,JSON.stringify(v));}catch{}};
   const emit=(name,detail={})=>document.dispatchEvent(new CustomEvent('bf:'+name,{detail}));
   let client=null,user=null,profile=null,addresses=[],saved=[],watches=new Set(sanitizeSkus(read(keyWatch,[])));
-  let loading=false,connectError='',initPromise=null,cartTimer=null,authSequence=0;
+  let loading=false,connectError='',initPromise=null,cartTimer=null,authSequence=0,authNotice=0,activeBag=[],pendingLoad=null;
   // Capture callback state before Supabase removes the URL fragment.
   const callback=window.BURTON_AUTH_CALLBACK?.inspect(location.href)||{recovery:false,error:false,access:''};
   let recovery=callback.error?'error':callback.recovery?'pending':'none';
@@ -26,52 +26,74 @@
   const redirectTo=()=>window.BURTON_AUTH_CALLBACK?.accountUrl(location.href)||new URL('/account',location.href).href;
   function scrubCallback(){if(!callback.callback)return;try{history.replaceState(null,'',redirectTo());}catch{}}
   const fail=message=>{throw new Error(message)};
-  const demandAuth=()=>{if(!client||!user)fail('Sign in to save this information to your account.');};
+  const demandAuth=()=>{if(!client||!user||recovery!=='none'||loading)fail('Sign in and finish account loading before saving this information.');};
   const check=({error,data})=>{if(error)throw error;return data;};
-  const getLocalBag=()=>sanitizeBagSkus(read(keyCart,[]));
+  const guestBag=()=>sanitizeBagSkus(read(keyCart,[]));
+  const getLocalBag=()=>recovery!=='none'?[]:user?[...activeBag]:guestBag();
+  const current=(seq,id)=>seq===authSequence&&user?.id===id&&recovery==='none';
+  const guard=(seq,id)=>{if(!current(seq,id))fail('Account session changed. Please try again.');};
+  const remove=key=>{try{localStorage.removeItem(key);}catch{}};
   const syncShopBag=next=>{
     const s=sanitizeBagSkus(next);
+    if(recovery==='none'){if(user)activeBag=s;else write(keyCart,s);}
     if(window.BURTON_STORE_API?.setBag)window.BURTON_STORE_API.setBag(s);
-    else write(keyCart,s);
     emit('bag-sync',{bag:s});
   };
   function tell(){emit('account-change',{signedIn:!!user,configured:readyToConnect});emit('watch-change',{count:watches.size});emit('auth-change',{signedIn:!!user});}
   function localWatches(){watches=new Set(sanitizeSkus(read(keyWatch,[])));}
   function guestCarts(){const arr=read(keyBags,[]);return Array.isArray(arr)?arr.map(x=>({id:x.id,title:String(x.title||'Saved bag'),item_skus:sanitizeBagSkus(x.item_skus),created_at:x.created_at})).slice(0,20):[];}
-  async function loadUser(sessionUser){
-    const seq=++authSequence;
-    if(!sessionUser){
-      user=null;profile=null;addresses=[];saved=[];loading=false;localWatches();syncShopBag([]);tell();return;
-    }
-    if(user?.id!==sessionUser.id){profile=null;addresses=[];saved=[];watches=new Set();}
-    user=sessionUser;
+  function loadUser(sessionUser){
+    if(sessionUser&&pendingLoad?.id===sessionUser.id&&pendingLoad.seq===authSequence&&recovery==='none')return pendingLoad.promise;
+    const seq=++authSequence,id=sessionUser?.id;
+    clearTimeout(cartTimer);cartTimer=null;
+    pendingLoad=null;
+    const switched=user?.id!==id;
+    if(!sessionUser||switched||recovery!=='none'){profile=null;addresses=[];saved=[];activeBag=[];watches=new Set();}
+    user=sessionUser||null;
+    // Old releases shared the private cart with the guest cart. Never import that
+    // ambiguous cache into a different account; server-side saved carts are retained.
+    remove('burton_found_bag');
+    if(recovery!=='none'){loading=false;syncShopBag([]);tell();return Promise.resolve();}
+    if(!user){loading=false;localWatches();syncShopBag(guestBag());tell();return Promise.resolve();}
+    if(switched)syncShopBag([]);
     loading=true;tell();
-    try{
-      const [profileRes,addressRes,watchRes,cartRes,savedRes]=await Promise.all([
-        client.from('collector_profiles').select('*').eq('user_id',user.id).maybeSingle(),
-        client.from('collector_addresses').select('*').eq('user_id',user.id).order('is_default',{ascending:false}),
-        client.from('collector_watchlist').select('sku').eq('user_id',user.id),
-        client.from('collector_active_carts').select('item_skus').eq('user_id',user.id).maybeSingle(),
-        client.from('collector_saved_carts').select('*').eq('user_id',user.id).order('updated_at',{ascending:false})
-      ]);
-      if(seq!==authSequence)return;
-      for(const r of [profileRes,addressRes,watchRes,cartRes,savedRes])if(r.error)throw r.error;
-      profile=profileRes.data||null;addresses=addressRes.data||[];saved=savedRes.data||[];
-      const newWatches=sanitizeSkus([...(watchRes.data||[]).map(x=>x.sku),...read(keyWatch,[])]);
-      const imported=newWatches.filter(s=>!(watchRes.data||[]).some(x=>x.sku===s));
-      if(imported.length)check(await client.from('collector_watchlist').upsert(imported.map(sku=>({user_id:user.id,sku})),{onConflict:'user_id,sku'}));
-      watches=new Set(newWatches);localStorage.removeItem(keyWatch);
-      const cart=sanitizeBagSkus([...(cartRes.data?.item_skus||[]),...getLocalBag()]);
-      syncShopBag(cart);await saveActiveBagNow(cart);
-      const localSaved=guestCarts();
-      if(localSaved.length){
-        for(const bag of localSaved)await client.from('collector_saved_carts').insert({user_id:user.id,title:bag.title,item_skus:bag.item_skus});
-        localStorage.removeItem(keyBags);
-        const refreshed=check(await client.from('collector_saved_carts').select('*').eq('user_id',user.id).order('updated_at',{ascending:false}));saved=refreshed||[];
-      }
-      connectError='';
-    }catch(e){connectError=e.message||'Account data could not be loaded';emit('account-error',{message:connectError});}
-    finally{loading=false;tell();}
+    const promise=(async()=>{
+      try{
+        const [profileRes,addressRes,watchRes,cartRes,savedRes]=await Promise.all([
+          client.from('collector_profiles').select('*').eq('user_id',id).maybeSingle(),
+          client.from('collector_addresses').select('*').eq('user_id',id).order('is_default',{ascending:false}),
+          client.from('collector_watchlist').select('sku').eq('user_id',id),
+          client.from('collector_active_carts').select('item_skus').eq('user_id',id).maybeSingle(),
+          client.from('collector_saved_carts').select('*').eq('user_id',id).order('updated_at',{ascending:false})
+        ]);
+        if(!current(seq,id))return;
+        for(const r of [profileRes,addressRes,watchRes,cartRes,savedRes])if(r.error)throw r.error;
+        const guestWatches=sanitizeSkus(read(keyWatch,[]));
+        const newWatches=sanitizeSkus([...(watchRes.data||[]).map(x=>x.sku),...guestWatches]);
+        const imported=newWatches.filter(s=>!(watchRes.data||[]).some(x=>x.sku===s));
+        if(imported.length){check(await client.from('collector_watchlist').upsert(imported.map(sku=>({user_id:id,sku})),{onConflict:'user_id,sku'}));if(!current(seq,id))return;}
+        if(guestWatches.length)remove(keyWatch);
+        const guest=guestBag(),cart=sanitizeBagSkus([...(cartRes.data?.item_skus||[]),...guest]);
+        if(guest.length){
+          check(await client.from('collector_active_carts').upsert({user_id:id,item_skus:cart},{onConflict:'user_id'}));
+          if(!current(seq,id))return;
+          remove(keyCart);
+        }
+        let nextSaved=savedRes.data||[];
+        const localSaved=guestCarts();
+        if(localSaved.length){
+          for(const bag of localSaved){if(!current(seq,id))return;check(await client.from('collector_saved_carts').insert({user_id:id,title:bag.title,item_skus:bag.item_skus}));if(!current(seq,id))return;}
+          nextSaved=check(await client.from('collector_saved_carts').select('*').eq('user_id',id).order('updated_at',{ascending:false}))||[];
+          if(!current(seq,id))return;
+          remove(keyBags);
+        }
+        if(!current(seq,id))return;
+        profile=profileRes.data||null;addresses=addressRes.data||[];saved=nextSaved;watches=new Set(newWatches);syncShopBag(cart);connectError='';
+      }catch(e){if(current(seq,id)){connectError=e.message||'Account data could not be loaded';emit('account-error',{message:connectError});}}
+      finally{if(current(seq,id)){loading=false;pendingLoad=null;tell();}}
+    })();
+    pendingLoad={id,seq,promise};
+    return promise;
   }
   async function injectSDK(){
     if(window.supabase?.createClient)return;
@@ -110,10 +132,14 @@
             // Record the recovery event synchronously, outside asynchronous profile loading.
             if(event==='PASSWORD_RECOVERY'&&session?.user&&session?.access_token){recovery='ready';callbackAccess='';}
             if(event==='SIGNED_OUT'&&recovery==='ready')recovery='error';
+            // Invalidate pending writes as soon as identity or recovery changes.
+            const notice=++authNotice;
+            if(event==='SIGNED_OUT'||event==='PASSWORD_RECOVERY'||session?.user?.id!==user?.id){++authSequence;clearTimeout(cartTimer);cartTimer=null;}
             // Avoid calls into Supabase's auth API while the auth callback holds the lock.
             setTimeout(()=>{
+              if(notice!==authNotice)return;
               if(event==='SIGNED_OUT')loadUser(null);
-              else if(session?.user && (session.user.id!==user?.id || event==='SIGNED_IN'))loadUser(session.user);
+              else if(session?.user && (session.user.id!==user?.id || event==='PASSWORD_RECOVERY'||recovery!=='none'||(loading&&pendingLoad?.seq!==authSequence)))loadUser(session.user);
               else if(session?.user){user=session.user;tell();}
               if(event==='PASSWORD_RECOVERY')emit('recovery-state',{state:recovery});
             },0);
@@ -149,15 +175,15 @@
   }
   async function signOut(){
     demandAuth();check(await client.auth.signOut({scope:'local'}));await loadUser(null);
-    try{localStorage.removeItem(keyCart);}catch{}
+    // A sign-out must not delete an independently saved guest cart.
   }
   async function forgotPassword(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resetPasswordForEmail(String(email).trim(),{redirectTo:redirectTo()}));}
   async function resendConfirmation(email){await init();if(!client)fail('Account email is not connected yet.');check(await client.auth.resend({type:'signup',email:String(email).trim(),options:{emailRedirectTo:redirectTo()}}));}
-  async function finishRecovery(password){if(recovery!=='ready'||!client||!user)fail('Request a fresh reset link before changing your password.');if(typeof password!=='string'||password.length<10)fail('Choose a password with at least 10 characters.');check(await client.auth.updateUser({password}));recovery='none';callbackAccess='';try{await client.auth.signOut({scope:'local'});}catch{}await loadUser(null);scrubCallback();emit('recovery-state',{state:recovery});}
-  async function cancelRecovery(){recovery='none';callbackAccess='';if(client&&user){check(await client.auth.signOut({scope:'local'}));await loadUser(null);}scrubCallback();emit('recovery-state',{state:recovery});}
+  async function finishRecovery(password){if(recovery!=='ready'||!client||!user)fail('Request a fresh reset link before changing your password.');if(typeof password!=='string'||password.length<10)fail('Choose a password with at least 10 characters.');check(await client.auth.updateUser({password}));recovery='none';callbackAccess='';try{check(await client.auth.signOut({scope:'local'}));}catch{recovery='error';emit('recovery-state',{state:recovery});fail('Password changed, but secure sign-out failed. Close the recovery session before signing in again.');}await loadUser(null);scrubCallback();emit('recovery-state',{state:recovery});}
+  async function cancelRecovery(){if(client&&user){check(await client.auth.signOut({scope:'local'}));}recovery='none';callbackAccess='';await loadUser(null);scrubCallback();emit('recovery-state',{state:recovery});}
   async function updatePassword(password){demandAuth();check(await client.auth.updateUser({password}));}
   async function updateEmail(email){demandAuth();check(await client.auth.updateUser({email:email.trim()}));}
-  async function updateProfile(data){demandAuth();
+  async function updateProfile(data){demandAuth();const seq=authSequence,id=user.id;
     const fields={
       full_name:String(data.full_name||'').trim().slice(0,100),phone:String(data.phone||'').trim().slice(0,35),
       age_range:String(data.age_range||'').slice(0,25),collecting_experience:String(data.collecting_experience||'').slice(0,40),
@@ -165,49 +191,64 @@
       interests:(Array.isArray(data.interests)?data.interests:[]).filter(x=>typeof x==='string').slice(0,8),
       newsletter_opt_in:data.newsletter_opt_in===undefined?!!profile?.newsletter_opt_in:!!data.newsletter_opt_in
     };
-    const result=check(await client.from('collector_profiles').upsert({user_id:user.id,...fields},{onConflict:'user_id'}).select().single());profile=result;emit('account-change');return result;
+    const result=check(await client.from('collector_profiles').upsert({user_id:id,...fields},{onConflict:'user_id'}).select().single());guard(seq,id);profile=result;emit('account-change');return result;
   }
-  async function saveAddress(data){demandAuth();
-    const v={user_id:user.id,label:String(data.label||'Home').slice(0,36),recipient:String(data.recipient||'').trim().slice(0,120),line1:String(data.line1||'').trim().slice(0,160),line2:String(data.line2||'').trim().slice(0,160),city:String(data.city||'').trim().slice(0,80),region:String(data.region||'').trim().slice(0,80),postal_code:String(data.postal_code||'').trim().slice(0,25),country:String(data.country||'Canada').slice(0,60),is_default:!!data.is_default};
+  async function saveAddress(data){demandAuth();const seq=authSequence,id=user.id;
+    const v={user_id:id,label:String(data.label||'Home').slice(0,36),recipient:String(data.recipient||'').trim().slice(0,120),line1:String(data.line1||'').trim().slice(0,160),line2:String(data.line2||'').trim().slice(0,160),city:String(data.city||'').trim().slice(0,80),region:String(data.region||'').trim().slice(0,80),postal_code:String(data.postal_code||'').trim().slice(0,25),country:String(data.country||'Canada').slice(0,60),is_default:!!data.is_default};
     if(!v.line1||!v.city||!v.postal_code||!v.recipient)fail('Recipient, street address, city and postal code are required.');
-    if(v.is_default){const {error}=await client.from('collector_addresses').update({is_default:false}).eq('user_id',user.id).eq('is_default',true);if(error)throw error;}
+    if(v.is_default){const {error}=await client.from('collector_addresses').update({is_default:false}).eq('user_id',id).eq('is_default',true);if(error)throw error;guard(seq,id);}
     if(data.id)v.id=data.id;
     const result=check(await client.from('collector_addresses').upsert(v).select().single());
-    addresses=check(await client.from('collector_addresses').select('*').eq('user_id',user.id).order('is_default',{ascending:false}));emit('account-change');return result;
+    guard(seq,id);const next=check(await client.from('collector_addresses').select('*').eq('user_id',id).order('is_default',{ascending:false}));guard(seq,id);addresses=next;emit('account-change');return result;
   }
-  async function deleteAddress(id){demandAuth();check(await client.from('collector_addresses').delete().eq('id',id).eq('user_id',user.id));addresses=addresses.filter(a=>a.id!==id);emit('account-change');}
+  async function deleteAddress(id){demandAuth();const seq=authSequence,uid=user.id;check(await client.from('collector_addresses').delete().eq('id',id).eq('user_id',uid));guard(seq,uid);addresses=addresses.filter(a=>a.id!==id);emit('account-change');}
   async function toggleWatch(sku){
-    if(!known.has(sku))return false;
+    if(!known.has(sku)||recovery!=='none'||loading)return false;
+    const seq=authSequence,id=user?.id;
     const previously=watches.has(sku);
     if(previously)watches.delete(sku);else watches.add(sku);
     emit('watch-change',{count:watches.size});
     if(!user||!client){write(keyWatch,[...watches]);return !previously;}
-    try{const result=previously?await client.from('collector_watchlist').delete().eq('user_id',user.id).eq('sku',sku):await client.from('collector_watchlist').upsert({user_id:user.id,sku},{onConflict:'user_id,sku'});check(result);}
-    catch(e){if(previously)watches.add(sku);else watches.delete(sku);emit('watch-change',{count:watches.size});emit('account-error',{message:'Could not save watchlist: '+e.message});}
+    try{const result=previously?await client.from('collector_watchlist').delete().eq('user_id',id).eq('sku',sku):await client.from('collector_watchlist').upsert({user_id:id,sku},{onConflict:'user_id,sku'});check(result);if(!current(seq,id))return false;}
+    catch(e){if(!current(seq,id))return false;if(previously)watches.add(sku);else watches.delete(sku);emit('watch-change',{count:watches.size});emit('account-error',{message:'Could not save watchlist: '+e.message});}
     return watches.has(sku);
   }
-  async function saveActiveBagNow(skus){if(!user||!client)return;check(await client.from('collector_active_carts').upsert({user_id:user.id,item_skus:sanitizeBagSkus(skus)},{onConflict:'user_id'}));}
-  function saveActiveBag(skus){if(!user||!client)return;clearTimeout(cartTimer);cartTimer=setTimeout(()=>saveActiveBagNow(skus).catch(e=>emit('account-error',{message:'Could not sync shopping bag: '+e.message})),350);}
+  function saveActiveBag(skus){
+    if(recovery!=='none')return;
+    const next=sanitizeBagSkus(skus);
+    if(!user||!client){write(keyCart,next);return;}
+    if(loading)return;
+    activeBag=next;
+    const seq=authSequence,id=user.id;
+    clearTimeout(cartTimer);
+    cartTimer=setTimeout(async()=>{
+      if(!current(seq,id))return;
+      try{check(await client.from('collector_active_carts').upsert({user_id:id,item_skus:next},{onConflict:'user_id'}));}
+      catch(e){if(current(seq,id))emit('account-error',{message:'Could not sync shopping bag: '+e.message});}
+    },350);
+  }
   async function saveNamedBag(name,skus){
+    if(recovery!=='none'||loading)fail('Finish account loading or recovery first.');
     const title=String(name||'Saved paper bag').trim().slice(0,60)||'Saved paper bag',item_skus=sanitizeBagSkus(skus);
     if(!item_skus.length)fail('Add at least one item to your bag before saving.');
-    if(user&&client){const result=check(await client.from('collector_saved_carts').insert({user_id:user.id,title,item_skus}).select().single());saved=[result,...saved];emit('account-change');return result;}
+    if(user&&client){const seq=authSequence,id=user.id;const result=check(await client.from('collector_saved_carts').insert({user_id:id,title,item_skus}).select().single());guard(seq,id);saved=[result,...saved];emit('account-change');return result;}
     const local=guestCarts();const value={id:'guest-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),title,item_skus,created_at:new Date().toISOString()};
     write(keyBags,[value,...local]);emit('account-change');return value;
   }
   async function deleteNamedBag(id){
-    if(user&&client){check(await client.from('collector_saved_carts').delete().eq('id',id).eq('user_id',user.id));saved=saved.filter(x=>x.id!==id);}
+    if(recovery!=='none'||loading)fail('Finish account loading or recovery first.');
+    if(user&&client){const seq=authSequence,uid=user.id;check(await client.from('collector_saved_carts').delete().eq('id',id).eq('user_id',uid));guard(seq,uid);saved=saved.filter(x=>x.id!==id);}
     else write(keyBags,guestCarts().filter(x=>x.id!==id));
     emit('account-change');
   }
-  function restoreBag(item_skus){const safe=sanitizeBagSkus(item_skus);syncShopBag(safe);saveActiveBag(safe);}
+  function restoreBag(item_skus){if(recovery!=='none'||loading)return;const safe=sanitizeBagSkus(item_skus);syncShopBag(safe);saveActiveBag(safe);}
   async function exportData(){demandAuth();
     const packet={exported_at:new Date().toISOString(),email:user.email,profile,addresses,watchlist:[...watches],saved_carts:saved,active_cart:getLocalBag()};
     return new Blob([JSON.stringify(packet,null,2)],{type:'application/json'});
   }
-  async function deleteMyAccount(){demandAuth();check(await client.rpc('delete_my_account'));try{await client.auth.signOut({scope:'local'});}catch{}await loadUser(null);localStorage.removeItem(keyCart);}
-  async function authToken(){if(!client||!user)return null;const {data,error}=await client.auth.getSession();return error?null:data?.session?.access_token||null;}
-  const API={authToken,init,recoveryState,finishRecovery,cancelRecovery,resendConfirmation,ready:()=>initPromise||init(),configured:()=>readyToConnect,connected:()=>!!client,connectionError:()=>connectError,isLoading:()=>loading,user:()=>user,profile:()=>profile,addresses:()=>[...addresses],savedCarts:()=>user?[...saved]:guestCarts(),isWatching:sku=>watches.has(sku),watchedSkus:()=>[...watches],watchCount:()=>watches.size,toggleWatch,signUp,signIn,signOut,forgotPassword,updatePassword,updateEmail,updateProfile,saveAddress,deleteAddress,saveActiveBag,saveNamedBag,deleteNamedBag,restoreBag,exportData,deleteMyAccount,getLocalBag,getInventory:()=>[...items]};
+  async function deleteMyAccount(){demandAuth();check(await client.rpc('delete_my_account'));try{await client.auth.signOut({scope:'local'});}catch{}await loadUser(null);}
+  async function authToken(){if(!client||!user||recovery!=='none')return null;const seq=authSequence,id=user.id;const {data,error}=await client.auth.getSession();return error||!current(seq,id)||data?.session?.user?.id!==id?null:data.session.access_token||null;}
+  const API={authToken,sessionVersion:()=>authSequence,init,recoveryState,finishRecovery,cancelRecovery,resendConfirmation,ready:()=>initPromise||init(),configured:()=>readyToConnect,connected:()=>!!client,connectionError:()=>connectError,isLoading:()=>loading,user:()=>user,profile:()=>profile,addresses:()=>[...addresses],savedCarts:()=>user?[...saved]:guestCarts(),isWatching:sku=>watches.has(sku),watchedSkus:()=>[...watches],watchCount:()=>watches.size,toggleWatch,signUp,signIn,signOut,forgotPassword,updatePassword,updateEmail,updateProfile,saveAddress,deleteAddress,saveActiveBag,saveNamedBag,deleteNamedBag,restoreBag,exportData,deleteMyAccount,getLocalBag,getInventory:()=>[...items]};
   window.BURTON_ACCOUNT=API;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
