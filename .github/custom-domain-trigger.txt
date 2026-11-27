@@ -1,1 +1,1 @@
-2026-11-27 — owner confirmed registrar nameservers updated to amos.ns.cloudflare.com and destiny.ns.cloudflare.com; recheck delegation and attach safe apex if active.
+2026-11-27 — owner confirmed Cloudflare active; verify exact nameserver delegation and attach existing Worker safely.
