@@ -1,0 +1,32 @@
+name: Connect Burton & Found custom domain safely
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        type: boolean
+        description: Attach only burtonandfound.ca to existing Worker after active zone and conflict checks
+        default: false
+  push:
+    branches: [main]
+    paths: ['.github/custom-domain-trigger.txt']
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-worker-deployment
+  cancel-in-progress: false
+jobs:
+  connect-domain:
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm) || (github.event_name == 'push' && github.event.head_commit.message == 'Connect owner-authorized burtonandfound.ca domain'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate preview release and domain setup script
+        run: |
+          node scripts/assert-preview-release.mjs
+          python3 -m py_compile scripts/connect-custom-domain.py
+      - name: Inspect exact zone and attach safe apex only
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 scripts/connect-custom-domain.py

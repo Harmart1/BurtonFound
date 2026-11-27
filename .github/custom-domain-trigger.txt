@@ -1,0 +1,1 @@
+2026-11-27 — owner confirmed burtonandfound.ca; connect existing Worker only if verified active zone and no conflicting DNS.
