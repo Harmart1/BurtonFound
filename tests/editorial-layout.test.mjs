@@ -7,7 +7,7 @@ test('Four visual collection choices include priced automobile listings without 
  const html=read('public/index.html');
  for(const cls of ['spotlight-coke','spotlight-hollywood','spotlight-sets','spotlight-cars'])assert.match(html,new RegExp('class="spotlight '+cls+'"'));
  assert.equal((html.match(/class="spotlight spotlight-/g)||[]).length,4);
- assert.match(html,/href="vintage-cars\.html"/);
+ assert.match(html,/href="vintage-cars\.html"/);assert.match(html,/href="\/collections\/automobiles\.html"/);
  assert.match(html,/AUTOMOTIVE ARCHIVE/);
  assert.match(html,/Add your favourites to the bag/);
  assert.match(html,/data-shop-hollywood-sets/);

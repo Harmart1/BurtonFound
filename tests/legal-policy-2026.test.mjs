@@ -62,14 +62,14 @@ test('Every static visitor-facing page links to all policies with a safe modal f
   assert.match(account,/<a href="\/policies\/privacy\.html" data-policy="privacy">full Privacy Policy<\/a>/);
 });
 test('Generated collectible detail, gift, collection and guide pages expose the policies',()=>{
-  for(const p of ['public/collections/coca-cola.html','public/collections/hollywood.html','public/collections/sets.html','public/gifts/vintage-gifts-for-collectors.html','public/guides/caring-for-vintage-paper.html']){
+  for(const p of ['public/collections/coca-cola.html','public/collections/hollywood.html','public/collections/automobiles.html','public/collections/sets.html','public/gifts/vintage-gifts-for-collectors.html','public/guides/caring-for-vintage-paper.html']){
     const html=read(p);
     assert.match(html,/src="\/policy-modal\.js"/);
     for(const slug of slugs)assert.ok(html.includes('data-policy="'+slug+'"'),p+' '+slug);
   }
   const urls=JSON.parse(read('public/product-links.js').match(/window\.BURTON_PRODUCT_LINKS = (\{[\s\S]*\});/)[1]);
-  assert.equal(Object.keys(urls).length,131);
-  for(const path of Object.values(urls).slice(0,10)){
+  assert.equal(Object.keys(urls).length,229);
+  for(const path of Object.values(urls)){
     const html=read('public'+path);
     assert.match(html,/data-policy="privacy"/);
     assert.match(html,/data-policy="terms"/);

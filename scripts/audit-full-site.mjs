@@ -48,7 +48,7 @@ for(const p of products){
  for(const photo of new Set(photos))local(photo,resolve(site,'index.html'),src,{image:true});
  if(links[id]){bucket.seo++;local(links[id],resolve(site,'index.html'),src+' product landing page');}
  else if(!enquiry)fail(src+' sale-catalogue landing page missing');
- if(enquiry&&links[id])warn(src+' enquiry-only landing page needs truthful stock labelling');
+ if(enquiry&&links[id]){const landing=resolve(site,links[id].replace(/^\//,''));if(existsSync(landing)){const html=readFileSync(landing,'utf8');if(!html.includes('Enquiry only · physical inventory unverified')||!html.includes('noindex,follow')||html.includes('"@type":"Offer"')||html.includes('data-bf-stock-sku='))fail(src+' enquiry page lacks required stock safeguards');}}
 }
 for(const id of Object.keys(links))if(!ids.has(id))fail('Product link points to unknown SKU '+id);
 const walk=d=>readdirSync(d,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(resolve(d,x.name)):[resolve(d,x.name)]);
