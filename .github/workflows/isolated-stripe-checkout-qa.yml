@@ -1,0 +1,82 @@
+name: Isolated Stripe checkout QA
+on:
+  workflow_dispatch:
+    inputs:
+      provider_test:
+        type: boolean
+        description: "Authorize isolated Stripe TEST checkout creation, expiration, test payment and test refund"
+        default: false
+  pull_request:
+    paths:
+      - 'functions/api/checkout.js'
+      - 'functions/api/stripe-webhook.js'
+      - 'functions/api/checkout-status.js'
+      - 'functions/_lib/**'
+      - 'supabase/migrations/**'
+      - 'tests/sandbox-checkout/**'
+      - 'scripts/isolated-checkout-qa.mjs'
+      - 'scripts/stripe-sandbox-provider-qa.py'
+      - '.github/workflows/isolated-stripe-checkout-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'functions/api/checkout.js'
+      - 'functions/api/stripe-webhook.js'
+      - 'functions/api/checkout-status.js'
+      - 'functions/_lib/**'
+      - 'supabase/migrations/**'
+      - 'tests/sandbox-checkout/**'
+      - 'scripts/isolated-checkout-qa.mjs'
+      - 'scripts/stripe-sandbox-provider-qa.py'
+      - '.github/workflows/isolated-stripe-checkout-qa.yml'
+      - '.github/isolated-stripe-qa-trigger.txt'
+permissions:
+  contents: read
+concurrency:
+  group: bf-isolated-stripe-qa
+  cancel-in-progress: false
+jobs:
+  local-checkout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      db:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: disposable-fixture-only
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Rebuild real schema in disposable PostgreSQL and run local checkout handlers
+        env:
+          FIXTURE_CONTAINER: ${{ job.services.db.id }}
+        run: |
+          set -euo pipefail
+          docker exec "$FIXTURE_CONTAINER" createdb -U postgres bf_checkout_fixture
+          docker exec -i "$FIXTURE_CONTAINER" psql -X -v ON_ERROR_STOP=1 -U postgres -d bf_checkout_fixture < tests/recovery/bootstrap.sql
+          for file in supabase/migrations/*.sql; do
+            docker exec -i "$FIXTURE_CONTAINER" psql -X -v ON_ERROR_STOP=1 -U postgres -d bf_checkout_fixture < "$file"
+          done
+          docker exec -i "$FIXTURE_CONTAINER" psql -X -v ON_ERROR_STOP=1 -U postgres -d bf_checkout_fixture < tests/sandbox-checkout/seed.sql
+          node scripts/isolated-checkout-qa.mjs
+  stripe-provider-test:
+    needs: local-checkout
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.provider_test) || (github.event_name == 'push' && github.event.head_commit.message == 'Run isolated Stripe sandbox integration check'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm committed preview safety flags
+        run: node scripts/assert-preview-release.mjs
+      - name: Run isolated Stripe test API lifecycle
+        env:
+          BF_TEST_KEY: ${{ secrets.BF_STRIPE_TEST_SECRET_KEY }}
+          BF_TEST_WEBHOOK: ${{ secrets.BF_STRIPE_TEST_WEBHOOK_SECRET }}
+        run: python3 scripts/stripe-sandbox-provider-qa.py

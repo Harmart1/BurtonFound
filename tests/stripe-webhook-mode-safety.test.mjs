@@ -41,3 +41,11 @@ test('authenticated malformed and non-checkout events never invoke database writ
   assert.equal(calls,0);
  }finally{globalThis.fetch=before;}
 });
+
+test('signed test-only QA sessions are acknowledged without production writes; live sessions cannot bypass payment processing',async()=>{
+ const fields={metadata:{bf_isolated_qa:'burtonfound-sandbox-v1'}};
+ for(const type of ['checkout.session.completed','checkout.session.expired','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','bf.integration.isolation_probe'])assert.equal(act(event(type,fields)),'qa-isolated');
+ assert.equal(act(event(undefined,{...fields,id:'cs_live_fixture',livemode:true},{livemode:true}),{...env,STRIPE_WEBHOOK_MODE:'live'}),'paid');
+ const old=globalThis.fetch;globalThis.fetch=()=>{throw Error('QA must not call database');};
+ try{const payload=JSON.stringify(event(undefined,fields)),ts=Math.floor(Date.now()/1000),key=await crypto.subtle.importKey('raw',new TextEncoder().encode(env.STRIPE_WEBHOOK_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']),sig=Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(ts+'.'+payload)))).map(x=>x.toString(16).padStart(2,'0')).join('');const r=await webhook({request:new Request('https://fixture.test/api/stripe-webhook',{method:'POST',body:payload,headers:{'Stripe-Signature':'t='+ts+',v1='+sig}}),env});assert.deepEqual(await r.json(),{received:true,qa_isolated:true});}finally{globalThis.fetch=old;}
+});
