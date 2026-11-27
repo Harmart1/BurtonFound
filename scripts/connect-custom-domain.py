@@ -41,8 +41,19 @@ def public_check(origin):
         j=json.loads(body)
         return r.returncode==0 and code=="200" and j.get("service")=="Burton & Found" and j.get("checkout")=="preview_only"
     except (ValueError,AttributeError):return False
+def dns_status(host):
+    for typ in ("A","AAAA","CNAME"):
+        try:
+            req=urllib.request.Request("https://dns.google/resolve?"+urllib.parse.urlencode({"name":host,"type":typ}),headers={"Accept":"application/dns-json"})
+            with opener.open(req,timeout=12) as r:j=json.load(r)
+            count=sum(1 for x in j.get("Answer",[]) if x.get("type")=={"A":1,"AAAA":28,"CNAME":5}[typ])
+            print("Public DNS "+host+" "+typ+": status="+str(j.get("Status"))+" records="+str(count))
+        except Exception:print("Public DNS "+host+" "+typ+": lookup unavailable")
 def main():
     ns=ns_lookup()
+    for host in (DOMAIN,"www."+DOMAIN):
+        dns_status(host)
+        print("Public HTTPS "+host+": "+("PASS Burton & Found preview-only health" if public_check("https://"+host) else "not verified"))
     ensure(token,"Missing Cloudflare deployment token")
     ensure(public_check(OLD),"Existing preview health not confirmed; no routing changes")
     ids=re.findall(r"(?<![a-fA-F0-9])[a-fA-F0-9]{32}(?![a-fA-F0-9])",os.environ.get("CF_ACCOUNT_HINT",""))
@@ -65,11 +76,14 @@ def main():
     path="/accounts/"+account+"/workers/domains"
     existing=request(path+"?"+urllib.parse.urlencode({"hostname":DOMAIN}))["result"]
     target=[v for v in existing if v.get("hostname")==DOMAIN]
+    print('Exact apex Worker bindings: '+str(len(target)))
     if target:
         ensure(len(target)==1 and target[0].get("service")==WORKER and target[0].get("zone_id")==zone and target[0].get("enabled") is True,"BLOCKED: existing hostname binding belongs elsewhere or is disabled")
         print("PASS apex hostname already attached to intended Worker")
     else:
-        records=request("/zones/"+zone+"/dns_records?"+urllib.parse.urlencode({"name.exact":DOMAIN,"per_page":100}))
+        try:records=request("/zones/"+zone+"/dns_records?"+urllib.parse.urlencode({"name.exact":DOMAIN,"per_page":100}))
+        except RuntimeError as e:
+            raise RuntimeError(str(e)+"; BLOCKED: DNS Read permission required to check conflicts before attachment. Use dashboard Custom Domain or scoped token. No DNS mutation.") from None
         ensure(not records.get("result_info",{}).get("total_pages",1)>1,"BLOCKED: DNS inventory incomplete")
         conflicts=[x for x in records["result"] if x.get("name")==DOMAIN and x.get("type") in ("A","AAAA","CNAME","HTTPS","SVCB")]
         ensure(not conflicts,"BLOCKED: existing apex website DNS records require owner review; no records overwritten")

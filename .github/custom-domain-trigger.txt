@@ -1,1 +1,1 @@
-2026-11-27 — owner confirmed Cloudflare active; verify exact nameserver delegation and attach existing Worker safely.
+2026-11-27 — owner reported branded website unavailable; diagnose exact apex and www public DNS/HTTPS and verify Worker routing; attach only after existing conflict and permission checks.
