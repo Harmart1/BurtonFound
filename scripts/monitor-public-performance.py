@@ -8,7 +8,7 @@ ROOT=Path(__file__).resolve().parent.parent
 ALLOWED={"https://burtonfound.timharmar.workers.dev","https://burtonandfound.ca"}
 TARGETS=[
  ("Home","/",b"Browse the collection",850_000),
- ("Automobile collection","/collections/automobiles",b"Vintage Automobile Advertising",850_000),
+ ("Automobile collection","/collections/automobiles.html",b"Vintage Automobile Advertising",850_000),
  ("Account","/account",b"signInForm",600_000),
  ("Health API","/api/health",b"Burton & Found",25_000),
  ("Catalogue API","/api/catalog",b'"items"',250_000),

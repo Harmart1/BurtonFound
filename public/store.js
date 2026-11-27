@@ -178,12 +178,12 @@
     const estimator=$('shippingEstimator');if(estimator)estimator.hidden=!bag.length||enquiryOnly||shippingMode!=='live_carrier';
     if(enquiryOnly){
       $('cartSubtotal').textContent=money(bag.reduce((n,id)=>n+(bySku.get(id)?.price||0),0));
-      b.innerHTML=(C.sellerEmail?'Email purchase request':'Copy purchase request')+' <span>↗</span>';
+      b.innerHTML='Prepare purchase enquiry'+' <span>↗</span>';
       $('checkoutHelp').textContent='Your automobile selections are in the bag at their listed CAD prices. Send or copy a purchase request to arrange next steps; no payment is taken on this site.';
     }
     else if(checkoutReady){b.innerHTML=(checkoutMode==='test_mode'?'Stripe test checkout':'Secure checkout with Stripe')+' <span>↗</span>';$('checkoutHelp').textContent=checkoutMode==='test_mode'?'TEST MODE ONLY · No real payments. Use Stripe test card details.':shippingMode==='live_carrier'?'Select a shipping quote, then enter the SAME destination at Stripe checkout. Different details will hold your paid order for review.':'Shipping and any configured taxes are shown before payment. Inventory is checked again securely.';}
-    else if(C.sellerEmail){b.innerHTML='Email a purchase request <span>↗</span>';$('checkoutHelp').textContent='Online payment is not yet available. We will confirm availability and shipping before proceeding.';}
-    else {b.innerHTML='Copy purchase request <span>↗</span>';$('checkoutHelp').textContent='Online payments are not enabled. You may save your bag or copy a purchase request; no payment is taken.';}
+    else if(C.sellerEmail){b.innerHTML='Prepare purchase enquiry <span>↗</span>';$('checkoutHelp').textContent='Online payment is not yet available. We will confirm availability and shipping before proceeding.';}
+    else {b.innerHTML='Prepare purchase enquiry <span>↗</span>';$('checkoutHelp').textContent='Online payments are not enabled. You may save your bag or copy a purchase request; no payment is taken.';}
     if(bagHasOverlappingUnits())$('checkoutHelp').textContent='Two selections contain the same pictured page. Remove one selection before proceeding.';
     else if(bag.some(sku=>bySku.get(sku)?.stockState==='unavailable'))$('checkoutHelp').textContent='An item in your bag is sold or reserved. Remove it before checking out.';
   }
@@ -218,12 +218,11 @@
       finally{btn.disabled=false;renderCart();}
       return;
     }
-    let lines=bag.map(s=>{let p=bySku.get(s);return `${p.sku} — ${p.title} — ${money(p.price)}`;});
-    const msg=`Hello Burton & Found,\n\nI'm interested in the following original paper items:\n\n${lines.join('\n')}\n\nListed subtotal: ${money(bag.reduce((s,id)=>s+bySku.get(id).price,0))} CAD (excluding shipping/taxes).\n\nPlease advise on purchasing arrangements, packaging, shipping, taxes and next steps. This request does not take payment or reserve items.\n\nThank you.`;
-    if(C.sellerEmail){window.location.href=`mailto:${encodeURIComponent(C.sellerEmail)}?subject=${encodeURIComponent('Vintage paper purchase enquiry')}&body=${encodeURIComponent(msg)}`;toast('Your email app will open. No payment has been taken.');return;}
-    try{await navigator.clipboard.writeText(msg);toast('Purchase request copied. Add a seller email to enable sending enquiries.');}catch{
-      const ta=document.createElement('textarea');ta.value=msg;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Purchase request copied to clipboard.');}catch{toast('Configure a seller email in config.js to accept enquiries.');}ta.remove();
-    }
+    if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Remove sold or reserved items first.');return;}
+    const selection=bag.map(id=>bySku.get(id)).filter(Boolean);
+    closeCart();
+    window.BURTON_ENQUIRY?.open(selection,C.sellerEmail);
+
   }
   function galleryImages(p){return p.type==='bundle'?[p.image,...p.images]:p.images;}
   function renderDetailImage(){if(!selectedProduct)return;const imgs=galleryImages(selectedProduct);const hero=$('detailHeroImage');if(!hero)return;hero.src=imgs[selectedImage];hero.alt=selectedProduct.type==='bundle'?`Photo ${selectedImage+1} of ${selectedProduct.catalogIds.length+1} in ${selectedProduct.title}`:selectedProduct.shortDescription;document.querySelectorAll('[data-thumb]').forEach(b=>{b.classList.toggle('active',Number(b.dataset.thumb)===selectedImage);b.setAttribute('aria-pressed',Number(b.dataset.thumb)===selectedImage?'true':'false');});}
@@ -310,7 +309,7 @@
     $('zoomDialog').addEventListener('click',e=>{if(e.target===$('zoomDialog'))$('zoomDialog').close();});
     $('productDetails').addEventListener('click',e=>{if(e.target.closest('[data-watch]')){window.BURTON_ACCOUNT?.toggleWatch?.(e.target.closest('[data-watch]').dataset.watch);return;}if(e.target.closest('#detailZoom')){let big=$('detailHeroImage');$('zoomImage').src=big.src;$('zoomImage').alt=big.alt;$('zoomDialog').showModal();}if(e.target.closest('[data-thumb]')){selectedImage=Number(e.target.closest('[data-thumb]').dataset.thumb);renderDetailImage();}if(e.target.closest('#detailAdd')){let sku=selectedProduct?.sku;$('productDialog').close();addItem(sku);openCart();}});
     $('infoClose').addEventListener('click',()=>$('infoDialog').close());document.querySelectorAll('[data-info]').forEach(b=>b.addEventListener('click',()=>info(b.dataset.info)));
-    $('contactButton').addEventListener('click',()=>{if(C.sellerEmail){window.location.href=`mailto:${encodeURIComponent(C.sellerEmail)}?subject=${encodeURIComponent('Burton & Found enquiry')}`;}else info('contact');});
+    $('contactButton').addEventListener('click',()=>{window.BURTON_ENQUIRY?.open([],C.sellerEmail);});
 
 
     document.addEventListener('keydown',e=>{

@@ -62,6 +62,6 @@ test('Automobile storefront, gallery and preview remove price/status warnings bu
  for(const phrase of ['INDICATIVE PRICE · VERIFY STOCK','VINTAGE AUTOMOBILE · VERIFY STOCK','Physical stock to verify · enquiry only','INDICATIVE CAD · CONFIRM BEFORE PURCHASE'])
   assert.ok(!store.includes(phrase),phrase);
  assert.match(store,/CAD · ASKING PRICE/);
- assert.match(store,/b\.innerHTML=\(C\.sellerEmail\?'Email purchase request':'Copy purchase request'\)/);
+ assert.match(store,/b\.innerHTML='Prepare purchase enquiry'/);assert.match(store,/BURTON_ENQUIRY\?\.open\(selection,C\.sellerEmail\)/);
  assert.doesNotMatch(read('public/preview.html'),/indicative automobile entries|physical stock and final prices require confirmation/i);
 });
