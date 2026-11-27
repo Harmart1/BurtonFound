@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Authorized, test-only provider check. Never accesses a production database or emits raw API objects."""
-import hashlib,hmac,json,os,re,sys,time,urllib.parse,urllib.request,urllib.error
+import hashlib,hmac,json,os,re,sys,time,subprocess,urllib.parse,urllib.request,urllib.error
 KEY=os.environ.get("BF_TEST_KEY","")
 SIGN=os.environ.get("BF_TEST_WEBHOOK","")
 MARK="burtonfound-sandbox-v1"
@@ -29,14 +29,25 @@ def stripe(path,fields=None,tag=None,allow=None):
     return body,status
 def own(obj,prefix):
     return obj.get("livemode") is False and str(obj.get("id","")).startswith(prefix) and obj.get("metadata",{}).get("bf_isolated_qa")==MARK and obj.get("metadata",{}).get("bf_qa_run")==RUN
+def public_request(path,body=None,headers=None):
+    # Match the deployed smoke check's curl transport. No redirects, no raw bodies or secrets in logs.
+    cmd=["curl","--silent","--show-error","--max-time","20","--write-out","\\n%{http_code}","--request","POST" if body is not None else "GET"]
+    for k,v in (headers or {}).items(): cmd+=["--header",k+": "+v]
+    if body is not None: cmd+=["--data-binary","@-"]
+    result=subprocess.run(cmd+[APP+path],input=body,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=25,check=False)
+    check(result.returncode==0,"Public safety probe connection failed")
+    raw,code=result.stdout.rsplit(b"\n",1)
+    status=int(code)
+    try: return status,json.loads(raw)
+    except (ValueError,UnicodeError): return status,{}
 def probe():
-    status,health=request(APP+"/api/health")
-    check(status==200 and health.get("checkout")=="preview_only","Public checkout safety not confirmed")
+    status,health=public_request("/api/health")
+    check(status==200 and health.get("checkout")=="preview_only","Public checkout safety not confirmed (HTTP "+str(status)+")")
     body=json.dumps({"id":"evt_bf_isolation_probe","type":"bf.integration.isolation_probe","livemode":False,"data":{"object":{"id":"cs_test_bf_isolation_probe","livemode":False,"metadata":{"bf_isolated_qa":MARK}}}},separators=(",",":")).encode()
     t=str(int(time.time()))
     sig=hmac.new(SIGN.encode(),t.encode()+b"."+body,hashlib.sha256).hexdigest()
-    status,r=request(APP+"/api/stripe-webhook","POST",body,{"Content-Type":"application/json","Stripe-Signature":"t="+t+",v1="+sig})
-    check(status==200 and r.get("qa_isolated") is True,"Deployed isolation guard not confirmed; no Stripe test writes")
+    status,r=public_request("/api/stripe-webhook",body,{"Content-Type":"application/json","Stripe-Signature":"t="+t+",v1="+sig})
+    check(status==200 and r.get("qa_isolated") is True,"Deployed isolation guard not confirmed (HTTP "+str(status)+"); no Stripe test writes")
 def main():
     check(re.fullmatch(r"sk_test_[A-Za-z0-9]+",KEY) and SIGN.startswith("whsec_"),"Missing test-only credentials")
     check(re.fullmatch(r"\d+-\d+",RUN),"Missing CI run identity")
