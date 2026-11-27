@@ -1,0 +1,36 @@
+name: Promotional graphics draft QA
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/build-promotional-graphics.py'
+      - 'scripts/build-marketing.mjs'
+      - '.github/workflows/promotional-graphics-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build-promotional-graphics.py'
+      - 'scripts/build-marketing.mjs'
+      - '.github/workflows/promotional-graphics-qa.yml'
+permissions:
+  contents: read
+jobs:
+  graphics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Create marketing drafts and generate PNG graphics
+        run: |
+          npm run build:marketing
+          python3 -m pip install --disable-pip-version-check Pillow==11.3.0
+          python3 scripts/build-promotional-graphics.py
+      - name: Upload draft graphics and manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: burton-found-promotional-graphics
+          path: marketing-output/promotional-graphics/
+          retention-days: 30
