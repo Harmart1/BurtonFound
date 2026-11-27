@@ -1,0 +1,41 @@
+name: Full catalogue and site quality audit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'public/**'
+      - 'scripts/build-marketing.mjs'
+      - 'scripts/audit-full-site.mjs'
+      - '.github/workflows/full-site-quality.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - 'scripts/build-marketing.mjs'
+      - 'scripts/audit-full-site.mjs'
+      - '.github/workflows/full-site-quality.yml'
+  schedule:
+    - cron: '17 15 * * 1'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build marketing and audit the complete catalogue and local site
+        run: |
+          npm run build:marketing
+          node scripts/audit-full-site.mjs
+      - name: Save review report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-site-quality-audit
+          path: marketing-output/full-site-quality-audit.md
+          if-no-files-found: warn
+          retention-days: 30

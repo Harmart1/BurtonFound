@@ -31,6 +31,7 @@ jobs:
         run: |
           npm run build:marketing
           npm run check:deploy
+          npm run audit:site
           npm test
           npm run shipping:worksheet
       - name: Attach organic marketing exports
