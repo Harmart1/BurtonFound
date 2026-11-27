@@ -99,7 +99,7 @@ def main():
     finally:
         if pi and own(pi,"pi_") and pi.get("status")=="succeeded":
             refund,_=stripe("refunds",{**common,"payment_intent":pi["id"],"amount":"1500"},"refund")
-            check(refund.get("livemode") is False and refund.get("amount")==1500 and refund.get("payment_intent")==pi["id"] and refund.get("status") in ("succeeded","pending"),"Test refund not confirmed")
+            check(refund.get("object")=="refund" and refund.get("amount")==1500 and refund.get("currency")=="cad" and refund.get("payment_intent")==pi["id"] and refund.get("metadata",{}).get("bf_qa_run")==RUN and refund.get("status") in ("succeeded","pending"),"Test refund not confirmed")
             print("PASS real Stripe sandbox refund request accepted; status "+refund["status"])
     probe()
     print("PASS public preview remains disabled and isolated")

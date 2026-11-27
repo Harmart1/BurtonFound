@@ -1,0 +1,28 @@
+name: Stripe sandbox existing transaction evidence
+on:
+  workflow_dispatch:
+    inputs:
+      prior_run:
+        type: string
+        description: Prior marked QA run ID and attempt (run-attempt)
+        required: true
+        default: '45948537273-1'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stripe-sandbox-evidence.yml'
+permissions:
+  contents: read
+jobs:
+  evidence:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify existing test payment, refund and event destinations (GET only)
+        env:
+          BF_TEST_KEY: ${{ secrets.BF_STRIPE_TEST_SECRET_KEY }}
+          BF_TEST_WEBHOOK: ${{ secrets.BF_STRIPE_TEST_WEBHOOK_SECRET }}
+          QA_EVIDENCE_RUN: ${{ inputs.prior_run || '45948537273-1' }}
+        run: python3 scripts/stripe-sandbox-evidence.py
