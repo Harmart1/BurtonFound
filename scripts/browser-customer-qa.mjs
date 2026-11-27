@@ -106,6 +106,11 @@ try{
      await card.locator('[data-view]').first().click();await visible(page,'#productDialog');await page.locator('#productClose').click();await hidden(page,'#productDialog');
      await card.locator('[data-add]').click();await page.waitForFunction(()=>document.querySelector('#cartCount')?.textContent.trim()==='1');await page.locator('#cartOpen').click();await visible(page,'#cartDrawer');await page.locator('#cartClose').click();
      assert((await page.evaluate(()=>window.__bfCalls)).length===0,'Guest browsing must not call auth');
+     await page.locator('#giftFinder summary').click();await page.locator('#giftInterest').selectOption('coca-cola');await page.locator('#giftBudget').selectOption('50');await page.locator('#giftFilter button').click();await page.locator('#giftResults .bf-find-card').first().waitFor({state:'visible'});
+     assert.match(await page.locator('#giftResults').textContent(),/CC-010/);
+     await page.locator('#giftInterest').selectOption('automobiles');await page.locator('#giftFilter button').click();assert.match(await page.locator('#giftStatus').textContent(),/No matches/);
+     await page.locator('#giftIncludeEnquiry').check();await page.locator('#giftFilter button').click();await page.locator('#giftResults .bf-find-card').first().waitFor({state:'visible'});assert.match(await page.locator('#giftResults').textContent(),/Enquiry only/);
+     await card.locator('[data-compare]').click();await page.locator('#compareFinds summary').click();await page.locator('#compareResults .bf-find-card').first().waitFor({state:'visible'});assert.match(await page.locator('#compareCount').textContent(),/1 of 3/);await page.locator('#compareClear').click();assert.match(await page.locator('#compareCount').textContent(),/0 of 3/);
    });
  }
  console.log('Browser launch verification: '+passed+' scenarios passed. No external provider traffic or production data.');

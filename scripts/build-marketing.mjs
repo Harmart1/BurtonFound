@@ -172,7 +172,7 @@ const giftDescription='Explore vintage gift ideas for Coca-Cola advertising fans
 const giftSchema={'@context':'https://schema.org','@type':'CollectionPage',name:'Vintage gift ideas for collectors',description:giftDescription,url:abs(giftPath),mainEntity:{'@type':'ItemList',itemListElement:giftProducts.map((p,i)=>({'@type':'ListItem',position:i+1,name:p.title,url:abs(urlOf(p))}))}};
 const giftContent='<nav class="mk-crumb" aria-label="Breadcrumb"><a href="/">Home</a> / Gift ideas</nav>'+
  '<p class="mk-kicker">Thoughtful gifts with a story</p><h1>Vintage gift ideas for collectors</h1>'+
- '<p class="mk-lead">'+giftDescription+'</p>'+
+ '<p class="mk-lead">'+giftDescription+'</p><p><a class="mk-button" href="/index.html#giftFinder">Find gifts by interest and budget</a></p>'+
  '<p>Rather than a mass-produced novelty, consider a catalogued piece of advertising or printed movie history tied to someone\'s favourite era. Every pictured item has its own listing with format and condition notes.</p>'+
  '<p class="mk-fine">Availability, exact condition, shipping cost and delivery timing must be confirmed. No promotional discounts or holiday arrival dates are promised. Online card checkout is not yet enabled.</p>'+
  '<nav class="mk-collection-nav" aria-label="Explore gift themes"><a href="/collections/coca-cola.html">Coca-Cola advertising</a><a href="/collections/hollywood.html">Classic film paper</a><a href="/collections/sets.html">Curated sets</a></nav>'+
