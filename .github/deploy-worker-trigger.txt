@@ -1,1 +1,1 @@
-2026-11-27 — deploy all 229 detail pages, safe automobile enquiry pages, marketing and mobile accessibility; retain preview gates.
+2026-11-27 — deploy tested identity, recovery and browser cart isolation; retain all preview-only gates.
