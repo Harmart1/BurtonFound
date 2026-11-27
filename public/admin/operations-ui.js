@@ -4,9 +4,10 @@ const A=window.BURTON_ACCOUNT,O=window.BURTON_OPERATIONS,$=id=>document.getEleme
 const money=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n/100);
 let ledgerResult=null,stockResult=null,stripeResult=null,stripeSeq=0;
 async function ownerFetch(url){
- const token=await A.authToken?.();if(!token)throw Error('Sign in first');
+ const version=A.sessionVersion(),uid=A.user()?.id;
+ const token=await A.authToken?.();if(!token||A.sessionVersion()!==version||A.user()?.id!==uid)throw Error('Sign in again');
  const r=await fetch(url,{headers:{Authorization:'Bearer '+token},cache:'no-store'});
- const data=await r.json();if(!r.ok)throw Error(data.error||'Report unavailable');return data;
+ const data=await r.json();if(A.sessionVersion()!==version||A.user()?.id!==uid||A.recoveryState()!=='none')throw Error('Owner session changed');if(!r.ok)throw Error(data.error||'Report unavailable');return data;
 }
 function download(text,name){
  const u=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
