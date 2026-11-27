@@ -86,8 +86,10 @@ def stripe_test_key_status():
     try:
         with urllib.request.urlopen(req, timeout=20) as resp:
             account = json.load(resp)
-    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
-        return "Stripe rejected test credential or connection failed"
+    except urllib.error.HTTPError as exc:
+        return "Stripe rejected test credential (HTTP %d; no response body printed)" % exc.code
+    except (urllib.error.URLError, TimeoutError):
+        return "Stripe test credential connection failed"
     return ("Validated with the connected Burton & Found merchant"
             if account.get("id") == EXPECTED_MERCHANT else
             "MISMATCH: test key belongs to a DIFFERENT merchant — do not install")

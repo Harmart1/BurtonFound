@@ -13,9 +13,13 @@ The Checkout server now requires `STRIPE_EXPECTED_ACCOUNT_ID=acct_1SN2j92NSH96Tj
 - A separate production guard `STRIPE_PAYOUTS_VERIFIED=false` is now enforced by `functions/_lib/core.js`. Even if someone enters a live key and enables the other switches, **real-money Checkout is blocked** until there is an explicit verified payout approval. This flag is not evidence from Stripe; it requires a current, independently confirmed owner sign-off.
 - Webhook signature and test payment RPC regression tests cover no forged payment and signed payment fulfillment recording.
 
+## November 27, 2026 verification
+
+Owner's connected live merchant account reports charges and payouts enabled, no currently due or past due identity requirements, and no pending verification. Stripe Tax remains pending head-office information. The November 27 public audit confirms encrypted Worker bindings and checkout disabled; stored GitHub sandbox API key was rejected or could not connect. The signed non-payment webhook probe passed. No approval flags have been changed; owner verification and tax/stock/shipping review are still required before live checkout. The sandbox installer now builds generated marketing pages before validating the complete preview release.
+
 ## Actions the Stripe account holder must take
 
-1. **Resolve account verification first** in [Stripe Dashboard](https://dashboard.stripe.com/). A connected account's `payouts_enabled=false` status must be fixed through Stripe's secure identity/liveness flow before any production charges are approved. Never share identity documents or verification codes through GitHub or this repository.
+1. **Reconfirm account verification before launch (November 27 check passed)** in [Stripe Dashboard](https://dashboard.stripe.com/). A connected account's `payouts_enabled=false` status must be fixed through Stripe's secure identity/liveness flow before any production charges are approved. Never share identity documents or verification codes through GitHub or this repository.
 2. **Tax**: decide the seller's actual CRA GST/HST registration status and provincial/U.S. sales tax obligations. Set correct head-office information and any legal registrations in [Stripe Tax](https://dashboard.stripe.com/tax). Do not add a Stripe Tax registration just because a location appears in the website.
 3. **Test key**: in Stripe, select your business's sandbox/testing environment and obtain a fresh `sk_test_...`. Store it ONLY as a GitHub Actions repository secret named `BF_STRIPE_TEST_SECRET_KEY` (Repository Settings → Secrets and variables → Actions). The merchant identity is checked automatically.
 4. **Test webhook**: in Stripe Workbench → Event destinations, create the **sandbox / test-mode** HTTPS endpoint `https://burtonfound.timharmar.workers.dev/api/stripe-webhook` and select:
