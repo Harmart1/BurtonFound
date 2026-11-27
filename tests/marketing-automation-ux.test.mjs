@@ -25,10 +25,10 @@ test('Automated marketing includes SEO product links, rotating calendar, safe fe
  const context={window:{}};
  runInNewContext(generated,context,{timeout:1500});
  const links=context.window.BURTON_PRODUCT_LINKS;
- assert.equal(Object.keys(links).length,131);
+ assert.equal(Object.keys(links).length,229);
  assert.ok(links['CC-NEW-001'].startsWith('/products/'));
  assert.ok(links['OHS-003'].endsWith('.html'));
- assert.equal(new Set(Object.values(links)).size,131);
+ assert.equal(new Set(Object.values(links)).size,229);
  const feed=JSON.parse(read('public/feeds/collectibles.json'));
  assert.equal(feed.version,'https://jsonfeed.org/version/1.1');
  assert.ok(feed.items.length>=100);
@@ -47,7 +47,7 @@ test('Automated marketing includes SEO product links, rotating calendar, safe fe
  assert.equal(report.weeklyDraftItems.length,14);
  assert.equal(new Set(report.weeklyDraftItems).size,14);
  assert.ok(Number.isInteger(report.weeklyRotation));
- assert.equal(report.productPages,131);
+ assert.equal(report.productPages,229);
  assert.equal(report.socialPostsPublished,false);
  assert.equal(report.newsletterSent,false);
  assert.equal(report.checkoutApproved,false);

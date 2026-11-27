@@ -78,3 +78,9 @@ p{max-width:74ch}
 .mk-gift-group h2{margin-bottom:5px}
 .mk-gift-group>p{margin-top:0;color:var(--muted)}
 .mk-gift-advice{margin:30px 0;padding:18px 24px;background:var(--panel);border-left:4px solid var(--accent)}
+
+/* Keep catalogue layouts stable and avoid rendering every offscreen card at once. */
+.mk-grid .mk-card{content-visibility:auto;contain-intrinsic-size:auto 360px}
+.mk-card-copy .mk-enquiry{color:#70402d;text-transform:none;letter-spacing:0}
+.mk-head nav a{display:inline-flex;align-items:center;min-height:32px}
+@media(max-width:650px){.mk-grid .mk-card{contain-intrinsic-size:auto 290px}.mk-head nav a{min-height:40px}}

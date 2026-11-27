@@ -99,6 +99,28 @@ try{
      await page.goto(origin+'/account#error_code=otp_expired&type=recovery');await ready(page);await visible(page,'#recoveryPanel');await hidden(page,'#recoveryForm');await hidden(page,'#accountDashboard');
      await page.locator('#recoveryCancel').click();await visible(page,'#forgotForm');assert(!(await page.evaluate(()=>window.__bfCalls)).some(x=>x.type==='password-update'));
    });
+   await test(size+' automobile collection and enquiry page accessibility',viewport,async page=>{
+     await page.goto(origin+'/collections/automobiles.html');
+     assert.equal(await page.locator('.mk-grid .mk-card').count(),98);
+     assert.equal(await page.locator('.mk-grid .mk-enquiry').count(),98);
+     assert.equal(await page.locator('h1').count(),1);
+     await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement?.textContent),'Skip to content');
+     await page.keyboard.press('Enter');assert.match(page.url(),/#main$/);
+     const cards=page.locator('.mk-grid .mk-card');
+     await cards.first().scrollIntoViewIfNeeded();await page.waitForFunction(()=>{const im=document.querySelector('.mk-card img');return im?.complete&&im.naturalWidth>0;});
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Collection horizontal overflow');
+     assert.equal(await page.locator('img:not([alt])').count(),0);
+     await cards.first().click();await page.locator('h1').waitFor({state:'visible'});
+     assert.match(await page.locator('[data-bf-availability]').textContent(),/Enquiry only/);
+     assert.match(await page.locator('[data-bf-shop-link]').textContent(),/request details/);
+     assert.equal(await page.locator('[data-bf-stock-sku]').count(),0);
+     assert.equal(await page.locator('script[src="/marketing-stock.js"]').count(),0);
+     await page.waitForFunction(()=>{const im=document.querySelector('.mk-gallery img');return im?.complete&&im.naturalWidth>0;});
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Product horizontal overflow');
+     assert.equal(await page.locator('img:not([alt])').count(),0);
+     const metrics=await page.evaluate(()=>({resources:performance.getEntriesByType('resource').length,encodedBytes:performance.getEntriesByType('resource').reduce((n,r)=>n+r.encodedBodySize,0),domReadyMs:Math.round(performance.getEntriesByType('navigation')[0]?.domContentLoadedEventEnd||0)}));
+     console.log('Local synthetic page measurements '+size+': '+JSON.stringify(metrics)+' (not real-user Core Web Vitals)');
+   });
    await test(size+' browse catalogue and guest shopping bag',viewport,async page=>{
      await page.goto(origin+'/#shop');await ready(page);await page.locator('#productGrid .product-card').first().waitFor({state:'visible'});
      assert((await page.locator('#productGrid .product-card').count())>0);

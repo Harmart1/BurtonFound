@@ -39,7 +39,7 @@ test('Storefront links to gifting and has working share assets without third par
 test('Product page marketing has social metadata and in-context sharing without fake Offers',()=>{
   const text=read('public/product-links.js').match(/window\.BURTON_PRODUCT_LINKS = (\{[\s\S]+\});/)[1];
   const paths=Object.values(JSON.parse(text));
-  assert.equal(paths.length,131);
+  assert.equal(paths.length,229);
   for(const url of paths.slice(0,12)){
     const html=read('public'+url);
     assert.match(html,/meta property="og:image:alt"/);
