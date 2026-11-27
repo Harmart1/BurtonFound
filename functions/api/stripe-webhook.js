@@ -20,8 +20,11 @@ export function classifyStripeEvent(evt,env){
  if(!validId(evt?.id,'evt_')||typeof evt?.type!=='string'||typeof evt?.livemode!=='boolean')return {error:'Unsupported event payload',status:400};
  if(evt.livemode!==(mode==='live'))return {error:'Stripe event mode mismatch',status:400};
  if(evt.account!=null&&evt.account!==env.STRIPE_EXPECTED_ACCOUNT_ID)return {error:'Stripe merchant mismatch',status:400};
- if(!checkoutEvents.has(evt.type))return {action:'ignore'};
  const session=evt.data?.object;
+ // Isolated CI test sessions never touch the real inventory/order database.
+ // The signed non-checkout probe proves the deployed guard before creating any test session.
+ if(mode==='test'&&evt.livemode===false&&session?.livemode===false&&validId(session.id,'cs_test_')&&session.metadata?.bf_isolated_qa==='burtonfound-sandbox-v1'&&(checkoutEvents.has(evt.type)||evt.type==='bf.integration.isolation_probe'))return {action:'qa-isolated'};
+ if(!checkoutEvents.has(evt.type))return {action:'ignore'};
  if(!validId(session?.id,'cs_'+mode+'_')||session.livemode!==evt.livemode||session.object!=='checkout.session'||session.mode!=='payment')return {error:'Invalid checkout session identity or mode',status:400};
  if(evt.type==='checkout.session.completed'||evt.type==='checkout.session.async_payment_succeeded'){
   // An ordinary completed event can precede a delayed payment; leave inventory reserved.
@@ -40,6 +43,7 @@ export async function onRequestPost({request,env}){
   let evt;try{evt=JSON.parse(payload)}catch{return error(400,'Malformed webhook')}
   const result=classifyStripeEvent(evt,env);
   if(result.error)return error(result.status,result.error);
+  if(result.action==='qa-isolated')return json({received:true,qa_isolated:true});
   if(result.action==='ignore')return json({received:true});
   const session=result.session;
   try{
