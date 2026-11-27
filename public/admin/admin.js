@@ -128,5 +128,5 @@ $('holdsList').addEventListener('click',async e=>{
  catch(err){status(err.message);btn.disabled=false;}
 });
 
-A.init().then(()=>setTimeout(refresh,300)).catch(()=>{$('loginHelp').hidden=false;status('Accounts not connected')});
+A.init().then(()=>{const initial=A.user()?.id||null;const leave=()=>{if((A.user()?.id||null)!==initial||A.recoveryState?.()!=='none'){$('dashboard').hidden=true;$('dashboard').replaceChildren();location.replace('/account');}};document.addEventListener('bf:auth-change',leave);document.addEventListener('bf:recovery-state',leave);window.addEventListener('pageshow',e=>{if(e.persisted){$('dashboard').hidden=true;location.reload();}});setTimeout(refresh,300);}).catch(()=>{$('loginHelp').hidden=false;status('Accounts not connected')});
 })();

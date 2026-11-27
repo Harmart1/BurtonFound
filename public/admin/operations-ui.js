@@ -13,7 +13,7 @@ function download(text,name){
 }
 const today=new Date().toISOString().slice(0,10);
 $('ledgerTo').value=today;$('ledgerFrom').value=today.slice(0,7)+'-01';
-function clearStripe(){stripeSeq++;stripeResult=null;$('stripeCompare').disabled=true;$('stripeCompareExport').disabled=true;$('stripeCompareResult').textContent='Load a live or sandbox order report first.';$('stripeCompareIssues').replaceChildren();}
+function clearStripe(){stripeSeq++;stripeResult=null;window.dispatchEvent(new Event('burton:stripe-clear'));$('stripeCompare').disabled=true;$('stripeCompareExport').disabled=true;$('stripeCompareResult').textContent='Load a live or sandbox order report first.';$('stripeCompareIssues').replaceChildren();}
 function clearLedger(){clearStripe();window.dispatchEvent(new Event('burton:ledger-clear'));ledgerResult=null;$('ledgerExport').disabled=true;$('ledgerResult').textContent='Choose a period and load the report.';}
 for(const id of ['ledgerFrom','ledgerTo','ledgerMode'])$(id).addEventListener('change',clearLedger);
 $('ledgerForm').addEventListener('submit',async e=>{
@@ -36,6 +36,7 @@ $('stripeCompare').addEventListener('click',async()=>{
   const d=await ownerFetch('/api/admin/stripe-reconciliation?'+new URLSearchParams({from:current.from,to:current.to,mode:current.mode}));
   if(seq!==stripeSeq||current!==ledgerResult)return;
   stripeResult=d;
+  window.dispatchEvent(new CustomEvent('burton:stripe-compared',{detail:d}));
   const clean=d.rows.filter(r=>r.issues.length===0).length;
   $('stripeCompareResult').textContent=(d.mode==='test'?'SANDBOX — NOT business revenue. ':'LIVE records. ')+d.rows.length+' compared · '+clean+' without flagged differences · '+(d.rows.length-clean)+' require review · '+d.excluded+' other-mode records excluded. '+d.notice;
   for(const r of d.rows.filter(x=>x.issues.length)){const li=document.createElement('li');li.textContent=r.id+' — '+r.issues.join('; ');$('stripeCompareIssues').append(li);}

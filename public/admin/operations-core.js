@@ -50,5 +50,30 @@ function priority(o){
  if(o.payment_status==='paid'&&o.fulfillment_status==='packed')return 2;
  return 3;
 }
-window.BURTON_OPERATIONS=Object.freeze({ledger,inventory,priority,csv,mode});
+function exceptions(orders,selection='live',stripeRows=[]){
+ if(!['live','test','unknown'].includes(selection))throw Error('Invalid review mode');
+ const compared=new Map(stripeRows.map(x=>[x.id,x]));
+ const rows=[];
+ for(const o of orders.filter(x=>mode(x)===selection)){
+  const p=compared.get(o.id),flags=[],categories=new Set();
+  const add=(category,note)=>{categories.add(category);flags.push(note);};
+  const a=cents(o.subtotal_cents),b=cents(o.shipping_cents),c=cents(o.total_cents);
+  if(a===null||b===null||c===null||c<a+b)add('amount','Recorded amounts inconsistent');
+  if(o.payment_status==='refunded')add('refund','Local refunded status; verify individual refund and balance records');
+  if(o.payment_status==='review'||o.fulfillment_status==='needs_attention')add('review','Local order requires review; hold fulfillment until resolved');
+  const reported=p?cents(p.refund_reported_cents):null;
+  if(reported!==null&&reported>0)add('refund','Stripe reports a refund amount; settlement not verified');
+  if(p&&Array.isArray(p.issues))for(const issue of p.issues){
+   if(typeof issue!=='string'||issue.length>250)continue;
+   add(/refund|disput/i.test(issue)?'refund':/total|shipping|amount|tax/i.test(issue)?'amount':'review',issue);
+  }
+  if(!flags.length)continue;
+  const action=selection!=='live'?'Non-live/unknown: review only, no real refund, shipment or customer contact.':categories.has('refund')?'Confirm original charge and individual refund status; inspect any returned item before considering stock release.':'Verify payment, amounts and order condition before proceeding.';
+  rows.push({id:String(o.id||''),created_at:String(o.created_at||''),payment_status:String(o.payment_status||''),fulfillment_status:String(o.fulfillment_status||''),total:c,reported,categories:[...categories],flags:[...new Set(flags)],action});
+ }
+ rows.sort((a,b)=>Number(b.categories.includes('refund'))-Number(a.categories.includes('refund'))||a.created_at.localeCompare(b.created_at)||a.id.localeCompare(b.id));
+ return rows;
+}
+function exceptionCsv(rows,selection){return csv([['Order ID','Created UTC','Mode','Payment status','Fulfillment status','Recorded total CAD','Provider-reported refund CAD (not settled)','Review flags','Suggested manual action'],...rows.map(r=>[r.id,r.created_at,selection,r.payment_status,r.fulfillment_status,cash(r.total),cash(r.reported),r.flags.join('; '),r.action])]);}
+window.BURTON_OPERATIONS=Object.freeze({ledger,inventory,priority,csv,mode,exceptions,exceptionCsv});
 })();
