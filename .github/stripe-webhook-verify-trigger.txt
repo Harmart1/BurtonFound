@@ -1,1 +1,1 @@
-2026-11-27 — verify existing Stripe test webhook signature after merchant verification; no payment events.
+2026-11-27 — post-install signed test webhook probe after verified replacement sandbox key.
