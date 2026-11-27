@@ -1,0 +1,34 @@
+name: Provision initial Stripe sandbox webhook
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        type: boolean
+        description: Authorize creation of missing TEST webhook and rotation of its Worker signing secret
+        default: false
+  push:
+    branches: [main]
+    paths: ['.github/stripe-test-webhook-setup-trigger.txt']
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-worker-deployment
+  cancel-in-progress: false
+jobs:
+  provision:
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm) || (github.event_name == 'push' && github.event.head_commit.message == 'Provision missing Stripe test webhook only'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate preview-only release and script syntax
+        run: |
+          node scripts/assert-preview-release.mjs
+          python3 -m py_compile scripts/provision-stripe-test-webhook.py
+      - name: Create exact test destination and securely install its signing secret
+        env:
+          BF_TEST_KEY: ${{ secrets.BF_STRIPE_TEST_SECRET_KEY }}
+          BF_TEST_WEBHOOK: ${{ secrets.BF_STRIPE_TEST_WEBHOOK_SECRET }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 scripts/provision-stripe-test-webhook.py

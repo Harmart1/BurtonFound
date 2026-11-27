@@ -1,0 +1,1 @@
+2026-11-27 — authorized test-only initialization; verified no Stripe event destinations, strict disabled-payment gate, no duplicates.
