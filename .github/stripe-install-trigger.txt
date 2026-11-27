@@ -1,1 +1,1 @@
-2026-11-27 — owner-authorized Stripe sandbox integration retry; only install merchant-verified test credentials, preserve all checkout gates.
+2026-11-27 — re-run repaired sandbox installer, with full preview guard and verified merchant only.
