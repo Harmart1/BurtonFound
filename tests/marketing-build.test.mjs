@@ -7,8 +7,8 @@ const read=p=>readFileSync(join(root,p),'utf8');
 const names=()=>readdirSync(join(pub,'products')).filter(x=>x.endsWith('.html'));
 test('marketing build creates real unique product URLs and SEO metadata without premature purchase offers',()=>{
  const items=names();
- assert.equal(items.length,131,'one static page per unique listed SKU');
- assert.equal(new Set(items).size,131);
+ assert.equal(items.length,229,'one static page per unique listed SKU');
+ assert.equal(new Set(items).size,229);
  for(const file of items){
    const html=read('public/products/'+file);
    assert.ok(html.includes('<link rel="canonical" href="https://burtonfound.timharmar.workers.dev/products/'),file);
@@ -16,7 +16,7 @@ test('marketing build creates real unique product URLs and SEO metadata without 
    assert.ok(html.includes('property="og:image"'),file);
    assert.ok(html.includes('https://schema.org'),file);
    assert.ok(html.includes('"@type":"Product"'),file);
-   assert.ok(html.includes('View in the shop / add to bag'),file);
+   assert.ok(html.includes('View in the shop / add to bag')||html.includes('View item in catalogue / request details'),file);
    assert.ok(html.includes('name="robots" content="noindex,follow"'),file);
    assert.ok(!html.includes('"@type":"Offer"'),'Offers must be held back until owner checkout approval');
  }
@@ -25,7 +25,7 @@ test('marketing build creates real unique product URLs and SEO metadata without 
  assert.ok(read('public/products/'+example).includes('Brussels'));
 });
 test('human-readable category pages and collector guides are generated and linked to real product pages',()=>{
- const cats=['coca-cola','hollywood','sets'];
+ const cats=['coca-cola','hollywood','automobiles','sets'];
  for(const c of cats){
   const path='public/collections/'+c+'.html';
   assert.ok(existsSync(join(root,path)),path);
@@ -49,7 +49,7 @@ test('human-readable category pages and collector guides are generated and linke
 test('sitemap is complete but public indexing remains disabled pending approval',()=>{
  const sitemap=read('public/sitemap.xml');
  const entries=[...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(x=>x[1]);
- assert.equal(entries.length,139,'Home, 131 products, 3 collections, 3 guides, 1 gift landing page');
+ assert.equal(entries.length,238,'Home, 229 products, 4 collections, 3 guides, 1 gift landing page');
  assert.equal(new Set(entries).size,entries.length);
  for(const url of entries)assert.ok(url.startsWith('https://burtonfound.timharmar.workers.dev/'),url);
  assert.ok(sitemap.includes('/products/'));
@@ -74,7 +74,7 @@ test('automated marketing kit contains reusable product links and accurately dis
  assert.ok(email.includes('DRAFT, not a sent email'));
  assert.ok(email.includes('consent'));
  const state=JSON.parse(read('marketing-output/marketing-readiness.json'));
- assert.equal(state.productPages,131);
+ assert.equal(state.productPages,229);
  assert.equal(state.indexable,false);
  assert.equal(state.checkoutApproved,false);
  assert.equal(state.merchantFeedCreated,false);

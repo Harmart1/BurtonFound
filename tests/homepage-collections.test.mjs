@@ -20,7 +20,7 @@ test('root index is the real visitor homepage, with prominent accurate collectio
  assert.ok(main.includes('data-shop-coke="" href="#shop"'));
  assert.ok(main.includes('data-shop-hollywood="" href="#shop"'));
  assert.ok(main.includes('data-shop-hollywood-sets="" href="#shop"'));
- assert.ok(main.includes('href="vintage-cars.html"'));
+ assert.ok(main.includes('href="vintage-cars.html"'));assert.ok(main.includes('href="/collections/automobiles.html"'));
  assert.ok(main.includes('Add your favourites to the bag'),'automobiles should be shoppable at posted CAD prices');
  assert.ok(main.includes('Coming next'));
  assert.ok(main.includes('href="books.html"'));
