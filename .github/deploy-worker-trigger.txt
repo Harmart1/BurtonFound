@@ -29,3 +29,5 @@ Canada-first scope selected by owner. Require individually verified listing allo
 Deploy photo-based physical inspection workflow and read-only owner review validator. Keep individual SKU allowlist empty and all checkout/production/customs approval switches disabled.
 
 Deploy Canadian cart shipping totals, duplicate checkout click protection, and owner-authorized guest email deferral. Live checkout remains locked pending live credentials and remaining operational approvals.
+
+Deploy independent live webhook signature support while retaining sandbox checkout and preview-only payments.
