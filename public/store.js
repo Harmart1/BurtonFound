@@ -33,9 +33,10 @@
     }return false;
   };
   const isCheckoutReady=()=>checkoutReady&&bag.length&&!bagNeedsVerification()&&!bagHasOverlappingUnits()&&bag.every(id=>!bySku.get(id)?.cmsOnly&&bySku.get(id)?.stockState!=='unavailable');
-  let stockRefreshSequence=0;
+  let stockRefreshSequence=0,stockRefreshing=false;
   async function loadLiveStatus(){
     const sequence=++stockRefreshSequence;
+    stockRefreshing=true;
     checkoutReady=false;inventoryConnected=false;
     liveApprovedSkus=new Set();
     window.BURTON_DISCOVERY_VIEW?.setStock(null);
@@ -46,7 +47,7 @@
       if(health.ok){const v=await health.json();if(sequence!==stockRefreshSequence)return;checkoutMode=v.checkout||'preview_only';shippingMode=v.shippingMode||'flat_rate';checkoutReady=['test_mode','live_mode','configured'].includes(checkoutMode);allowedShippingCountries=Array.isArray(v.shippingCountries)?v.shippingCountries:['CA'];flatRates=Array.isArray(v.flatRates)?v.flatRates.filter(r=>['CA','US'].includes(r.country)&&Number.isInteger(r.standard)&&r.standard>0):[];if(!flatRates.some(r=>r.country===flatCountry))flatCountry=flatRates[0]?.country||'CA';const menu=$('shipCountry');if(menu){for(const opt of menu.options){opt.disabled=!allowedShippingCountries.includes(opt.value);}if(!allowedShippingCountries.includes(menu.value)){menu.value=allowedShippingCountries.find(c=>[...menu.options].some(o=>o.value===c))||'CA';}}}else{checkoutReady=false;checkoutMode='preview_only';}
       const res=await fetch('/api/catalog',{cache:'no-store'});
       if(sequence!==stockRefreshSequence)return;
-      if(res.ok){const v=await res.json();if(sequence!==stockRefreshSequence)return;if(v.configured&&Array.isArray(v.items)){
+      if(res.ok){const v=await res.json();if(sequence!==stockRefreshSequence)return;if(v.configured===true&&Array.isArray(v.items)&&window.BURTON_DISCOVERY?.stockMap(v)){
         window.BURTON_DISCOVERY_VIEW?.setStock(v);inventoryConnected=true;liveApprovedSkus=new Set(v.items.filter(row=>row.checkout_eligible===true).map(row=>row.sku));for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly||(baseNeedsVerification(p)&&!autoApproved(p)))continue;
           if(Number.isInteger(row.price_cents))p.price=row.price_cents/100;
           p.stockState=row.available?'available':'unavailable';
@@ -57,7 +58,7 @@
     if(sequence!==stockRefreshSequence)return;
     await loadPublishedCms();
     if(sequence!==stockRefreshSequence)return;
-    setPreview();renderProducts();renderCart();window.BURTON_GIFT_COMPARE?.refresh();
+    stockRefreshing=false;setPreview();renderProducts();renderCart();window.BURTON_GIFT_COMPARE?.refresh();
   }
 
   /* Published editorial overrides. CMS-only products always remain non-sale previews.
@@ -187,7 +188,7 @@
       return `<div class="cart-item"><img src="${safe(p.image)}" alt=""><div><small>${safe(p.collection==='automobiles'?'VINTAGE AUTOMOBILE ADVERTISING':p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD EPHEMERA':'ORIGINAL · '+p.year)}</small><strong>${safe(p.title)}</strong><small>${safe(p.sku)} · Qty 1</small><button type="button" data-remove="${safe(p.sku)}">Remove</button></div><b>${money(p.price)}</b></div>`;
     }).join(''):`<div class="cart-empty"><span>✳</span><h3>Your bag is a blank page.</h3><p>A good find is just around the corner.</p><button type="button" class="btn btn-outline" id="bagBrowse">Explore the shelves ↗</button></div>`;
     const enquiryOnly=bagNeedsVerification();
-    const b=$('checkoutButton');b.disabled=checkoutInFlight||!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
+    const b=$('checkoutButton');b.disabled=stockRefreshing||checkoutInFlight||!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
     const terms=$('livePurchaseTerms'),accept=$('liveTermsAccepted');const liveReview=checkoutMode==='live_mode'&&checkoutReady&&bag.length>0&&!enquiryOnly;
     if(terms)terms.hidden=!liveReview;if(liveReview&&(!accept||!accept.checked))b.disabled=true;
     const flat=$('flatShipping'),flatMenu=$('flatShipCountry'),flatPrice=$('flatShippingPrice');
@@ -229,7 +230,7 @@
     catch(err){if(requestId!==shippingRequestId)return;target.textContent=err.message||'Rates unavailable · Contact the shop for a shipping quote';renderCart();}
   }
   async function handleCheckout(){
-    if(checkoutInFlight||!bag.length||bagHasOverlappingUnits())return;
+    if(stockRefreshing||checkoutInFlight||!bag.length||bagHasOverlappingUnits())return;
     if(checkoutReady&&!bagNeedsVerification()){
       if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Please remove unavailable items first.');return;}
       if(checkoutMode==='live_mode'&&!$('liveTermsAccepted')?.checked){toast('Please review and confirm the purchase terms.');return;}
