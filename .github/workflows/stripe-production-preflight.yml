@@ -56,3 +56,18 @@ jobs:
           print("Required Checkout event coverage:", "present" if len(exact)==1 and events.issubset(set(exact[0].get("enabled_events",[]))) else "not confirmed")
           print("No secrets, endpoints, charges, payment sessions, or orders changed. Live checkout still requires controlled cutover and commercial approvals.")
           PY
+      - name: Inspect encrypted Worker binding presence (read-only)
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0,"scripts")
+          from audit_stripe_payment_setup import cloudflare_bindings,secret_status,flag_status
+          bindings=cloudflare_bindings()
+          for name in ("STRIPE_LIVE_SECRET_KEY","STRIPE_LIVE_WEBHOOK_SECRET"):
+              print(name+": "+secret_status(bindings,name))
+          for name in ("LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED","PHYSICAL_STOCK_APPROVED","DOMESTIC_POSTAGE_VERIFIED","SELLER_TERMS_APPROVED","TAX_CONFIGURATION_APPROVED","PRODUCTION_WEBHOOK_READY"):
+              print(name+": "+flag_status(bindings,name))
+          PY
