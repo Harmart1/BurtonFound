@@ -223,6 +223,21 @@ try{
      }
      assert.equal(cancelCalls,1);assert.equal(reserved,false);
    });
+   await test(size+' back-to-top navigation on storefront and long collections',viewport,async page=>{
+     await page.emulateMedia({reducedMotion:'reduce'});
+     for(const path of ['/', '/storefront.html','/vintage-cars.html','/collections/coca-cola.html','/collections/hollywood.html','/collections/automobiles.html','/collections/sets.html']){
+       await page.goto(origin+path);
+       const button=page.locator('#bfBackToTop');
+       await button.waitFor({state:'attached'});assert(await button.isHidden());
+       await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'}));
+       await button.waitFor({state:'visible'});
+       assert.equal(await button.getAttribute('aria-label'),'Back to top of page');
+       const box=await button.boundingBox();assert(box&&box.height>=44&&box.x>=0&&box.x+box.width<=viewport.width+1);
+       if(path==='/'){await page.locator('#cartOpen').click();await hidden(page,'#bfBackToTop');await page.locator('#cartClose').click();await visible(page,'#bfBackToTop');}
+       await button.click();await page.waitForFunction(()=>window.scrollY===0);
+       await hidden(page,'#bfBackToTop');
+     }
+   });
    await test(size+' browse catalogue and guest shopping bag',viewport,async page=>{
      await page.goto(origin+'/#shop');await ready(page);await page.locator('#productGrid .product-card').first().waitFor({state:'visible'});
      assert((await page.locator('#productGrid .product-card').count())>0);
