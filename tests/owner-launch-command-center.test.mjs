@@ -24,13 +24,14 @@ test('launch command center identifies each real blocker without changing paymen
  assert.equal(m.storefrontBaseline,229);
  assert.equal(m.backendListings,131);
  assert.equal(m.items.length,11);
- assert.equal(m.actionCount,11);
+ assert.equal(m.actionCount,9);
+ assert.equal(m.deferredCount,2);
  assert.equal(m.checkout,'preview_only');
  assert.match(m.headline,/Payments are safely disabled/);
  const catalog=m.items.find(x=>x.id==='stock');
  assert.equal(catalog.status,'attention');
  assert.match(catalog.detail,/98 published listings have no matching checkout SKU/);
- for(const name of ['payouts','tax','flat-rate','canada-post','fedex','parcels','customs','email','domain'])
+ for(const name of ['payouts','tax','flat-rate','parcels','customs','email','domain'])
   assert.equal(m.items.find(x=>x.id===name).status,'attention',name);
  assert.match(m.items.find(x=>x.id==='stripe').detail,/validity must be checked separately/);
  assert.match(m.items.find(x=>x.id==='email').detail,/not configured/);
@@ -46,8 +47,8 @@ test('credential flags are never interpreted as actual real-money approval',()=>
  const m=build(modified,{sellerEmail:'support@example.org'},'store.example.org');
  assert.equal(m.items.find(x=>x.id==='payouts').status,'review');
  assert.equal(m.items.find(x=>x.id==='tax').status,'review');
- assert.equal(m.items.find(x=>x.id==='canada-post').status,'review');
- assert.equal(m.items.find(x=>x.id==='fedex').status,'review');
+ assert.equal(m.items.find(x=>x.id==='canada-post').status,'deferred');
+ assert.equal(m.items.find(x=>x.id==='fedex').status,'deferred');
  assert.equal(m.items.find(x=>x.id==='domain').status,'review');
  assert.equal(m.items.find(x=>x.id==='email').status,'attention','Test email is not evidence of actual delivery');
  assert.match(m.headline,/Sandbox checkout/);
