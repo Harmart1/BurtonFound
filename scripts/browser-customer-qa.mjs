@@ -215,7 +215,7 @@ try{
      await page.waitForURL('https://checkout.stripe.com/**');assert.equal(calls,2);assert.equal(reserved,true);
      if(checkoutPage==='/'){
        await page.goto(origin+'/?checkout=cancelled#shop');await ready(page);
-       await page.waitForFunction(()=>document.querySelector('#productGrid [data-add="CC-010"]')?.textContent.includes('IN YOUR BAG'));
+       await page.waitForFunction(()=>!sessionStorage.getItem('bf_pending_checkout_v1')&&document.querySelector('#productGrid [data-add="CC-010"]')?.textContent.includes('IN YOUR BAG'));
      }else{
        await page.goto(origin+checkoutPage+'#shop');await ready(page);await page.locator('#cartOpen').click();
        await page.locator('#cartItems [data-remove="CC-010"]').click();
