@@ -1,0 +1,29 @@
+name: Verify live automobile checkout (unpaid)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/verify-live-automobile-trigger.txt'
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-worker-deployment
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Verify live automobile purchases without payment')
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check an individual advertisement and expire unpaid
+        env:
+          BF_LIVE_KEY: ${{ secrets.BF_STRIPE_LIVE_SECRET_KEY }}
+          BF_SMOKE_SKU: VA-001
+        run: python3 scripts/verify-live-cart-unpaid.py
+      - name: Check a three-page automobile set and expire unpaid
+        env:
+          BF_LIVE_KEY: ${{ secrets.BF_STRIPE_LIVE_SECRET_KEY }}
+          BF_SMOKE_SKU: BF-VA-SET01
+        run: python3 scripts/verify-live-cart-unpaid.py
