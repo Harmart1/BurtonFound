@@ -2,6 +2,11 @@ name: Deploy Burton & Found Worker (test-safe)
 
 on:
   workflow_dispatch:
+    inputs:
+      confirm_suspend_live:
+        type: boolean
+        default: false
+        description: Explicitly authorize suspending a live store and returning it to preview-only checkout
   # Intentional deployment trigger; unrelated code pushes never publish the Worker.
   push:
     branches: [main]
@@ -134,6 +139,17 @@ jobs:
           with open(os.environ["GITHUB_ENV"],"a") as out:
               out.write("CF_RESOLVED_ACCOUNT_ID="+selected[0]+"\n")
           print("Cloudflare account confirmed: existing burtonfound Worker found. No secret contents displayed.")
+          PY
+      - name: Prevent accidental suspension of live payments by preview deployment
+        env:
+          CONFIRM_SUSPEND: ${{ inputs.confirm_suspend_live || 'false' }}
+        run: |
+          curl --fail --silent --show-error --max-time 20 https://burtonandfound.ca/api/health -o /tmp/bf-current-mode.json
+          python3 - <<'PY'
+          import os,json,sys
+          mode=json.load(open('/tmp/bf-current-mode.json')).get('checkout')
+          if mode not in ('preview_only','live_mode'):sys.exit('Unverified current payment mode; refusing preview deployment')
+          if mode=='live_mode' and os.environ.get('CONFIRM_SUSPEND')!='true':sys.exit('Store is live. Use production workflow; preview deployment would suspend payments.')
           PY
       - name: Deploy to existing burtonfound Worker
         uses: cloudflare/wrangler-action@v4
