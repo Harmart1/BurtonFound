@@ -1,0 +1,1 @@
+Verify production storefront and merchant without initiating any checkout sessions or modifying live configuration.
