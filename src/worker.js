@@ -57,8 +57,16 @@ const response = (message,status,headers={})=>new Response(JSON.stringify({error
   headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff',...headers}
 });
 
+// Keep test credentials intact while production credentials are staged independently.
+// Never fall back to a sandbox API key when live mode is selected.
+export function paymentEnvironment(env){
+ if(env.STRIPE_WEBHOOK_MODE!=='live')return env;
+ const ready=/^sk_live_[A-Za-z0-9]+$/.test(env.STRIPE_LIVE_SECRET_KEY||'')&&/^whsec_/.test(env.STRIPE_LIVE_WEBHOOK_SECRET||'');
+ return {...env,STRIPE_SECRET_KEY:ready?env.STRIPE_LIVE_SECRET_KEY:''};
+}
 export default {
   async fetch(request,env,ctx){
+    env=paymentEnvironment(env);
     const path=new URL(request.url).pathname;
     if(path==='/sitemap.xml'||path==='/robots.txt'){
       if(!['GET','HEAD'].includes(request.method))return response('Method not allowed',405,{allow:'GET, HEAD'});
