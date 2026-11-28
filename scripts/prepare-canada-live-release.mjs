@@ -2,6 +2,7 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {assertPreviewRelease} from './assert-preview-release.mjs';
 const root=resolve(import.meta.dirname,'..');
 const files=['products.js','old-hollywood-item-data.js','old-hollywood-sets-data.js','old-hollywood-products.js','coke-new-products.js','coke-archive-singles.js','vintage-cars-data.js','vintage-cars-sets.js','vintage-cars-products.js'];
 export function eligible(products,snapshot){
@@ -26,9 +27,15 @@ async function main(){
  const r=await fetch('https://burtonandfound.ca/api/catalog',{headers:{Accept:'application/json'},signal:AbortSignal.timeout(20000)});
  if(!r.ok)throw Error('Public stock unavailable');
  const records=eligible(ctx.window.BURTON_DATA?.inventory,await r.json());
- const manifest={schema:'burtonfound-canada-release-review-v1',created_at:new Date().toISOString(),scope:'CA',owner_confirmations:{available_coca_cola_and_hollywood_inventory:true,flat_rate_cost_risk_accepted:true,unregistered_small_supplier_eligibility:true,existing_policies_approved:true},legal_seller_confirmed:false,production_authorized_by_manifest:false,proposed_skus:records.map(r=>r.sku),records,shipping_cents:{standard:1995,express:3495},automatic_tax:false,guest_email_deferred:true};
+ const manifest={schema:'burtonfound-canada-release-review-v1',created_at:new Date().toISOString(),scope:'CA',owner_confirmations:{available_coca_cola_and_hollywood_inventory:true,flat_rate_cost_risk_accepted:true,unregistered_small_supplier_eligibility:true,existing_policies_approved:true},legal_seller_confirmed:true,legal_seller:{name:'Burton and Found',telephone:'249-700-1871',address:'2-356 Queen Street East, Sault Ste. Marie, Ontario, P6A 1Z1, Canada'},production_authorized_by_manifest:false,proposed_skus:records.map(r=>r.sku),records,shipping_cents:{standard:1995,express:3495},automatic_tax:false,guest_email_deferred:true};
  mkdirSync(resolve(root,'release-review'),{recursive:true});writeFileSync(resolve(root,'release-review/canada-live-candidates.json'),JSON.stringify(manifest,null,2)+'\n');
  console.log('Eligible owner-confirmed Canadian listing candidates: '+records.length+'; individual units and bundles remain subject to database overlap and stock checks.');
- console.log('No inventory, payment gates, credentials or deployed settings changed. Legal seller and production verification remain required.');
+ if(process.argv.includes('--prepare-production-config')){
+  if(records.length!==131)throw Error('Initial production release must match the 131 owner-approved eligible listings; review changes before release.');
+  const config=JSON.parse(readFileSync(resolve(root,'wrangler.jsonc'),'utf8'));assertPreviewRelease(config);
+  Object.assign(config.vars,{LIVE_CHECKOUT_ENABLED:'true',STRIPE_WEBHOOK_MODE:'live',LIVE_PAYMENTS_APPROVED:'true',STRIPE_PAYOUTS_VERIFIED:'true',PHYSICAL_STOCK_APPROVED:'true',DOMESTIC_POSTAGE_VERIFIED:'true',SELLER_TERMS_APPROVED:'true',TAX_CONFIGURATION_APPROVED:'true',PRODUCTION_WEBHOOK_READY:'true',LIVE_APPROVED_SKUS_JSON:JSON.stringify(records.map(r=>r.sku))});
+  writeFileSync(resolve(root,'wrangler.production.generated.jsonc'),JSON.stringify(config,null,2)+'\n');
+  console.log('Generated explicit Canada-only real-payment configuration, without deploying or initiating a charge.');
+ }else console.log('No inventory, payment gates, credentials or deployed settings changed.');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){try{await main()}catch(e){console.error(e.message);process.exitCode=1}}
