@@ -3,6 +3,7 @@ import {json,secure} from '../functions/_lib/core.js';
 // global quota. Use the platform-provided address for anonymous guest traffic;
 // do not accept X-Forwarded-For, browser-supplied IDs, or arbitrary headers.
 export const limits=Object.freeze({
+ '/api/checkout-cancel':{binding:'BF_QUOTE_LIMIT',enabled:()=>true},
  '/api/checkout':{binding:'BF_CHECKOUT_LIMIT',enabled:env=>secure(env)},
  '/api/shipping-quotes':{binding:'BF_QUOTE_LIMIT',enabled:env=>env.SHIPPING_MODE==='live_carrier'&&env.CARRIER_QUOTES_ENABLED==='true'}
 });
