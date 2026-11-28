@@ -3,3 +3,5 @@ Read-only live Stripe readiness check requested by owner. No charges or configur
 Fresh run after owner reports live key added; verify encrypted credential only.
 
 Run safe missing-versus-invalid credential diagnostic.
+
+Owner reports corrected live key; fresh production credential check.
