@@ -17,7 +17,7 @@ const server=createServer(async(req,res)=>{
     if(req.method!=='GET'){json(res,{error:'Fixture refuses all real HTTP writes'},405);return;}
     if(path==='/api/public-account-config')return json(res,{configured:true,supabaseUrl:'https://fixture.supabase.co',supabasePublishableKey:'sb_publishable_fixture'});
     if(path==='/api/catalog')return json(res,{configured:true,items:[{sku:'CC-010',price_cents:3995,available:true}]});
-    if(path==='/api/health')return json(res,{service:'Burton & Found',checkout:'preview_only',currency:'CAD'});
+    if(path==='/api/health')return json(res,{service:'Burton & Found',checkout:'preview_only',currency:'CAD',shippingCountries:['CA'],shippingMode:'flat_rate',flatRates:[{country:'CA',standard:1995,express:3495,label:'Canada'}]});
     if(path==='/api/account-orders')return json(res,{orders:[]});
     if(path.startsWith('/api/admin/')&&req.headers.authorization==='Bearer fixture-owner'){
       if(path==='/api/admin/me')return json(res,{admin:true});
@@ -186,7 +186,7 @@ try{
      assert((await page.locator('#productGrid .product-card').count())>0);
      const card=page.locator('#productGrid [data-sku="CC-010"]');await card.waitFor({state:'attached'});
      await card.locator('[data-view]').first().click();await visible(page,'#productDialog');await page.locator('#productClose').click();await hidden(page,'#productDialog');
-     await card.locator('[data-add]').click();await page.waitForFunction(()=>document.querySelector('#cartCount')?.textContent.trim()==='1');await page.locator('#cartOpen').click();await visible(page,'#cartDrawer');await page.locator('#checkoutButton').click();await visible(page,'#infoDialog');assert.match(await page.locator('#enquiryDelivery').textContent(),/open your email app/);assert.match(await page.locator('#enquiryDraft').inputValue(),/CC-010/);await page.locator('#enquiryNote').fill('Please confirm dimensions');assert.match(await page.locator('#enquiryDraft').inputValue(),/Please confirm dimensions/);assert(await page.locator('#enquiryEmail').isVisible());await page.locator('#infoClose').click();await hidden(page,'#infoDialog');
+     await card.locator('[data-add]').click();await page.waitForFunction(()=>document.querySelector('#cartCount')?.textContent.trim()==='1');await page.locator('#cartOpen').click();await visible(page,'#cartDrawer');await visible(page,'#flatShipping');assert.match(await page.locator('#flatShippingPrice').textContent(),/59\.90/);assert.match(await page.locator('#flatShippingPrice').textContent(),/74\.90/);await page.locator('#checkoutButton').click();await visible(page,'#infoDialog');assert.match(await page.locator('#enquiryDelivery').textContent(),/open your email app/);assert.match(await page.locator('#enquiryDraft').inputValue(),/CC-010/);await page.locator('#enquiryNote').fill('Please confirm dimensions');assert.match(await page.locator('#enquiryDraft').inputValue(),/Please confirm dimensions/);assert(await page.locator('#enquiryEmail').isVisible());await page.locator('#infoClose').click();await hidden(page,'#infoDialog');
      assert((await page.evaluate(()=>window.__bfCalls)).length===0,'Guest browsing must not call auth');
      await page.locator('#giftFinder summary').click();await page.locator('#giftInterest').selectOption('coca-cola');await page.locator('#giftBudget').selectOption('50');await page.locator('#giftFilter button').click();await page.locator('#giftResults .bf-find-card').first().waitFor({state:'visible'});
      assert.match(await page.locator('#giftResults').textContent(),/CC-010/);
