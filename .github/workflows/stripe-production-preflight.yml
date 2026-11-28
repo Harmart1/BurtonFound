@@ -1,0 +1,50 @@
+name: Verify production Stripe setup (no charges)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/stripe-production-preflight-trigger.txt'
+permissions:
+  contents: read
+jobs:
+  verify-live-merchant:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify preview safety before inspecting production credentials
+        run: node scripts/assert-preview-release.mjs
+      - name: Check production key, merchant and existing destinations without creating anything
+        env:
+          BF_LIVE_KEY: ${{ secrets.BF_STRIPE_LIVE_SECRET_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os,re,json,urllib.request,urllib.error,sys
+          key=os.environ.get("BF_LIVE_KEY","")
+          if not re.fullmatch(r"sk_live_[A-Za-z0-9]+",key):
+              sys.exit("ACTION REQUIRED: save the Burton & Found live Stripe secret key as the encrypted GitHub Actions secret BF_STRIPE_LIVE_SECRET_KEY. No payment changes made.")
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs):return None
+          opener=urllib.request.build_opener(NoRedirect())
+          def read(path):
+              req=urllib.request.Request("https://api.stripe.com/v1/"+path,headers={"Authorization":"Bearer "+key,"Accept":"application/json"})
+              try:
+                  with opener.open(req,timeout=20) as r:return json.load(r)
+              except urllib.error.HTTPError as e:sys.exit("Stripe production verification failed (HTTP "+str(e.code)+"). No credentials or raw response logged.")
+              except Exception:sys.exit("Stripe production connection unavailable.")
+          account=read("account")
+          if account.get("id")!="acct_1SN2j92NSH96TjSa" or account.get("charges_enabled") is not True or account.get("payouts_enabled") is not True:
+              sys.exit("Wrong merchant or Stripe charges/payouts unavailable. No changes made.")
+          print("PASS live credential belongs to Burton & Found; charges and payouts enabled")
+          endpoints=read("webhook_endpoints?limit=100")
+          if endpoints.get("has_more"):sys.exit("Webhook list incomplete. Review in Stripe.")
+          exact=[e for e in endpoints.get("data",[]) if e.get("url")=="https://burtonandfound.ca/api/stripe-webhook" and e.get("livemode") is True and e.get("status")=="enabled"]
+          events={"checkout.session.completed","checkout.session.expired","checkout.session.async_payment_succeeded","checkout.session.async_payment_failed"}
+          print("Matching enabled classic live endpoints:",len(exact))
+          print("Required Checkout event coverage:", "present" if len(exact)==1 and events.issubset(set(exact[0].get("enabled_events",[]))) else "not confirmed")
+          print("No secrets, endpoints, charges, payment sessions, or orders changed. Live checkout still requires controlled cutover and commercial approvals.")
+          PY
