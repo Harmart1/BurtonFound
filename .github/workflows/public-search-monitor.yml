@@ -1,0 +1,17 @@
+name: Monitor public search readiness
+on:
+  schedule:
+    - cron: '43 14 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check canonical sitemap, public page metadata and private page exclusions
+        run: |
+          set -o pipefail
+          python3 scripts/verify-public-search.py --live | tee -a "$GITHUB_STEP_SUMMARY"
