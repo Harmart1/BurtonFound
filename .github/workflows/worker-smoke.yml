@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import json,subprocess,sys,os,urllib.parse
+          import json,subprocess,sys,os,urllib.parse,xml.etree.ElementTree as ET
           origins=("https://burtonandfound.ca","https://www.burtonandfound.ca","https://burtonfound.timharmar.workers.dev")
           base=origins[0]
           checks=[]
@@ -40,7 +40,8 @@ jobs:
               try:
                   status,body=get(path)
                   ok=status==expected and bool(validator(body))
-              except Exception: ok=False
+                  if not ok:print('REVIEW',label,'HTTP',status,'response bytes',len(body))
+              except Exception: ok=False;print('REVIEW',label,'request/parse failed')
               checks.append((label,ok))
           def health(b):
               j=json.loads(b)
@@ -52,6 +53,17 @@ jobs:
           def account(b):
               j=json.loads(b)
               return j.get("configured") is True
+          def sitemap(b):
+              try:
+                  doc=ET.fromstring(b)
+                  urls=[e.text or '' for e in doc.findall('.//{*}loc')]
+                  correct=sum(u.startswith("https://burtonandfound.ca/") for u in urls)
+                  product=sum(u.startswith("https://burtonandfound.ca/products/") for u in urls)
+                  print("Sitemap diagnostic:",base,"entries",len(urls),"branded",correct,"product",product)
+                  return len(urls)==238 and correct==len(urls) and product==229
+              except ET.ParseError:
+                  print("Sitemap diagnostic:",base,"not valid XML; bytes",len(b))
+                  return False
           for base in origins:
               check(base+" — Homepage HTML","/",200,lambda b:b"Burton" in b and b"<html" in b.lower() and b"cf-chl-" not in b.lower())
               check(base+" — Checkout remains preview-only","/api/health",200,health)
@@ -64,7 +76,7 @@ jobs:
               check(base+" — Private CMS studio protected","/api/cms/studio",403,lambda b:bool(json.loads(b).get("error")))
               check(base+" — Customer account page","/account",200,lambda b:b'id="signInForm"' in b and b'id="signUpForm"' in b)
               check(base+" — Branded canonical homepage","/",200,lambda b:b'rel="canonical" href="https://burtonandfound.ca/"' in b)
-              check(base+" — Branded sitemap","/sitemap.xml",200,lambda b:b"<loc>https://burtonandfound.ca/products/" in b and b"workers.dev" not in b)
+              check(base+" — Branded sitemap","/sitemap.xml",200,sitemap)
               check(base+" — Collection preview","/preview.html",200,lambda b:b"prFeaturedGrid" in b and b"<html" in b.lower())
               check(base+" — Hollywood collection","/old-hollywood-new.html",200,lambda b:b"Old Hollywood" in b and b"<html" in b.lower())
               check(base+" — Preview script","/preview-launch.js",200,lambda b:b"prFeaturedGrid" in b and b"BURTON_FEATURED" in b)
