@@ -1,6 +1,7 @@
 /* Merchant-configured flat rates in CAD; never trust client prices. */
 const cents=value=>{const s=String(value??'');return /^\d{1,6}$/.test(s)&&Number(s)>0&&Number(s)<=500000?Number(s):null;};
 export function flatRateFor(env,rawCountry='CA'){
+  if(env.FLAT_RATE_PRICES_APPROVED==='false'||(String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_')&&env.FLAT_RATE_PRICES_APPROVED!=='true'))throw Error('Flat-rate shipping prices are awaiting merchant approval.');
   const country=String(rawCountry??'').trim().toUpperCase();
   const allowed=String(env.SHIPPING_ALLOWED_COUNTRIES||'CA').split(',').map(c=>c.trim().toUpperCase());
   if(!['CA','US'].includes(country)||!allowed.includes(country))throw Error('Shipping to this country is not available.');
