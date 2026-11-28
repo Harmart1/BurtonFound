@@ -1,0 +1,31 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
+const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const ctx={window:{},document:{getElementById:()=>null}};
+runInNewContext(read('public/admin/stock-review.js'),ctx);
+const S=ctx.window.BURTON_STOCK_REVIEW;
+const p={sku:'CC-010',title:'Vintage original',price:39.95,collection:'coca-cola',type:'original',catalogIds:['physical-unit'],image:'assets/item.webp'};
+const other={...p,sku:'CC-011'};
+const snapshot={configured:true,items:[{sku:p.sku,price_cents:3995,available:true},{sku:other.sku,price_cents:3995,available:true}]};
+test('only matched available original listings with unique units become candidates',()=>{
+ assert.equal(S.candidates([p,other],snapshot).length,1);
+ assert.equal(S.candidates([{...p,requiresVerification:true}],snapshot).length,0);
+ assert.equal(S.candidates([{...p,price:40}],snapshot).length,0);
+ assert.equal(S.candidates([{...p,type:'bundle'}],snapshot).length,0);
+ assert.equal(S.candidates([{...p,collection:'automobiles'}],snapshot).length,0);
+ assert.throws(()=>S.candidates([p],{configured:false}));
+ assert.throws(()=>S.candidates([p],{configured:true,items:[snapshot.items[0],snapshot.items[0]]}));
+ assert.equal(S.candidates([{...p,image:'https://untrusted.invalid/img'}],snapshot)[0].image,null);
+});
+test('export requires all four explicit checks and every packed dimension; no changes to stock',()=>{
+ const rows=S.candidates([p],snapshot),input={'CC-010':{located:true,condition:true,unit:true,approved:true,kg:'0.15',length:'35',width:'28',height:'1'}};
+ const stamp='2026-11-28T04:00:00Z',exported=S.review(rows,input,stamp,new Date(stamp));
+ assert.equal(exported.reviewed_candidates.length,1);
+ assert.equal(exported.planning_only,true);assert.equal(exported.requires_independent_recheck,true);
+ assert.equal(exported.reviewed_candidates[0].packed.kg,.15);
+ for(const k of ['located','condition','unit','approved','kg','length','width','height'])assert.equal(S.review(rows,{'CC-010':{...input['CC-010'],[k]:''}},stamp).reviewed_candidates.length,0,k);
+ assert.equal(S.measure('0'),null);assert.equal(S.measure('-1'),null);assert.equal(S.measure('1e2'),null);
+ assert.doesNotMatch(read('public/admin/stock-review.js'),/method:\s*['"](?:POST|PATCH|PUT|DELETE)|localStorage\.|sessionStorage\./);
+});
