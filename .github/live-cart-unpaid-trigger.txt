@@ -1,0 +1,1 @@
+Verify owner-authorized real Canadian checkout using a single temporary unpaid session. No card, real charge or refund; expire and verify recorded release.
