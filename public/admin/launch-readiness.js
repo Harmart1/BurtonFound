@@ -13,9 +13,9 @@
   cloudflare:'https://dash.cloudflare.com/',
   canada:'https://developer-developpeur.canadapost-postescanada.ca/devportal-portaildesdeveloppeurs/',
   fedex:'https://developer.fedex.com/',
-  ship:rootRepo+'/blob/main/CARRIER_LAUNCH_CA_US.md',
-  parcels:rootRepo+'/actions/workflows/deploy-worker.yml',
-  supabase:'https://supabase.com/dashboard/project/nyvdrgpcwfasajyncnhi',
+  ship:rootRepo+'/blob/main/COMMERCIAL_LAUNCH_FLAT_RATE.md',
+  parcels:rootRepo+'/actions/workflows/launch-inventory-audit.yml',
+  supabase:'https://supabase.com/dashboard/project/nyvdrgpcwfasajyncnhi/auth/smtp',
   launch:rootRepo+'/blob/main/STRIPE_PAYMENT_LAUNCH_2026.md'
  });
  const goodEmail=x=>typeof x==='string'&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.trim());
@@ -44,7 +44,7 @@
       'Run safe Stripe readiness audit',links.test),
    item('payouts','Stripe identity & payouts',payoutFlag?'review':'attention',
       payoutFlag?'Owner payout approval flag is set; confirm Stripe still permits payouts.':
-        'Stripe payout identity/liveness verification must be completed by the account holder. Live checkout is blocked.',
+        'Historical Stripe inspection found charges and payouts enabled. Reconfirm before final owner approval; the production payout gate is intentionally off.',
       'Review Stripe verification',links.bank),
    item('tax','Sales tax decision',taxFlag&&v?.stripe?.taxSettings==='active'?'review':'attention',
       'Stripe Tax state: '+(v?.stripe?.taxSettings||'unknown')+
@@ -55,12 +55,12 @@
       'Canada standard '+fmt(flat.CA?.standard)+' / express '+fmt(flat.CA?.express)+'; U.S. standard '+fmt(flat.US?.standard)+' / express '+fmt(flat.US?.express)+
       '. '+(flat.approved?'Price approval recorded; verify packaging and customs.':'Draft amounts only; no public payable flat rates until merchant approval.'),
       'Review flat-rate launch plan',links.ship),
-   item('canada-post','Canada Post live rates',cpVerified?'review':'attention',
+   item('canada-post','Canada Post live rates (optional for flat-rate launch)',v?.shipping?.mode==='flat_rate'?'deferred':cpVerified?'review':'attention',
       'Credentials: '+(cp.credentialsPresent?'present':'missing')+
       ' · Production rate review: '+(cp.productionRatesVerified?'flagged approved':'not approved')+
       ' · Test app: '+(cp.testApp?'yes':'no or not reported')+'.',
       'Open Canada Post Developer Portal',links.canada),
-   item('fedex','FedEx live rates',fxVerified?'review':'attention',
+   item('fedex','FedEx live rates (optional for flat-rate launch)',v?.shipping?.mode==='flat_rate'?'deferred':fxVerified?'review':'attention',
       'Credentials: '+(fedex.credentialsPresent?'present':'missing')+
       ' · Production rate review: '+(fedex.productionRatesVerified?'flagged approved':'not approved')+
       ' · Sandbox: '+(fedex.sandbox?'yes':'no or not reported')+'.',
@@ -90,6 +90,7 @@
    items,
    actionCount:items.filter(x=>x.status==='attention').length,
    reviewCount:items.filter(x=>x.status==='review').length,
+   deferredCount:items.filter(x=>x.status==='deferred').length,
    checkout,
    storefrontBaseline:229,
    backendListings:count,
@@ -105,7 +106,7 @@
   const m=build(v,window.BURTON_CONFIG||{},location.hostname);
   el.innerHTML='<div class="launch-overview" role="status">'+
     '<strong>'+escapeHtml(m.headline)+'</strong>'+
-    '<p>'+escapeHtml(m.actionCount+' areas need owner action; '+m.reviewCount+' have configuration that still requires independent verification.')+'</p>'+
+    '<p>'+escapeHtml(m.actionCount+' areas need owner action; '+m.reviewCount+' require independent verification; '+m.deferredCount+' optional carrier integrations are deferred.')+'</p>'+
     '<p class="launch-small">Read-only diagnostic. No merchant approval, tax registration, carrier rate, original stock, payment, or customer email is verified solely by this page.</p>'+
     '</div>'+
     '<div class="launch-actions">'+
@@ -115,7 +116,7 @@
     '<span id="copyLaunchResult" aria-live="polite"></span></div>'+
     '<div class="readiness-grid">'+m.items.map(x=>
       '<article class="readiness-row"><span class="readiness-state launch-state-'+x.status+'">'+
-      escapeHtml(x.status==='attention'?'Needs owner action':'Verify externally')+'</span>'+
+      escapeHtml(x.status==='attention'?'Needs owner action':x.status==='deferred'?'Optional — deferred':'Verify externally')+'</span>'+
       '<strong>'+escapeHtml(x.title)+'</strong><small>'+escapeHtml(x.detail)+'</small>'+
       '<a target="_blank" rel="noopener noreferrer" href="'+x.url+'">'+escapeHtml(x.action)+'</a></article>'
     ).join('')+'</div>'+
