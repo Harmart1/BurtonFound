@@ -5,3 +5,5 @@ Owner requested correction of Stripe-hosted customer-facing name to Burton and F
 Correct live discovery and gift availability; validate catalogue refresh before enabling checkout. Preserve verified Stripe branding, existing public indexing and all 229 listing approvals.
 
 Deploy initial conservative live Merchant feed for individually documented vintage Coca-Cola magazine pages; no Google submission or advertising. Preserve all live catalogue and payment approvals.
+
+Deploy optional first-party aggregate activity and private owner reporting. Analytics off by default, no IDs or third-party trackers, honor GPC/DNT, retain existing live commerce settings.
