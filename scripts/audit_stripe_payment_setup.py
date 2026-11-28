@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Read-only Stripe launch audit. No live charges, secrets or account IDs in output."""
 import json
+import hashlib
+import hmac
+import time
+import urllib.parse
 import os
 import re
 import subprocess
@@ -117,6 +121,70 @@ def public_safety_check():
     except (ValueError, subprocess.TimeoutExpired, OSError, KeyError):
         return "Unavailable — inspect deployed checkout manually"
 
+def webhook_audit():
+    """Inspect exact test destinations and compare existing GitHub signing key by a no-order probe."""
+    key=os.environ.get("STRIPE_TEST_KEY","").strip()
+    sign=os.environ.get("STRIPE_TEST_WEBHOOK","").strip()
+    if stripe_test_key_status()!="Validated with the connected Burton & Found merchant":
+        return ["| Test webhook inspection | Blocked: test merchant not verified |"]
+    origins=("https://burtonandfound.ca","https://www.burtonandfound.ca",APP)
+    urls={x+"/api/stripe-webhook" for x in origins}
+    required={"checkout.session.completed","checkout.session.expired","checkout.session.async_payment_succeeded","checkout.session.async_payment_failed"}
+    rows=[]
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self,*args,**kwargs):return None
+    opener=urllib.request.build_opener(NoRedirect())
+    def get(path,version=None):
+        headers={"Authorization":"Bearer "+key,"Accept":"application/json"}
+        if version:headers["Stripe-Version"]=version
+        req=urllib.request.Request("https://api.stripe.com/"+path,headers=headers)
+        with opener.open(req,timeout=20) as resp:return json.load(resp)
+    try:
+        data=get("v1/webhook_endpoints?limit=100")
+        active=[x for x in data.get("data",[]) if x.get("livemode") is False and x.get("status")=="enabled"]
+        matching=[x for x in active if x.get("url") in urls]
+        complete=[x for x in matching if required.issubset(set(x.get("enabled_events",[]))) or "*" in x.get("enabled_events",[])]
+        rows.append("| Classic test destinations | "+str(len(active))+" enabled; "+str(len(matching))+" exact store URLs; "+str(len(complete))+" cover all required events; pagination "+("incomplete" if data.get("has_more") else "complete")+" |")
+        for origin in origins:
+            rows.append("| Test endpoint at "+origin+" | "+str(sum(x.get("url")==origin+"/api/stripe-webhook" for x in complete))+" matching enabled endpoints |")
+    except Exception:
+        rows.append("| Classic test destinations | Inspection unavailable |")
+    try:
+        query=urllib.parse.urlencode({"include[0]":"webhook_endpoint.url","limit":100})
+        data=get("v2/core/event_destinations?"+query,"2026-11-18.endive")
+        active=[x for x in data.get("data",[]) if x.get("livemode") is False and x.get("status")=="enabled"]
+        matching=[x for x in active if x.get("type")=="webhook_endpoint" and (x.get("webhook_endpoint") or {}).get("url") in urls]
+        complete=[x for x in matching if x.get("event_payload")=="snapshot" and required.issubset({e.removeprefix("v1.") for e in x.get("enabled_events",[])})]
+        rows.append("| V2 test destinations | "+str(len(active))+" enabled; "+str(len(matching))+" exact store URLs; "+str(len(complete))+" required snapshot configurations; pagination "+("incomplete" if data.get("next_page_url") else "complete")+" |")
+    except Exception:
+        rows.append("| V2 test destinations | Inspection unavailable |")
+    if not re.fullmatch(r"whsec_[A-Za-z0-9]+",sign):
+        return rows+["| Signed isolation probes | GitHub signing credential absent/invalid format |"]
+    payload=json.dumps({"id":"evt_bf_audit_probe","type":"bf.integration.isolation_probe","livemode":False,"data":{"object":{"id":"cs_test_bf_audit_probe","livemode":False,"metadata":{"bf_isolated_qa":"burtonfound-sandbox-v1"}}}},separators=(",",":")).encode()
+    for origin in origins:
+        try:
+            h=subprocess.run(["curl","--silent","--show-error","--max-time","12","--write-out","\\n%{http_code}",origin+"/api/health"],capture_output=True,timeout=15)
+            raw,status=h.stdout.rsplit(b"\n",1)
+            if h.returncode or status!=b"200" or json.loads(raw).get("checkout")!="preview_only":
+                rows.append("| Signed probe at "+origin+" | Blocked: preview-only status not verified |");continue
+            t=str(int(time.time()))
+            sig=hmac.new(sign.encode(),t.encode()+b"."+payload,hashlib.sha256).hexdigest()
+            # Pass the derived signature over stdin rather than printing it or including it in logs.
+            config='header = "Stripe-Signature: t='+t+',v1='+sig+'"\n'
+            with __import__("tempfile").TemporaryFile() as body:
+                body.write(payload);body.seek(0)
+                cmd=["curl","--silent","--show-error","--max-time","12","--config","-","--header","Content-Type: application/json","--data-binary", "@/proc/self/fd/"+str(body.fileno()),"--write-out","\\n%{http_code}",origin+"/api/stripe-webhook"]
+                res=subprocess.run(cmd,input=config.encode(),capture_output=True,pass_fds=(body.fileno(),),timeout=15)
+            raw,code=res.stdout.rsplit(b"\n",1)
+            try:result=json.loads(raw)
+            except ValueError:result={}
+            ok=res.returncode==0 and code==b"200" and result.get("qa_isolated") is True
+            label="PASS: GitHub signing secret matches deployed isolation guard" if ok else "REVIEW: HTTP "+str(int(code))+"; "+("signature rejected" if result.get("error")=="Invalid Stripe webhook signature" else "isolation guard not confirmed")
+            rows.append("| Signed probe at "+origin+" | "+label+" |")
+        except Exception:
+            rows.append("| Signed probe at "+origin+" | Connection or response unavailable |")
+    return rows
+
 def main():
     rows = ["## Active Cloudflare Worker bindings", "",
             "| Payment requirement | Status |", "|---|---|"]
@@ -142,6 +210,7 @@ def main():
                 ("Present (format valid; NOT compared to live Cloudflare secret)"
                  if re.fullmatch(r"whsec_[A-Za-z0-9]+", test_webhook or "")
                  else "Missing or incorrectly formatted") + " |")
+    rows += ["", "## Test webhook destination and signing audit", "", "| Check | Status |", "|---|---|"] + webhook_audit()
     rows += ["", "## Public checkout safety", "", "**" + public_safety_check() + "**", "",
              "## Owner-required prerequisites", "",
              "1. Stripe account must report **payouts_enabled=true** after completing its overdue identity/liveness verification.",
