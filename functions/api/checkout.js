@@ -21,7 +21,7 @@ export async function onRequestPost({request,env}){
     return error(503,'Payment merchant verification is not configured. No payment has been taken.');
   try{
     const activeMerchant=await stripe(env,'account',null,'GET');
-    if(activeMerchant?.id!==expectedMerchant){
+    if(activeMerchant?.id!==expectedMerchant|| (String(env.STRIPE_SECRET_KEY).startsWith('sk_live_')&&(activeMerchant.charges_enabled!==true||activeMerchant.payouts_enabled!==true))){
       console.error('Checkout blocked: Stripe merchant verification mismatch');
       return error(503,'Payment merchant verification is unavailable. No payment has been taken.');
     }
