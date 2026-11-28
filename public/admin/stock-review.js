@@ -66,7 +66,8 @@ load.addEventListener('click',async()=>{
  try{
   owner={id:A.user()?.id,version:A.sessionVersion()};if(!current())throw Error('Approved owner sign-in required.');
   const t=await A.authToken();if(!t||!current()||tokenSeq!==seq)throw Error('Owner session changed.');
-  const auth=await fetch('/api/admin/readiness',{headers:{Authorization:'Bearer '+t},cache:'no-store'});if(!auth.ok)throw Error('Owner access could not be verified.');
+  const auth=await fetch('/api/admin/me',{headers:{Authorization:'Bearer '+t},cache:'no-store'});if(!auth.ok||(await auth.json()).admin!==true)throw Error('Owner access could not be verified.');
+  if(!current()||tokenSeq!==seq)return;
   const r=await fetch('/api/catalog',{cache:'no-store'});if(!r.ok)throw Error('Current stock unavailable.');
   const data=await r.json();if(!current()||tokenSeq!==seq)return;
   rows=candidates(window.BURTON_DATA?.inventory,data,$('stockReviewScope').value==='all'?500:8);checkedAt=new Date().toISOString();render();
