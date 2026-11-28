@@ -11,6 +11,7 @@ export function secure(env){
   // A separate explicit approval is required before any sk_live_* key can enable checkout.
   const liveMoney=String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_');
   if(liveMoney&&(env.LIVE_PAYMENTS_APPROVED!=='true'||env.STRIPE_PAYOUTS_VERIFIED!=='true'))return false;
+  if(env.SHIPPING_MODE!=='live_carrier'&&(env.FLAT_RATE_PRICES_APPROVED==='false'||(liveMoney&&env.FLAT_RATE_PRICES_APPROVED!=='true')))return false;
   // A valid API key or a synthetic quote is not evidence of verified commercial rates.
   // In live money mode require a separately signed-off production carrier.
   if(liveMoney&&env.SHIPPING_MODE==='live_carrier'
