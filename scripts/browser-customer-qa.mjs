@@ -132,6 +132,17 @@ try{
      const metrics=await page.evaluate(()=>({resources:performance.getEntriesByType('resource').length,encodedBytes:performance.getEntriesByType('resource').reduce((n,r)=>n+r.encodedBodySize,0),domReadyMs:Math.round(performance.getEntriesByType('navigation')[0]?.domContentLoadedEventEnd||0)}));
      console.log('Local synthetic page measurements '+size+': '+JSON.stringify(metrics)+' (not real-user Core Web Vitals)');
    });
+   await test(size+' live collection cards distinguish available and sold automobile items',viewport,async page=>{
+     await page.route('**/api/catalog',route=>route.fulfill({json:{configured:true,items:[{sku:'VA-001',price_cents:1695,available:true,checkout_eligible:true},{sku:'VA-002',price_cents:2195,available:false,checkout_eligible:true}]}}));
+     await page.goto(origin+'/collections/automobiles.html');
+     const first=page.locator('[data-bf-card-sku="VA-001"]'),second=page.locator('[data-bf-card-sku="VA-002"]');
+     await first.getByText('Available · Canadian checkout',{exact:true}).waitFor({state:'visible'});
+     await second.getByText('Sold or reserved',{exact:true}).waitFor({state:'visible'});
+     assert.match(await first.locator('[data-bf-card-price]').textContent(),/16\.95/);
+     assert.equal(await first.locator('.mk-enquiry').count(),0);
+     await first.click();await page.getByText('Available for Canadian checkout',{exact:true}).waitFor({state:'visible'});
+     assert.match(await page.locator('[data-bf-shop-link]').textContent(),/add to bag/);
+   });
    await test(size+' private owner exception report and mode isolation',viewport,async page=>{
      await page.goto(origin+'/admin/orders.html?owner_fixture=1');await visible(page,'#dashboard');
      const wizard=page.locator('#launchWizard');
