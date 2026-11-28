@@ -5,3 +5,5 @@ Fresh run after owner reports live key added; verify encrypted credential only.
 Run safe missing-versus-invalid credential diagnostic.
 
 Owner reports corrected live key; fresh production credential check.
+
+Owner created production destination; verify live endpoint and inspect encrypted Worker binding presence.
