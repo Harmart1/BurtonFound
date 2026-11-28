@@ -37,7 +37,7 @@
     "SHIPPING_EXPRESS_CA_CENTS": "3495",
     "SHIPPING_STANDARD_US_CENTS": "2995",
     "SHIPPING_EXPRESS_US_CENTS": "4995",
-    "FLAT_RATE_PRICES_APPROVED": "false"
+    "FLAT_RATE_PRICES_APPROVED": "true"
   },
   "ratelimits": [
     {
