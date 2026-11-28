@@ -42,6 +42,8 @@ export async function onRequestPost({request,env}){
     if(!hold?.id||!Array.isArray(hold.lines))throw Error(hold?.error||'Those originals are not currently available');
     const origin=safeReturnUrl(request),created=Math.floor(Date.now()/1000);
     const args={mode:'payment','payment_method_types[0]':'card',success_url:`${origin}/checkout-success.html?session_id={CHECKOUT_SESSION_ID}`,cancel_url:`${origin}/index.html?checkout=cancelled#shop`,'shipping_address_collection[allowed_countries][0]':country,'phone_number_collection[enabled]':'true',expires_at:String(created+1860),client_reference_id:hold.id,'metadata[bf_hold_id]':hold.id,'metadata[source]':'burton-found'};
+    // Use the storefront's public trading name on each newly created hosted Checkout page.
+    args['branding_settings[display_name]']='Burton and Found';
     if(live){args['metadata[bf_terms_version]']='CA-2026-11-28';args['custom_text[submit][message]']='Canadian delivery only. Review items and shipping before payment. Seller: Burton and Found, 249-700-1871. No GST/HST currently charged. No voluntary change-of-mind returns unless agreed; statutory rights preserved.';}
     hold.lines.forEach((p,i)=>{
       args[`line_items[${i}][price_data][currency]`]='cad';args[`line_items[${i}][price_data][unit_amount]`]=String(p.price_cents);
