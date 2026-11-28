@@ -24,7 +24,7 @@
  function build(v={},configuration={},hostname='burtonfound.timharmar.workers.dev'){
   const count=number(v?.supabase?.listings),remaining=count===null?null:Math.max(0,229-count);
   const stockDetail=count===null?'Database could not be checked; download the latest SKU reconciliation.':
-   count+' database SKUs against the 229-listing launch baseline. '+
+   count+' database SKUs against the 229-listing launch baseline. Individually approved live SKUs: '+(number(v?.supabase?.approvedLiveSkuCount)??'not checked')+'. '+
    (remaining?remaining+' published listings have no matching checkout SKU; the automobile designs remain enquiry-only until physically verified.':
     'All SKUs are represented, but physical condition and ownership still require seller review.');
   const cp=v?.shipping?.canadaPost||{},fedex=v?.shipping?.fedex||{};
