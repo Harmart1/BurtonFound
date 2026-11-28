@@ -5,7 +5,7 @@
 - Merchant head office and dispatch origin supplied by owner; postal code P6A 1Z1, Sault Ste. Marie, ON. Do not publish a street/return address until owner confirms appropriate public contact details.
 - Owner reports not registered for GST/HST. Stripe Tax head-office setup is active; automatic tax remains off. This is not a determination of eligibility for small-supplier status.
 - Merchant's preference is Canada and United States flat-rate tracked postage first. Live carrier credentials are not required for this initial model.
-- Draft prices in CAD: Canada standard 19.95, express 34.95; US standard 29.95, express 49.95. These are proposed seller prices, not carrier quotations. FLAT_RATE_PRICES_APPROVED=false, US_SHIPPING_APPROVED=false, CANADA_POST_US_DUTIES_APPROVED=false. All checkout and live-payment flags remain false.
+- Owner-approved starting prices in CAD: Canada standard 19.95, express 34.95; US standard 29.95, express 49.95. These are approved seller prices, not verified carrier quotations. FLAT_RATE_PRICES_APPROVED=true, US_SHIPPING_APPROVED=false, CANADA_POST_US_DUTIES_APPROVED=false. All checkout and live-payment flags remain false.
 - Verify packed weight, dimensions, protection, carrier prices to representative destinations and supported cart combinations before approving flat rates. Oversize, unusually fragile, or uneconomic shipments should be enquiry-only until costed. Do not infer package sizes or customs origin from photographs.
 - Verify actual stock, including any imported/automobile items, before changing enquiry-only listings.
 
@@ -28,3 +28,6 @@ Keep the tax approval gate off until the owner has confirmed the correct tax tre
 
 ## Launch gate
 Verify actual account confirmation/reset email delivery using an owner-controlled mailbox, provide a working customer support email, approve shipping/returns disclosures, verify stock and package costs, reconcile test checkout and refunds, and approve actual live key and webhook configuration separately. Search indexing and payments remain off pending owner launch approval.
+
+## Owner approval and completed sandbox tests
+Owner accepted the four recommended flat prices on November 27, 2026. Keep live checkout and US customs approvals off until separate authorization and operational checks. Stripe sandbox job 46095017815 passed session creation, separate test-card payment, refund, and isolated inventory tests; actual Stripe event delivery and production payment readiness are separate checks.
