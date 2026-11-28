@@ -15,3 +15,5 @@ Deploy owner-authorized temporary customer email configuration and verified cont
 Refresh deployment after updating obsolete no-contact inventory audit expectation; no payment activation.
 
 Deploy owner-only GST/HST screening and additional public launch readiness checks. All payment, tax and US customs gates remain off.
+
+Deploy owner fulfillment documents, draft email and shipping expense calculator; retain all preview-only checkout and customs safety gates.
