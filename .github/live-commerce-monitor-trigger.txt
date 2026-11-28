@@ -1,3 +1,5 @@
 Verify production storefront and merchant without initiating any checkout sessions or modifying live configuration.
 
 Verify expanded automobile catalogue and existing production payment connection.
+
+Verify corrected merchant public display name and existing statement descriptor.
