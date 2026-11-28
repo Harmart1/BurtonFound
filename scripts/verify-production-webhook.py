@@ -40,6 +40,12 @@ def main():
         if status!=200 or body.get("live_probe") is not True:sys.exit("Production signature probe rejected at "+base+" (HTTP "+str(status)+")")
         if probe(base,"0"*64)[0]!=400:sys.exit("Invalid signature not rejected at "+base)
         print("PASS "+base+" — production signature accepted, invalid signature rejected, checkout state verified.")
+    if expected_live:
+        payload=json.dumps({"id":"evt_bf_live_merchant_probe","type":"bf.integration.live_merchant_probe","livemode":True},separators=(",",":")).encode()
+        stamp=str(int(time.time()));signature=hmac.new(sign.encode(),stamp.encode()+b"."+payload,hashlib.sha256).hexdigest()
+        status,body=probe("https://burtonandfound.ca",signature)
+        if status!=200 or body.get("merchant_verified") is not True:sys.exit("Deployed live merchant verification failed")
+        print("PASS deployed live Stripe credential verified against authorized merchant; charges and payouts enabled.")
     print("No real Stripe events, orders, inventory reservations, payments or refunds created.")
 if __name__=="__main__":
     try:main()
