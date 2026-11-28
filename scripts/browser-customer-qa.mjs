@@ -16,7 +16,7 @@ const server=createServer(async(req,res)=>{
     const path=new URL(req.url,'http://127.0.0.1').pathname;
     if(req.method!=='GET'){json(res,{error:'Fixture refuses all real HTTP writes'},405);return;}
     if(path==='/api/public-account-config')return json(res,{configured:true,supabaseUrl:'https://fixture.supabase.co',supabasePublishableKey:'sb_publishable_fixture'});
-    if(path==='/api/catalog')return json(res,{configured:true,items:[{sku:'CC-010',price_cents:2495,available:true}]});
+    if(path==='/api/catalog')return json(res,{configured:true,items:[{sku:'CC-010',price_cents:3995,available:true}]});
     if(path==='/api/health')return json(res,{service:'Burton & Found',checkout:'preview_only',currency:'CAD'});
     if(path==='/api/account-orders')return json(res,{orders:[]});
     if(path.startsWith('/api/admin/')&&req.headers.authorization==='Bearer fixture-owner'){
@@ -147,6 +147,17 @@ try{
      for(let i=0;i<5;i++)await wizard.getByRole('button',{name:'Next',exact:true}).click();
      assert.match(await wizard.locator('.wizard-step h3').textContent(),/Verify US customs/);
      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Owner wizard horizontal overflow');
+     await page.locator('#stockReviewLoad').click();
+     const reviewCard=page.locator('.stock-review-card').first();await reviewCard.waitFor({state:'visible'});
+     assert.match(await reviewCard.textContent(),/CC-010/);
+     assert(await page.locator('#stockReviewDownload').isDisabled());
+     for(const field of ['located','condition','unit','approved'])await reviewCard.locator('input[data-field="'+field+'"]').check();
+     assert(await page.locator('#stockReviewDownload').isDisabled());
+     for(const [field,value] of [['kg','0.15'],['length','35'],['width','28'],['height','1']])await reviewCard.locator('input[data-field="'+field+'"]').fill(value);
+     assert(await page.locator('#stockReviewDownload').isEnabled());
+     assert.match(await page.locator('#stockReviewStatus').textContent(),/1 of 1 candidates fully reviewed/);
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Stock review horizontal overflow');
+
 
      await page.locator('#ledgerFrom').fill('2026-11-01');await page.locator('#ledgerTo').fill('2026-11-30');
      await page.locator('#ledgerLoad').click();await page.locator('#exceptionRows tr').first().waitFor({state:'visible'});
