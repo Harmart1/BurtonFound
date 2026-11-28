@@ -1,0 +1,28 @@
+name: Verify live cart (unpaid session only)
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_unpaid:
+        type: boolean
+        default: false
+        description: Authorize one temporary hold on CC-010 and expiration of the unpaid live Checkout session
+  push:
+    branches: [main]
+    paths:
+      - '.github/live-cart-unpaid-trigger.txt'
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-worker-deployment
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm_unpaid) || (github.event_name == 'push' && github.event.head_commit.message == 'Verify authorized live cart without payment'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify one live session and expire without paying
+        env:
+          BF_LIVE_KEY: ${{ secrets.BF_STRIPE_LIVE_SECRET_KEY }}
+        run: python3 scripts/verify-live-cart-unpaid.py
