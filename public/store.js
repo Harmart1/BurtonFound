@@ -22,6 +22,30 @@
   let checkoutReady=false,checkoutMode='preview_only',inventoryConnected=false,shippingMode='flat_rate',allowedShippingCountries=['CA'];
   let activeShippingQuote=null,liveOptions=[],shippingRequestId=0,flatRates=[],flatCountry='CA',checkoutInFlight=false,checkoutError='';
   let liveApprovedSkus=new Set();
+  const pendingKey='bf_pending_checkout_v1';
+  let pendingCheckout=null,cancelInFlight=null;
+  try{pendingCheckout=JSON.parse(sessionStorage.getItem(pendingKey)||'null');}catch{}
+  function savePending(value){pendingCheckout=value;try{if(value)sessionStorage.setItem(pendingKey,JSON.stringify(value));else sessionStorage.removeItem(pendingKey);}catch{}}
+  function validPending(p){return p&&/^cs_(test|live)_[A-Za-z0-9_]{12,160}$/.test(p.session_id||'')&&/^[a-f0-9]{64}$/.test(p.cancel_token||'')&&Array.isArray(p.skus);}
+  async function cancelPending(){
+    if(cancelInFlight)return cancelInFlight;
+    if(!validPending(pendingCheckout))return false;
+    const p=pendingCheckout;
+    cancelInFlight=(async()=>{
+      checkoutError='Releasing your previous unpaid checkout reservation…';renderCart();
+      try{
+        const response=await fetch('/api/checkout-cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:p.session_id,cancel_token:p.cancel_token})});
+        const data=await response.json();
+        if(!response.ok)throw Error(data.error||'Cancellation could not be confirmed.');
+        if(pendingCheckout?.session_id===p.session_id)savePending(null);
+        checkoutError=data.released===true?'':'Previous checkout could not be released. If payment was completed, stock remains unavailable.';
+        if(data.released===true)toast('Unpaid checkout cancelled. Stock released.');
+        return data.released===true;
+      }catch(e){checkoutError=e.message||'Stock release could not be confirmed. Please try again or contact us.';return false;}
+      finally{await loadLiveStatus();}
+    })();
+    try{return await cancelInFlight;}finally{cancelInFlight=null;renderCart();}
+  }
   const baseNeedsVerification=p=>p?.requiresVerification===true||p?.availableForCheckout===false;
   const autoApproved=p=>p?.collection==='automobiles'&&checkoutMode==='live_mode'&&liveApprovedSkus.has(p.sku);
   const needsVerification=p=>!autoApproved(p)&&(baseNeedsVerification(p)||(checkoutMode==='live_mode'&&!liveApprovedSkus.has(p?.sku)));
@@ -159,7 +183,7 @@
     bag.push(sku);window.BURTON_ACTIVITY?.record('add_to_bag',p.type==='bundle'?'sets':p.collection||'other');saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();
     toast('A good find! Added to your paper bag.');
   }
-  function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();}
+  function removeItem(sku){if(checkoutInFlight)return;bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();if(validPending(pendingCheckout)&&pendingCheckout.skus.includes(sku))void cancelPending();else void loadLiveStatus();}
   function openCart(){
     if($('cartDrawer').classList.contains('open'))return;
     const active=document.activeElement;
@@ -188,7 +212,7 @@
       return `<div class="cart-item"><img src="${safe(p.image)}" alt=""><div><small>${safe(p.collection==='automobiles'?'VINTAGE AUTOMOBILE ADVERTISING':p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD EPHEMERA':'ORIGINAL · '+p.year)}</small><strong>${safe(p.title)}</strong><small>${safe(p.sku)} · Qty 1</small><button type="button" data-remove="${safe(p.sku)}">Remove</button></div><b>${money(p.price)}</b></div>`;
     }).join(''):`<div class="cart-empty"><span>✳</span><h3>Your bag is a blank page.</h3><p>A good find is just around the corner.</p><button type="button" class="btn btn-outline" id="bagBrowse">Explore the shelves ↗</button></div>`;
     const enquiryOnly=bagNeedsVerification();
-    const b=$('checkoutButton');b.disabled=stockRefreshing||checkoutInFlight||!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
+    const b=$('checkoutButton');b.disabled=stockRefreshing||!!cancelInFlight||checkoutInFlight||!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
     const terms=$('livePurchaseTerms'),accept=$('liveTermsAccepted');const liveReview=checkoutMode==='live_mode'&&checkoutReady&&bag.length>0&&!enquiryOnly;
     if(terms)terms.hidden=!liveReview; // Keep the button actionable so an unchecked terms box receives a clear prompt; handleCheckout still requires consent.
     const flat=$('flatShipping'),flatMenu=$('flatShipCountry'),flatPrice=$('flatShippingPrice');
@@ -234,7 +258,7 @@
     catch(err){if(requestId!==shippingRequestId)return;target.textContent=err.message||'Rates unavailable · Contact the shop for a shipping quote';renderCart();}
   }
   async function handleCheckout(){
-    if(stockRefreshing||checkoutInFlight||!bag.length||bagHasOverlappingUnits())return;
+    if(stockRefreshing||cancelInFlight||checkoutInFlight||!bag.length||bagHasOverlappingUnits())return;
     if(checkoutReady&&!bagNeedsVerification()){
       if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Please remove unavailable items first.');return;}
       if(checkoutMode==='live_mode'&&!$('liveTermsAccepted')?.checked){checkoutError='Please review and confirm the purchase terms.';renderCart();$('liveTermsAccepted')?.focus();return;}
@@ -245,6 +269,7 @@
         const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:checkoutSkus,...(checkoutMode==='live_mode'?{terms_version:'CA-2026-11-28'}:{}),...(shippingMode==='live_carrier'?{shipping_quote:checkoutQuote}:{shipping_country:checkoutCountry})})});
         const data=await response.json();if(!response.ok||!/^https:\/\/checkout\.stripe\.com\//.test(data.url||''))throw Error(data.error||'Checkout unavailable');
         if(checkoutMode==='live_mode'){try{window.BURTON_ACTIVITY?.record('checkout_open','other');}catch{/* Optional analytics must never prevent payment navigation. */}}
+        if(validPending({...data,skus:checkoutSkus}))savePending({session_id:data.session_id,cancel_token:data.cancel_token,skus:checkoutSkus});
         location.assign(data.url);return;
       }catch(e){checkoutError=e.message||'Checkout could not be confirmed. Please contact the shop before trying again.';renderCart();await loadLiveStatus();}
       finally{checkoutInFlight=false;renderCart();}
@@ -336,7 +361,10 @@
     $('flatShipCountry')?.addEventListener('change',e=>{flatCountry=e.target.value;renderCart();});
     $('shippingForm')?.addEventListener('submit',getShippingQuote);
     $('shippingForm')?.addEventListener('input',()=>{shippingRequestId++;if(activeShippingQuote||liveOptions.length){activeShippingQuote=null;liveOptions=[];$('shippingResults').textContent='Destination changed · Compare rates again';$('shippingEstimateTotal').hidden=true;renderCart();}});
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadLiveStatus()});
+    const returnedFromCheckout=()=>new URLSearchParams(location.search).get('checkout')==='cancelled'||performance.getEntriesByType?.('navigation')?.[0]?.type==='back_forward';
+    if(returnedFromCheckout()&&validPending(pendingCheckout))void cancelPending();
+    window.addEventListener('pageshow',e=>{if(e.persisted&&validPending(pendingCheckout))void cancelPending();else if(e.persisted)void loadLiveStatus();});
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!cancelInFlight)void loadLiveStatus()});
     $('saveBagButton').addEventListener('click',async()=>{if(!bag.length){toast('First add a vintage find to your bag.');return;}const title=prompt('Name this saved bag:', 'My vintage favourites');if(title===null)return;try{await window.BURTON_ACCOUNT?.saveNamedBag(title,bag);toast(window.BURTON_ACCOUNT?.user()?.id?'Bag saved to your collector account.':'Saved to this browser only. Create an account to sync it.');}catch(e){toast('Could not save bag: '+e.message);}});
     $('productClose').addEventListener('click',()=>$('productDialog').close());
     $('zoomClose').addEventListener('click',()=>$('zoomDialog').close());
