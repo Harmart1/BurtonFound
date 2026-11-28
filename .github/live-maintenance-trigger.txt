@@ -15,3 +15,5 @@ Urgent owner-reported Stripe checkout repair: restore alternate storefront stock
 Release an original immediately when its own unpaid Stripe checkout is cancelled or an item is removed after return. Require capability authorization, Stripe-confirmed unpaid expiry and authoritative stock refresh. Run live reservation release and browser tests, preserve all approved commercial settings and roll back on verification failure.
 
 Retry cancellation release after correcting the synthetic carrier session ID to a realistic Stripe shape; all production checks remain required.
+
+Add an accessible floating Top button to storefront and generated collection pages, with mobile and desktop tests and reduced-motion support. Preserve all approved live commercial settings and inventory.
