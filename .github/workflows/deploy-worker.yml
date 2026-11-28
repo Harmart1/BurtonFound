@@ -168,16 +168,16 @@ jobs:
           base="https://burtonfound.timharmar.workers.dev"
           # Use the same curl path that already passed the live API smoke test.
           # Python urllib receives a Cloudflare bot-policy 403 for public static assets.
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview.html" -o /tmp/bf-preview.html
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/" -o /tmp/bf-homepage.html
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/homepage-collections.css" -o /tmp/bf-homepage.css
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview-launch.js" -o /tmp/bf-preview.js
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/preview-launch.css" -o /tmp/bf-preview.css
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/old-hollywood-new.html" -o /tmp/bf-hollywood.html
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/assets/images/old-hollywood/ohnew-003-01.webp" -o /tmp/bf-photo.webp
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/coke-new-products.js" -o /tmp/bf-coke-products.js
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/coke-new-feature.css" -o /tmp/bf-coke-feature.css
-          curl --fail --silent --show-error --max-time 20 --retry 2 "$base/assets/images/coca-cola/new-2026/brussels-1958-hero.webp" -o /tmp/bf-coke-photo.webp
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/preview.html" -o /tmp/bf-preview.html
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/" -o /tmp/bf-homepage.html
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/homepage-collections.css" -o /tmp/bf-homepage.css
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/preview-launch.js" -o /tmp/bf-preview.js
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/preview-launch.css" -o /tmp/bf-preview.css
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/old-hollywood-new.html" -o /tmp/bf-hollywood.html
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/assets/images/old-hollywood/ohnew-003-01.webp" -o /tmp/bf-photo.webp
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/coke-new-products.js" -o /tmp/bf-coke-products.js
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/coke-new-feature.css" -o /tmp/bf-coke-feature.css
+          curl --fail --silent --show-error --location --max-redirs 2 --proto-redir "=https" --max-time 20 --retry 2 "$base/assets/images/coca-cola/new-2026/brussels-1958-hero.webp" -o /tmp/bf-coke-photo.webp
           # Cloudflare may deliver managed-browser challenges to CI clients.
           # Keep diagnostics transparent: HTTP 200 is not proof of the actual page.
           python3 - <<'PY'
@@ -188,7 +188,7 @@ jobs:
             ('/tmp/bf-coke-feature.css',b'bf-coke-feature-grid'),
             ('/tmp/bf-homepage.html',b'Browse the collection'),
             ('/tmp/bf-homepage.css',b'spotlight-grid'),
-            ('/tmp/bf-preview.js',b'OH-NEW-003-01'),
+            ('/tmp/bf-preview.js',b'prFeaturedGrid'),
             ('/tmp/bf-preview.css',b'pr-products'),
             ('/tmp/bf-hollywood.html',b'Old Hollywood')
           ]
