@@ -20,7 +20,7 @@
   let toastTimer;
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
   let checkoutReady=false,checkoutMode='preview_only',inventoryConnected=false,shippingMode='flat_rate',allowedShippingCountries=['CA'];
-  let activeShippingQuote=null,liveOptions=[],shippingRequestId=0;
+  let activeShippingQuote=null,liveOptions=[],shippingRequestId=0,flatRates=[],flatCountry='CA';
   const needsVerification=p=>p?.requiresVerification===true||p?.availableForCheckout===false;
   const bagNeedsVerification=()=>bag.some(id=>needsVerification(bySku.get(id)));
   const bagHasOverlappingUnits=()=>{
@@ -34,7 +34,7 @@
     window.BURTON_DISCOVERY_VIEW?.setStock(null);
     try {
       const health=await fetch('/api/health',{cache:'no-store'});
-      if(health.ok){const v=await health.json();checkoutMode=v.checkout||'preview_only';shippingMode=v.shippingMode||'flat_rate';checkoutReady=['test_mode','live_mode','configured'].includes(checkoutMode);allowedShippingCountries=Array.isArray(v.shippingCountries)?v.shippingCountries:['CA'];const menu=$('shipCountry');if(menu){for(const opt of menu.options){opt.disabled=!allowedShippingCountries.includes(opt.value);}if(!allowedShippingCountries.includes(menu.value)){menu.value=allowedShippingCountries.find(c=>[...menu.options].some(o=>o.value===c))||'CA';}}}else{checkoutReady=false;checkoutMode='preview_only';}
+      if(health.ok){const v=await health.json();checkoutMode=v.checkout||'preview_only';shippingMode=v.shippingMode||'flat_rate';checkoutReady=['test_mode','live_mode','configured'].includes(checkoutMode);allowedShippingCountries=Array.isArray(v.shippingCountries)?v.shippingCountries:['CA'];flatRates=Array.isArray(v.flatRates)?v.flatRates.filter(r=>['CA','US'].includes(r.country)&&Number.isInteger(r.standard)&&r.standard>0):[];if(!flatRates.some(r=>r.country===flatCountry))flatCountry=flatRates[0]?.country||'CA';const menu=$('shipCountry');if(menu){for(const opt of menu.options){opt.disabled=!allowedShippingCountries.includes(opt.value);}if(!allowedShippingCountries.includes(menu.value)){menu.value=allowedShippingCountries.find(c=>[...menu.options].some(o=>o.value===c))||'CA';}}}else{checkoutReady=false;checkoutMode='preview_only';}
       const res=await fetch('/api/catalog',{cache:'no-store'});
       if(res.ok){const v=await res.json();if(v.configured&&Array.isArray(v.items)){
         window.BURTON_DISCOVERY_VIEW?.setStock(v);inventoryConnected=true;for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly||needsVerification(p))continue;
@@ -175,6 +175,14 @@
     }).join(''):`<div class="cart-empty"><span>✳</span><h3>Your bag is a blank page.</h3><p>A good find is just around the corner.</p><button type="button" class="btn btn-outline" id="bagBrowse">Explore the shelves ↗</button></div>`;
     const enquiryOnly=bagNeedsVerification();
     const b=$('checkoutButton');b.disabled=!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
+    const flat=$('flatShipping'),flatMenu=$('flatShipCountry'),flatPrice=$('flatShippingPrice');
+    if(flat&&flatMenu&&flatPrice){
+      flat.hidden=!bag.length||enquiryOnly||shippingMode!=='flat_rate'||!checkoutReady||!flatRates.length;
+      flatMenu.replaceChildren(...flatRates.map(rate=>{const opt=document.createElement('option');opt.value=rate.country;opt.textContent=rate.country==='CA'?'Canada':'United States';return opt;}));
+      flatMenu.value=flatCountry;
+      const rate=flatRates.find(r=>r.country===flatCountry);
+      flatPrice.textContent=rate?'Standard '+money(rate.standard/100)+(Number.isInteger(rate.express)?' · Express '+money(rate.express/100):'')+(rate.country==='US'?' · Customs terms apply; review the shipping policy before purchase.':''):'Shipping will be confirmed before payment.';
+    }
     const estimator=$('shippingEstimator');if(estimator)estimator.hidden=!bag.length||enquiryOnly||shippingMode!=='live_carrier';
     if(enquiryOnly){
       $('cartSubtotal').textContent=money(bag.reduce((n,id)=>n+(bySku.get(id)?.price||0),0));
@@ -211,7 +219,7 @@
       const btn=$('checkoutButton');btn.disabled=true;btn.textContent='Connecting securely…';
       try {
         const token=await window.BURTON_ACCOUNT?.authToken?.();
-        const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:bag,...(shippingMode==='live_carrier'?{shipping_quote:activeShippingQuote}:{})})});
+        const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:bag,...(shippingMode==='live_carrier'?{shipping_quote:activeShippingQuote}:{shipping_country:flatCountry})})});
         const data=await response.json();if(!response.ok||!/^https:\/\/checkout\.stripe\.com\//.test(data.url||''))throw Error(data.error||'Checkout unavailable');
         location.assign(data.url);return;
       }catch(e){toast(e.message||'Checkout unavailable. No payment taken.');await loadLiveStatus();}
@@ -300,6 +308,7 @@
     document.addEventListener('bf:auth-change',()=>{const signedIn=!!window.BURTON_ACCOUNT?.user?.()?.email;const label=document.getElementById('accountNavLabel');if(label)label.textContent=signedIn?'MY ACCOUNT':'SIGN IN';const c=document.querySelector('.account-create-header');if(c)c.hidden=signedIn;const a=document.querySelector('.account-header-link');if(a)a.href=signedIn?'account.html':'account.html#signin';});$('cartClose').addEventListener('click',closeCart);$('scrim').addEventListener('click',closeCart);
     $('cartItems').addEventListener('click',e=>{if(e.target.closest('[data-remove]'))removeItem(e.target.closest('[data-remove]').dataset.remove);if(e.target.closest('#bagBrowse')){closeCart();$('shop').scrollIntoView({behavior:'smooth'});}});
     $('checkoutButton').addEventListener('click',handleCheckout);
+    $('flatShipCountry')?.addEventListener('change',e=>{flatCountry=e.target.value;renderCart();});
     $('shippingForm')?.addEventListener('submit',getShippingQuote);
     $('shippingForm')?.addEventListener('input',()=>{shippingRequestId++;if(activeShippingQuote||liveOptions.length){activeShippingQuote=null;liveOptions=[];$('shippingResults').textContent='Destination changed · Compare rates again';$('shippingEstimateTotal').hidden=true;renderCart();}});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadLiveStatus()});
