@@ -1,0 +1,16 @@
+/* Fixed navigation clear of the cart, menus and dialogs. */
+.bf-back-to-top {
+ position:fixed; z-index:35;
+ right:calc(16px + env(safe-area-inset-right,0px));
+ bottom:calc(16px + env(safe-area-inset-bottom,0px));
+ display:inline-flex; align-items:center; justify-content:center; gap:7px;
+ min-height:48px; min-width:72px; padding:10px 16px; border-radius:999px;
+ border:1px solid #f7f4ec; background:#203c33; color:#fff;
+ font:700 15px/1.15 system-ui,sans-serif; cursor:pointer; box-shadow:0 3px 14px #0004;
+}
+.bf-back-to-top span:first-child{font-size:21px;line-height:1;}
+.bf-back-to-top:hover{background:#31584b;color:#fff;}
+.bf-back-to-top:focus-visible{outline:3px solid #be8234;outline-offset:3px;}
+.bf-back-to-top[hidden],body.no-scroll .bf-back-to-top,body.site-menu-open .bf-back-to-top,body:has(dialog[open]) .bf-back-to-top,body:has(.cart-drawer.open) .bf-back-to-top{display:none!important;}
+html[data-theme="dark"] .bf-back-to-top{background:#f3e7d1;color:#203c33;border-color:#203c33;}
+html[data-theme="dark"] .bf-back-to-top:hover{background:#fff9ee;color:#203c33;}
