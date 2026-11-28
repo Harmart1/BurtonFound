@@ -31,8 +31,10 @@ test('Privacy, marketing and consumer policies are grounded in applicable statut
   assert.match(privacy,/Anti-Spam Legislation/);
   const sale=read('public/policies/shipping-returns.html');
   assert.match(sale,/Consumer Protection Act, 2002/);
-  assert.match(sale,/Online card checkout is disabled/);
-  assert.match(sale,/not yet established an optional change-of-mind return window/);
+  assert.match(sale,/Burton and Found sells eligible/);
+  assert.match(sale,/249-700-1871/);
+  assert.match(sale,/2-356 Queen Street East/);
+  assert.match(sale,/does not offer a voluntary change-of-mind return/);
   assert.match(sale,/does not override, statutory cancellation/);
   const terms=read('public/policies/terms.html');
   assert.match(terms,/statutory warranties/);
