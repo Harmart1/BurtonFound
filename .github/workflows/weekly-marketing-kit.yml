@@ -5,6 +5,10 @@ on:
     # Monday 13:00 UTC. Artifacts only; nothing is auto-posted or emailed.
     - cron: '0 13 * * 1'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/weekly-marketing-trigger.txt'
 
 permissions:
   contents: read
@@ -24,12 +28,15 @@ jobs:
         shell: bash
         run: |
           if ! curl --fail --location --silent --show-error --retry 2 --max-time 25 \
-            "https://burtonfound.timharmar.workers.dev/api/catalog" \
+            "https://burtonandfound.ca/api/catalog" \
             --output marketing-stock-snapshot.json; then
             rm -f marketing-stock-snapshot.json
-            echo "Stock service unavailable — marketing drafts will use catalogue data and require review."
+            echo "Stock service unavailable — no weekly kit generated."
+            exit 1
           fi
-      - name: Generate marketing outputs
+      - name: Generate stock-checked marketing outputs
+        env:
+          BF_REQUIRE_LIVE_MARKETING_STOCK: 'true'
         run: npm run build:marketing
       - name: Build branded square and portrait promotional drafts
         run: |
