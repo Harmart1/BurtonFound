@@ -3,3 +3,5 @@ Refresh live collection cards and product stock display, retain exact existing 2
 Owner requested correction of Stripe-hosted customer-facing name to Burton and Found. No legal identity, account, payout, tax, pricing or shipping changes. Verify unpaid provider session and actual live storefront, rollback on failure.
 
 Correct live discovery and gift availability; validate catalogue refresh before enabling checkout. Preserve verified Stripe branding, existing public indexing and all 229 listing approvals.
+
+Deploy initial conservative live Merchant feed for individually documented vintage Coca-Cola magazine pages; no Google submission or advertising. Preserve all live catalogue and payment approvals.
