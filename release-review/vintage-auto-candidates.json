@@ -1,0 +1,825 @@
+{
+  "scope": "CA",
+  "physical_inventory_confirmation_required": true,
+  "products": [
+    {
+      "sku": "VA-001",
+      "title": "1934 Nash — Right with the World",
+      "price_cents": 1695,
+      "units": [
+        "VA-001"
+      ]
+    },
+    {
+      "sku": "VA-002",
+      "title": "1934 Buick — Knee-Action Wheels",
+      "price_cents": 2195,
+      "units": [
+        "VA-002"
+      ]
+    },
+    {
+      "sku": "VA-003",
+      "title": "Lincoln Seven-Passenger Sedan — Monument Illustration",
+      "price_cents": 1595,
+      "units": [
+        "VA-003"
+      ]
+    },
+    {
+      "sku": "VA-004",
+      "title": "Cadillac — Leadership Rests on Achievement",
+      "price_cents": 2295,
+      "units": [
+        "VA-004"
+      ]
+    },
+    {
+      "sku": "VA-005",
+      "title": "Plymouth Six — Glad We Looked at All Three",
+      "price_cents": 1295,
+      "units": [
+        "VA-005"
+      ]
+    },
+    {
+      "sku": "VA-006",
+      "title": "Dodge Eight — Bought My First Dodge Nearly Twenty Years Ago",
+      "price_cents": 1295,
+      "units": [
+        "VA-006"
+      ]
+    },
+    {
+      "sku": "VA-010",
+      "title": "1965 Pontiac Grand Prix — Second-Best-Looking Car",
+      "price_cents": 1795,
+      "units": [
+        "VA-010"
+      ]
+    },
+    {
+      "sku": "VA-011",
+      "title": "Oldsmobile Vista-Cruiser Station Wagon",
+      "price_cents": 1795,
+      "units": [
+        "VA-011"
+      ]
+    },
+    {
+      "sku": "VA-012",
+      "title": "1965 Cadillac — More Than a New Car",
+      "price_cents": 1995,
+      "units": [
+        "VA-012"
+      ]
+    },
+    {
+      "sku": "VA-013",
+      "title": "Buick — I Would Greet You with a Smile",
+      "price_cents": 1895,
+      "units": [
+        "VA-013"
+      ]
+    },
+    {
+      "sku": "VA-014",
+      "title": "1957 Chevrolet — Sweet, Smooth and Sassy",
+      "price_cents": 1995,
+      "units": [
+        "VA-014"
+      ]
+    },
+    {
+      "sku": "VA-016",
+      "title": "1960 Pontiac — Right of Creative Design",
+      "price_cents": 1795,
+      "units": [
+        "VA-016"
+      ]
+    },
+    {
+      "sku": "VA-017",
+      "title": "Cadillac — Elegance Is the Word",
+      "price_cents": 2295,
+      "units": [
+        "VA-017"
+      ]
+    },
+    {
+      "sku": "VA-018",
+      "title": "Mercedes-Benz — Sophisticated, Studebaker-Packard",
+      "price_cents": 2295,
+      "units": [
+        "VA-018"
+      ]
+    },
+    {
+      "sku": "VA-020",
+      "title": "Nash — Golden Year for Nash",
+      "price_cents": 1995,
+      "units": [
+        "VA-020"
+      ]
+    },
+    {
+      "sku": "VA-022",
+      "title": "Oldsmobile Rocket 88 — Super 88",
+      "price_cents": 1795,
+      "units": [
+        "VA-022"
+      ]
+    },
+    {
+      "sku": "VA-023",
+      "title": "Body by Fisher — So Big",
+      "price_cents": 1595,
+      "units": [
+        "VA-023"
+      ]
+    },
+    {
+      "sku": "VA-024",
+      "title": "Buick — Custom Built for Custom Service",
+      "price_cents": 1495,
+      "units": [
+        "VA-024"
+      ]
+    },
+    {
+      "sku": "VA-025",
+      "title": "Plymouth — The One for '41",
+      "price_cents": 1495,
+      "units": [
+        "VA-025"
+      ]
+    },
+    {
+      "sku": "VA-026",
+      "title": "Buick Limited — Beautiful in Any Setting",
+      "price_cents": 1295,
+      "units": [
+        "VA-026"
+      ]
+    },
+    {
+      "sku": "VA-027",
+      "title": "Nash — Weather Eye Magic",
+      "price_cents": 1895,
+      "units": [
+        "VA-027"
+      ]
+    },
+    {
+      "sku": "VA-028",
+      "title": "Ford Thunderbird — Poolside Automobile Photograph",
+      "price_cents": 2295,
+      "units": [
+        "VA-028"
+      ]
+    },
+    {
+      "sku": "VA-029",
+      "title": "1961 Ford Thunderbird — Presenting the Thunderbird",
+      "price_cents": 1595,
+      "units": [
+        "VA-029"
+      ]
+    },
+    {
+      "sku": "VA-030",
+      "title": "Plymouth Six — I Know Something About Machinery",
+      "price_cents": 1295,
+      "units": [
+        "VA-030"
+      ]
+    },
+    {
+      "sku": "VA-031",
+      "title": "Chrysler Airflow — Authentic Streamlining",
+      "price_cents": 1495,
+      "units": [
+        "VA-031"
+      ]
+    },
+    {
+      "sku": "VA-032",
+      "title": "Buick — Pattern for the World's Finest",
+      "price_cents": 1295,
+      "units": [
+        "VA-032"
+      ]
+    },
+    {
+      "sku": "VA-033",
+      "title": "Plymouth Six — Taking No Chances with My Kids",
+      "price_cents": 1295,
+      "units": [
+        "VA-033"
+      ]
+    },
+    {
+      "sku": "VA-034",
+      "title": "1934 Buick — Assurance of Complete Motoring Satisfaction",
+      "price_cents": 2195,
+      "units": [
+        "VA-034"
+      ]
+    },
+    {
+      "sku": "VA-035",
+      "title": "Oldsmobile — A Brand New Oldsmobile in the Low-Price Field",
+      "price_cents": 1295,
+      "units": [
+        "VA-035"
+      ]
+    },
+    {
+      "sku": "VA-036",
+      "title": "1939 Buick — Buick's the Beauty",
+      "price_cents": 1495,
+      "units": [
+        "VA-036"
+      ]
+    },
+    {
+      "sku": "VA-037",
+      "title": "Nash — Look Out, It's Catching",
+      "price_cents": 1895,
+      "units": [
+        "VA-037"
+      ]
+    },
+    {
+      "sku": "VA-038",
+      "title": "1934 Nash — Eyes Right, Eyes Left",
+      "price_cents": 1495,
+      "units": [
+        "VA-038"
+      ]
+    },
+    {
+      "sku": "VA-039",
+      "title": "Buick — Knee-Action Wheels",
+      "price_cents": 1895,
+      "units": [
+        "VA-039"
+      ]
+    },
+    {
+      "sku": "VA-040",
+      "title": "Plymouth — Building a Canal, Good Engineering Counts",
+      "price_cents": 1295,
+      "units": [
+        "VA-040"
+      ]
+    },
+    {
+      "sku": "VA-041",
+      "title": "Ford V-8 — Only V-8 in the Low-Price Field",
+      "price_cents": 1595,
+      "units": [
+        "VA-041"
+      ]
+    },
+    {
+      "sku": "VA-044",
+      "title": "Plymouth — New Wagons with Wonderful Ways",
+      "price_cents": 1795,
+      "units": [
+        "VA-044"
+      ]
+    },
+    {
+      "sku": "VA-045",
+      "title": "Plymouth — New '36 Plymouth Now on Display",
+      "price_cents": 1595,
+      "units": [
+        "VA-045"
+      ]
+    },
+    {
+      "sku": "VA-046",
+      "title": "Chrysler — The Beautiful New Chrysler",
+      "price_cents": 1995,
+      "units": [
+        "VA-046"
+      ]
+    },
+    {
+      "sku": "VA-047",
+      "title": "Oldsmobile — Rockets Ahead",
+      "price_cents": 1995,
+      "units": [
+        "VA-047"
+      ]
+    },
+    {
+      "sku": "VA-048",
+      "title": "Plymouth — Luxury Ride and Luxury Price",
+      "price_cents": 1495,
+      "units": [
+        "VA-048"
+      ]
+    },
+    {
+      "sku": "VA-049",
+      "title": "1958 DeSoto — Pick Your DeSoto, Pick Your Price",
+      "price_cents": 1895,
+      "units": [
+        "VA-049"
+      ]
+    },
+    {
+      "sku": "VA-051",
+      "title": "Plymouth — Red Convertible in the Mountains",
+      "price_cents": 1995,
+      "units": [
+        "VA-051"
+      ]
+    },
+    {
+      "sku": "VA-052",
+      "title": "Chrysler — Roominess",
+      "price_cents": 1795,
+      "units": [
+        "VA-052"
+      ]
+    },
+    {
+      "sku": "VA-053",
+      "title": "Plymouth — The New Travel Car",
+      "price_cents": 1795,
+      "units": [
+        "VA-053"
+      ]
+    },
+    {
+      "sku": "VA-054",
+      "title": "Canadian Briscoe Motor Car Advertisement",
+      "price_cents": 1995,
+      "units": [
+        "VA-054"
+      ]
+    },
+    {
+      "sku": "VA-055",
+      "title": "DeSoto — All-New DeSoto Advertisement",
+      "price_cents": 1895,
+      "units": [
+        "VA-055"
+      ]
+    },
+    {
+      "sku": "VA-056",
+      "title": "1953 Nash — The Travelingest Car Ever Built",
+      "price_cents": 1995,
+      "units": [
+        "VA-056"
+      ]
+    },
+    {
+      "sku": "VA-057",
+      "title": "Plymouth — Red Car at Home",
+      "price_cents": 1995,
+      "units": [
+        "VA-057"
+      ]
+    },
+    {
+      "sku": "VA-058",
+      "title": "Studebaker — Speed and Power Automobile Advertisement",
+      "price_cents": 1795,
+      "units": [
+        "VA-058"
+      ]
+    },
+    {
+      "sku": "VA-060",
+      "title": "Lincoln Continental — Six Thousand Two Hundred Seventy Dollars",
+      "price_cents": 2295,
+      "units": [
+        "VA-060"
+      ]
+    },
+    {
+      "sku": "VA-061",
+      "title": "Dodge Eight — Since the First Dodge",
+      "price_cents": 1295,
+      "units": [
+        "VA-061"
+      ]
+    },
+    {
+      "sku": "VA-062",
+      "title": "Cadillac — Leadership Rests on Achievement",
+      "price_cents": 1995,
+      "units": [
+        "VA-062"
+      ]
+    },
+    {
+      "sku": "VA-063",
+      "title": "1934 Nash — Car of a Million K's",
+      "price_cents": 1495,
+      "units": [
+        "VA-063"
+      ]
+    },
+    {
+      "sku": "VA-064",
+      "title": "Lincoln — Two-Window Town Sedan",
+      "price_cents": 1495,
+      "units": [
+        "VA-064"
+      ]
+    },
+    {
+      "sku": "VA-065",
+      "title": "Plymouth — Real Fun Starts with a Safe Car",
+      "price_cents": 1495,
+      "units": [
+        "VA-065"
+      ]
+    },
+    {
+      "sku": "VA-066",
+      "title": "Lincoln Seven-Passenger Sedan — Roadside Profile",
+      "price_cents": 1595,
+      "units": [
+        "VA-066"
+      ]
+    },
+    {
+      "sku": "VA-067",
+      "title": "1940 Plymouth — Switching to Plymouth",
+      "price_cents": 1495,
+      "units": [
+        "VA-067"
+      ]
+    },
+    {
+      "sku": "VA-068",
+      "title": "Nash — You'll Be Happier in a Nash",
+      "price_cents": 1895,
+      "units": [
+        "VA-068"
+      ]
+    },
+    {
+      "sku": "VA-069",
+      "title": "Cadillac — Unique Acclaim, Even for a Cadillac",
+      "price_cents": 2295,
+      "units": [
+        "VA-069"
+      ]
+    },
+    {
+      "sku": "VA-070",
+      "title": "1960 Thunderbird — Parade Flag Ceremony",
+      "price_cents": 1495,
+      "units": [
+        "VA-070"
+      ]
+    },
+    {
+      "sku": "VA-071",
+      "title": "1960 Thunderbird — The Sliding Sun Roof",
+      "price_cents": 1495,
+      "units": [
+        "VA-071"
+      ]
+    },
+    {
+      "sku": "VA-072",
+      "title": "1959 Thunderbird — The Car Everyone Would Love to Own",
+      "price_cents": 2295,
+      "units": [
+        "VA-072"
+      ]
+    },
+    {
+      "sku": "VA-074",
+      "title": "1956 Lincoln — Unmistakably the Finest",
+      "price_cents": 2295,
+      "units": [
+        "VA-074"
+      ]
+    },
+    {
+      "sku": "VA-076",
+      "title": "1938 Lincoln-Zephyr V-12",
+      "price_cents": 1995,
+      "units": [
+        "VA-076"
+      ]
+    },
+    {
+      "sku": "VA-077",
+      "title": "Buick Roadmaster — Where There's Roadmaster, There's Life",
+      "price_cents": 1295,
+      "units": [
+        "VA-077"
+      ]
+    },
+    {
+      "sku": "VA-078",
+      "title": "Lincoln — Now You Can Own a Lincoln",
+      "price_cents": 1495,
+      "units": [
+        "VA-078"
+      ]
+    },
+    {
+      "sku": "VA-079",
+      "title": "1959 Chrysler — Sweet Temptation",
+      "price_cents": 1795,
+      "units": [
+        "VA-079"
+      ]
+    },
+    {
+      "sku": "VA-080",
+      "title": "Chrysler Six — Convertible Coupe for $925",
+      "price_cents": 2495,
+      "units": [
+        "VA-080"
+      ]
+    },
+    {
+      "sku": "VA-081",
+      "title": "Plymouth — We Found What We Wanted",
+      "price_cents": 1795,
+      "units": [
+        "VA-081"
+      ]
+    },
+    {
+      "sku": "VA-082",
+      "title": "Buick — Listen to a Smart Summer Gathering",
+      "price_cents": 1895,
+      "units": [
+        "VA-082"
+      ]
+    },
+    {
+      "sku": "VA-083",
+      "title": "Plymouth — Two Big Results of Great Engineering",
+      "price_cents": 1295,
+      "units": [
+        "VA-083"
+      ]
+    },
+    {
+      "sku": "VA-084",
+      "title": "Lincoln-Zephyr V-12 — Goodbye Bad Lands",
+      "price_cents": 2295,
+      "units": [
+        "VA-084"
+      ]
+    },
+    {
+      "sku": "VA-085",
+      "title": "Buick — Traveler's Aide",
+      "price_cents": 1295,
+      "units": [
+        "VA-085"
+      ]
+    },
+    {
+      "sku": "VA-086",
+      "title": "Nash — The Hounds of Spring Are at Your Heels",
+      "price_cents": 1995,
+      "units": [
+        "VA-086"
+      ]
+    },
+    {
+      "sku": "VA-087",
+      "title": "Oldsmobile — This Year It's Oldsmobile",
+      "price_cents": 1295,
+      "units": [
+        "VA-087"
+      ]
+    },
+    {
+      "sku": "VA-089",
+      "title": "Plymouth — It Looks Big, It Is Big",
+      "price_cents": 1295,
+      "units": [
+        "VA-089"
+      ]
+    },
+    {
+      "sku": "VA-090",
+      "title": "1939 Buick — What This Country Needs Is More SEE Power",
+      "price_cents": 1695,
+      "units": [
+        "VA-090"
+      ]
+    },
+    {
+      "sku": "VA-091",
+      "title": "Nash — It'll Lead You Astray",
+      "price_cents": 1995,
+      "units": [
+        "VA-091"
+      ]
+    },
+    {
+      "sku": "VA-092",
+      "title": "Oldsmobile — Lowest-Priced Car with Modern Coil Springs",
+      "price_cents": 1295,
+      "units": [
+        "VA-092"
+      ]
+    },
+    {
+      "sku": "VA-093",
+      "title": "1939 Hudson — The Day You Change to Hudson",
+      "price_cents": 1495,
+      "units": [
+        "VA-093"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET01",
+      "title": "Art Deco Engineering",
+      "price_cents": 4495,
+      "units": [
+        "VA-001",
+        "VA-002",
+        "VA-031"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET02",
+      "title": "Buick in Colour",
+      "price_cents": 4995,
+      "units": [
+        "VA-013",
+        "VA-034",
+        "VA-039"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET03",
+      "title": "Cadillac Style & Prestige",
+      "price_cents": 5995,
+      "units": [
+        "VA-004",
+        "VA-017",
+        "VA-069"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET04",
+      "title": "The Thunderbird Years",
+      "price_cents": 4495,
+      "units": [
+        "VA-029",
+        "VA-071",
+        "VA-072"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET05",
+      "title": "Plymouth: Safety, Comfort & Value",
+      "price_cents": 3995,
+      "units": [
+        "VA-025",
+        "VA-045",
+        "VA-048"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET06",
+      "title": "Colourful American Road Trips",
+      "price_cents": 4995,
+      "units": [
+        "VA-014",
+        "VA-020",
+        "VA-051"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET07",
+      "title": "The Oldsmobile Rocket Story",
+      "price_cents": 4495,
+      "units": [
+        "VA-022",
+        "VA-035",
+        "VA-047"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET08",
+      "title": "DeSoto Design & Choice",
+      "price_cents": 3295,
+      "units": [
+        "VA-049",
+        "VA-055"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET09",
+      "title": "Nash: Adventure in Colour",
+      "price_cents": 4995,
+      "units": [
+        "VA-027",
+        "VA-056",
+        "VA-086"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET10",
+      "title": "Lincoln: Luxury Across the Decades",
+      "price_cents": 4995,
+      "units": [
+        "VA-003",
+        "VA-074",
+        "VA-076"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET11",
+      "title": "From the V-8 to Thunderbird",
+      "price_cents": 4495,
+      "units": [
+        "VA-041",
+        "VA-028",
+        "VA-070"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET12",
+      "title": "Family Wagons & Holiday Motoring",
+      "price_cents": 4495,
+      "units": [
+        "VA-011",
+        "VA-044",
+        "VA-053"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET13",
+      "title": "The Chrysler Look",
+      "price_cents": 4995,
+      "units": [
+        "VA-046",
+        "VA-052",
+        "VA-079"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET14",
+      "title": "Plymouth Engineering & Everyday Life",
+      "price_cents": 3495,
+      "units": [
+        "VA-005",
+        "VA-030",
+        "VA-040"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET15",
+      "title": "Showroom Sophistication",
+      "price_cents": 4995,
+      "units": [
+        "VA-012",
+        "VA-018",
+        "VA-058"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET16",
+      "title": "Buick: The Formal Years",
+      "price_cents": 3495,
+      "units": [
+        "VA-024",
+        "VA-026",
+        "VA-032"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET17",
+      "title": "Early Motor-Car Milestones",
+      "price_cents": 4995,
+      "units": [
+        "VA-054",
+        "VA-080",
+        "VA-093"
+      ]
+    },
+    {
+      "sku": "BF-VA-SET18",
+      "title": "Nash Road Stories",
+      "price_cents": 4995,
+      "units": [
+        "VA-037",
+        "VA-068",
+        "VA-091"
+      ]
+    }
+  ]
+}
