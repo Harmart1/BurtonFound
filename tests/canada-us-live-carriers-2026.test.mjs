@@ -114,7 +114,7 @@ test('Signed US rates cannot become paid orders before customs approvals; Canada
 });
 test('Readiness flags default off and no invented packed sizes are shipped to Cloudflare',()=>{
  const vars=JSON.parse(readFileSync(new URL('../wrangler.jsonc',import.meta.url),'utf8')).vars;
- assert.equal(vars.SHIPPING_ALLOWED_COUNTRIES,'CA,US');
+ assert.equal(vars.SHIPPING_ALLOWED_COUNTRIES,'CA');
  assert.equal(vars.CANADA_POST_API_MODE,'json');
  for(const k of ['LIVE_CHECKOUT_ENABLED','LIVE_PAYMENTS_APPROVED','TAX_CONFIGURATION_APPROVED','CARRIER_QUOTES_ENABLED','US_SHIPPING_APPROVED','CANADA_POST_US_DUTIES_APPROVED','CANADA_POST_PRODUCTION_VERIFIED','FEDEX_PRODUCTION_VERIFIED'])
   assert.equal(vars[k],'false',k);
