@@ -38,7 +38,7 @@ function render(){
  <div class="order-actions">${o.record_mode!=='live'?'<strong>Non-live or unknown record — no real shipment or customer contact.</strong>':''}<button class="secondary" type="button" data-action="packing">Print packing slip</button>${o.record_mode==='live'?'<a class="secondary" href="https://www.canadapost-postescanada.ca/cpc/en/small-business/snap-ship.page" target="_blank" rel="noopener noreferrer">Canada Post Snap Ship ↗</a><a class="secondary" href="https://www.fedex.com/en-ca/shipping/ship-online.html" target="_blank" rel="noopener noreferrer">FedEx Ship Manager ↗</a>':''}<button class="secondary" type="button" data-action="address">Copy address</button><button class="secondary" type="button" data-action="email">Prepare update email</button>${F?.ready(o)?`<button class="secondary" type="button" data-action="summary">Print paid order summary</button><button class="secondary" type="button" data-action="confirmation">Prepare order confirmation</button><button class="secondary" type="button" data-action="shipping-cost">Calculate shipping contribution</button>`:'' }<button class="secondary" type="button" data-action="history">View change history</button></div>
  <div class="shipping-cost-panel" hidden></div><div class="history" hidden></div></article>`).join('')||'<div class="help">No orders match these filters</div>';
 }
-async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Recent order records, including review and test records');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness();loadHolds()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
+async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Recent order records, including review and test records');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness();loadHolds();loadActivity()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
 async function loadReadiness(){
  const el=$('readinessResults');if(!el)return;
  el.textContent='Checking connected services…';if($('launchWizard'))$('launchWizard').textContent='Checking authenticated launch configuration…';
@@ -82,6 +82,16 @@ function exportCsv(){
  const csv='\ufeff'+[cols,...data].map(r=>r.map(csvCell).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`burton-found-orders-${new Date().toISOString().slice(0,10)}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  status('Private order register downloaded. Store it securely; it contains customer personal information.');
 }
+async function loadActivity(){
+ const host=$('activityRows'),label=$('activityStatus');if(!host||!label)return;
+ host.replaceChildren();label.textContent='Loading aggregate activity…';
+ try{const d=await request('/api/admin/activity');if(!d?.totals||!d.byCollection)throw Error('Report unavailable');
+ const rows=[['All collections',d.totals],...Object.entries(d.byCollection)];
+ for(const [name,counts] of rows){const tr=document.createElement('tr');for(const value of [name,counts.page_view,counts.add_to_bag,counts.checkout_open]){const td=document.createElement('td');td.textContent=String(value??0);tr.append(td)}host.append(tr);}
+ label.textContent=d.from+' to '+d.to+' UTC · Opt-in counts only; zero means no recorded activity, not no visitors.';
+ }catch{label.textContent='Activity report unavailable. Refresh to retry.';}
+}
+$('activityRefresh')?.addEventListener('click',loadActivity);
 $('reload').addEventListener('click',refresh);
 $('refreshReadiness').addEventListener('click',loadReadiness);$('exportCsv').addEventListener('click',exportCsv);
 $('orderSort')?.addEventListener('change',render);$('statusFilter').addEventListener('change',render);$('orderSearch').addEventListener('input',render);
