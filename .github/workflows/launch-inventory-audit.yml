@@ -60,6 +60,7 @@ jobs:
           name: burtonfound-launch-inventory-review
           path: |
             marketing-output/launch-inventory-review.csv
+            marketing-output/canada-first-shortlist.csv
             marketing-output/launch-inventory-reconciliation.md
             marketing-output/flat-rate-cost-review.csv
             marketing-output/flat-rate-cost-review.md
