@@ -21,7 +21,7 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/account-orders')return json(res,{orders:[]});
     if(path.startsWith('/api/admin/')&&req.headers.authorization==='Bearer fixture-owner'){
       if(path==='/api/admin/me')return json(res,{admin:true});
-      if(path==='/api/admin/orders')return json(res,{orders:[]});
+      if(path==='/api/admin/orders')return json(res,{orders:[ownerRow,ownerClean].map(o=>({...o,record_mode:'live',customer_name:'Fixture Collector',email:'collector@example.invalid',item_lines:o.item_lines.map(p=>({...p,title:'Fixture collectible'}))}))});
       if(path==='/api/admin/holds')return json(res,{holds:[]});
       if(path==='/api/admin/bookkeeping')return json(res,{orders:[ownerRow,ownerClean]});
       if(path==='/api/admin/stripe-reconciliation')return json(res,{from:'2026-11-01',to:'2026-11-30',mode:'live',excluded:0,notice:'Synthetic comparison only',rows:[{id:ownerRow.id,issues:['Refund reported — reconcile individual refund status and balance transactions'],refund_reported_cents:1500},{id:ownerClean.id,issues:['Disputed charge — manual review'],refund_reported_cents:0}]});
@@ -142,6 +142,19 @@ try{
      await page.locator('#exceptionFilter').selectOption('review');assert.equal(await page.locator('#exceptionRows tr').count(),1);
      await page.locator('#ledgerMode').selectOption('test');assert.equal(await page.locator('#exceptionRows tr').count(),0);
      assert(await page.locator('#exceptionExport').isDisabled());
+     const live=page.locator('.order[data-id="fixture-paid-order"]'),review=page.locator('.order[data-id="fixture-refunded-order"]');
+     assert(await live.locator('[data-action="summary"]').isVisible());
+     assert.equal(await review.locator('[data-action="summary"]').count(),0);
+     await live.locator('[data-action="shipping-cost"]').click();
+     const panel=live.locator('.shipping-cost-panel');await panel.waitFor({state:'visible'});
+     for(const [i,c] of ['3.00','1.00','0','0.50'].entries())await panel.locator('[data-expense="'+i+'"]').fill(c);
+     assert.match(await panel.locator('[role="status"]').textContent(),/Shipping contribution.*0\.50/);
+     await panel.locator('[data-expense="0"]').fill('6.00');
+     assert.match(await panel.locator('[role="status"]').textContent(),/Shipping shortfall.*2\.50/);
+     await live.locator('[data-action="shipping-cost"]').click();assert(await panel.isHidden());
+     await live.locator('[data-action="shipping-cost"]').click();assert(await panel.isVisible());
+     assert.match(await panel.locator('[role="status"]').textContent(),/Enter all four costs/);
+
    });
    await test(size+' browse catalogue and guest shopping bag',viewport,async page=>{
      await page.goto(origin+'/#shop');await ready(page);await page.locator('#productGrid .product-card').first().waitFor({state:'visible'});
