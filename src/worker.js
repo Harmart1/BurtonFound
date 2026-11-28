@@ -27,7 +27,11 @@ import {onRequestPost as cmsMedia} from '../functions/api/cms/media.js';
 import {commerceProtection} from './commerce-protection.js';
 import {sitemapXml,robotsText} from './seo-assets.generated.js';
 
+import {onRequestPost as activity} from '../functions/api/activity.js';
+import {onRequestGet as adminActivity} from '../functions/api/admin/activity.js';
 const routes = {
+  '/api/activity': {POST: activity},
+  '/api/admin/activity': {GET: adminActivity},
   '/api/health': {GET: health},
   '/api/public-account-config': {GET: publicAccountConfig},
   '/api/catalog': {GET: catalog},
