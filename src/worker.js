@@ -24,6 +24,7 @@ import {onRequestPost as cmsTeam} from '../functions/api/cms/team.js';
 import {onRequestPost as cmsMedia} from '../functions/api/cms/media.js';
 
 import {commerceProtection} from './commerce-protection.js';
+import {sitemapXml,robotsText} from './seo-assets.generated.js';
 
 const routes = {
   '/api/health': {GET: health},
@@ -59,6 +60,13 @@ const response = (message,status,headers={})=>new Response(JSON.stringify({error
 export default {
   async fetch(request,env,ctx){
     const path=new URL(request.url).pathname;
+    if(path==='/sitemap.xml'||path==='/robots.txt'){
+      if(!['GET','HEAD'].includes(request.method))return response('Method not allowed',405,{allow:'GET, HEAD'});
+      const sitemap=path==='/sitemap.xml';
+      const headers={'content-type':sitemap?'application/xml; charset=utf-8':'text/plain; charset=utf-8','cache-control':'public, max-age=300','x-content-type-options':'nosniff'};
+      if(env.MARKETING_INDEXING_APPROVED!=='true')headers['x-robots-tag']='noindex';
+      return new Response(request.method==='HEAD'?null:sitemap?sitemapXml:robotsText,{status:200,headers});
+    }
     if(!path.startsWith('/api/')){
       if(!env.ASSETS?.fetch)return response('Static asset binding missing',503);
       return env.ASSETS.fetch(request);
