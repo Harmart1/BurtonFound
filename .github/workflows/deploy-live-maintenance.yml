@@ -213,6 +213,13 @@ jobs:
       - name: Verify live Merchant feed against public catalogue
         if: env.BF_INDEX_PUBLIC == 'true'
         run: python3 scripts/verify-merchant-feed.py
+      - name: Verify private aggregate analytics access boundary
+        run: |
+          status=$(curl --silent --show-error --max-time 20 -o /dev/null -w '%{http_code}' https://burtonandfound.ca/api/admin/activity)
+          test "$status" = 403
+          status=$(curl --silent --show-error --max-time 20 -o /dev/null -w '%{http_code}' -H 'Origin: https://burtonandfound.ca' -H 'Sec-GPC: 1' -H 'Content-Type: application/json' -d '{"event":"page_view","collection":"home"}' https://burtonandfound.ca/api/activity)
+          test "$status" = 204
+          echo 'PASS anonymous report blocked and privacy opt-out accepted; no activity recorded.'
       - name: Restore previous live version on failed maintenance deployment or postflight
         if: failure() && steps.live_deploy.outcome != 'skipped' && steps.live_deploy.outcome != ''
         uses: cloudflare/wrangler-action@v4
