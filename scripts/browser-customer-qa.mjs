@@ -233,7 +233,7 @@ try{
        await button.waitFor({state:'visible'});
        assert.equal(await button.getAttribute('aria-label'),'Back to top of page');
        const box=await button.boundingBox();assert(box&&box.height>=44&&box.x>=0&&box.x+box.width<=viewport.width+1);
-       if(path==='/'){await page.locator('#cartOpen').click();await hidden(page,'#bfBackToTop');await page.locator('#cartClose').click();await visible(page,'#bfBackToTop');}
+       if(path==='/'){await page.locator('#cartOpen').evaluate(el=>el.click());await visible(page,'#cartDrawer');await hidden(page,'#bfBackToTop');await page.locator('#cartClose').click();await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'}));await visible(page,'#bfBackToTop');}
        await button.click();await page.waitForFunction(()=>window.scrollY===0);
        await hidden(page,'#bfBackToTop');
      }
