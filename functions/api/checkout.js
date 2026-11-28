@@ -1,3 +1,4 @@
+import {cancellationToken} from './checkout-cancel.js';
 import {boundedJson} from '../_lib/bounded-json.js';
 import {verifyQuote} from '../_lib/shipping.js';
 import {json,error,secure,checkSameOrigin,rpc,db,stripe,safeReturnUrl,verifiedUser,approvedLiveSkus} from '../_lib/core.js';
@@ -63,7 +64,7 @@ export async function onRequestPost({request,env}){
     if(!(live?/^cs_live_/:/^cs_test_/).test(session.id)||!/^https:\/\/checkout\.stripe\.com\//.test(session.url||''))throw Error('Stripe did not return a usable checkout URL');
     if(await rpc(env,'bf_bind_stripe_session',{p_hold_id:hold.id,p_session_id:session.id})!==true)
       throw Error('Checkout reservation could not be bound');
-    return json({url:session.url,session_id:session.id});
+    return json({url:session.url,session_id:session.id,cancel_token:await cancellationToken(env,session.id)});
   }catch(e){
     console.error('Checkout could not start',e.message);
     // A network timeout is not proof that Stripe failed to create a session.
