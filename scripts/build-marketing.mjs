@@ -82,7 +82,7 @@ const head=(title,desc,path,photo='',type='website',ld=null,unverified=false)=>{
   '<meta name="twitter:image" content="'+clean(abs(img))+'"><meta name="twitter:image:alt" content="'+clean(title+' · Burton & Found catalogue')+'">'+
   '<link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'+
   '<link rel="stylesheet" href="/marketing.css"><link rel="stylesheet" href="/policy-modal.css"><script defer src="/policy-modal.js"></script><script defer src="/marketing-share.js"></script>'+
-  (type==='product'&&!unverified?'<script defer src="/marketing-stock.js"></script>':'')+
+  (type==='product'?'<script defer src="/marketing-stock.js"></script>':'')+
   (ld?'<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'</script>':'')+'</head>';
 };
 const header='<header class="mk-head"><div class="mk-wrap mk-head-inner"><a class="mk-logo" href="/">B<span>&amp;</span>F <small>Burton &amp; Found</small></a><nav aria-label="Explore the collections"><a href="/collections/coca-cola.html">Coca-Cola</a><a href="/collections/hollywood.html">Old Hollywood</a><a href="/collections/automobiles.html">Automobiles</a><a href="/collections/sets.html">Curated sets</a><a href="/guides/collecting-vintage-ads.html">Collector guides</a><a href="/gifts/vintage-gifts-for-collectors.html">Gift ideas</a><a href="/#shop">Shop</a></nav></div></header>';
@@ -109,13 +109,13 @@ for(const p of items){
  const photos=imgs.map((im,i)=>'<a href="/'+clean(im)+'" target="_blank" rel="noopener" aria-label="View photograph '+(i+1)+' of '+clean(p.title)+'"><img src="/'+clean(im)+'" alt="'+clean(p.title)+' — photograph '+(i+1)+'" '+(i?'loading="lazy"':'fetchpriority="high"')+' decoding="async" width="600" height="800"></a>').join('');
  const cat=collectionFor(p);
  const info='<nav class="mk-crumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="'+collectionUrl(cat)+'">'+navLabel(p)+'</a> / '+clean(p.title)+'</nav>'+
-  '<div class="mk-detail"'+(enquiry(p)?'':' data-bf-stock-sku="'+clean(p.sku)+'"')+'><div class="mk-gallery">'+photos+'</div><div class="mk-detail-info"><p class="mk-kicker">'+clean(p.type==='bundle'?'Curated set':categoryLabel(p))+'</p>'+
+  '<div class="mk-detail" data-bf-stock-sku="'+clean(p.sku)+'"><div class="mk-gallery">'+photos+'</div><div class="mk-detail-info"><p class="mk-kicker">'+clean(p.type==='bundle'?'Curated set':categoryLabel(p))+'</p>'+
   '<h1>'+clean(p.title)+'</h1><p class="mk-price"><span data-bf-price>'+dollar(p.price)+'</span> <small>CAD asking price</small></p><p class="mk-stock" aria-live="polite" data-bf-availability>'+(enquiry(p)?'Enquiry only · physical inventory unverified':'Request availability')+'</p><p>'+clean(copy)+'</p>'+
   '<dl><div><dt>Catalogue reference</dt><dd>'+clean(p.sku)+'</dd></div><div><dt>Item format</dt><dd>'+clean(p.edition||'Vintage printed-paper item')+'</dd></div>'+
   (p.year&&Number(p.year)>1900?'<div><dt>Year indicated</dt><dd>'+p.year+' ('+(enquiry(p)?'vehicle period, printing date unverified':'verify publication date')+')</dd></div>':'')+
   '<div><dt>Condition</dt><dd>'+clean(p.conditionNotes||p.condition||'Ask for current physical condition and dimensions')+'</dd></div></dl>'+
   '<a class="mk-button" data-bf-shop-link href="/index.html?item='+encodeURIComponent(p.sku)+'#shop">'+(enquiry(p)?'View item in catalogue / request details':'View in the shop / add to bag')+'</a>'+shareControls(path,p.title,p.image)+
-  '<p class="mk-fine">'+(enquiry(p)?'This listing is for enquiry only. Physical possession, condition and printing date require confirmation; online purchase is disabled for this item.':checkoutApproved?'Shipping and applicable taxes are presented before payment.':'Online card checkout is not yet enabled. Items can be saved in a bag for a purchase enquiry.')+' Ask for exact measurements, reverse images and shipping details as needed.</p>'+
+  '<p class="mk-fine">'+(enquiry(p)?'Check current stock in the shop. Paper condition and printing date may be unverified; ask for further details if these matter to you.':checkoutApproved?'Shipping and applicable taxes are presented before payment.':'Check current checkout availability in the shop.')+' Ask for exact measurements, reverse images and shipping details as needed.</p>'+
   (p.type==='bundle'?'<p>Set contents: '+p.catalogIds.map(id=>bySku.has(id)?'<a href="'+urlOf(bySku.get(id))+'">'+clean(bySku.get(id).title)+'</a>':clean(id)).join(', ')+'.</p>':'')+
   '<p class="mk-fine">Burton &amp; Found is an independent vintage-paper seller. Brand and entertainment names describe the historical materials, not an endorsement.</p></div></div>';
  const score=x=>Number(marketable(x))*50+Number(x.type===p.type)*8+
@@ -189,7 +189,7 @@ const giftContent='<nav class="mk-crumb" aria-label="Breadcrumb"><a href="/">Hom
  '<p class="mk-kicker">Thoughtful gifts with a story</p><h1>Vintage gift ideas for collectors</h1>'+
  '<p class="mk-lead">'+giftDescription+'</p><p><a class="mk-button" href="/index.html#giftFinder">Find gifts by interest and budget</a></p>'+
  '<p>Rather than a mass-produced novelty, consider a catalogued piece of advertising or printed movie history tied to someone\'s favourite era. Every pictured item has its own listing with format and condition notes.</p>'+
- '<p class="mk-fine">Availability, exact condition, shipping cost and delivery timing must be confirmed. No promotional discounts or holiday arrival dates are promised. Online card checkout is not yet enabled.</p>'+
+ '<p class="mk-fine">Availability, exact condition, shipping cost and delivery timing must be confirmed. No promotional discounts or holiday arrival dates are promised. Check current checkout availability in the shop.</p>'+
  '<nav class="mk-collection-nav" aria-label="Explore gift themes"><a href="/collections/coca-cola.html">Coca-Cola advertising</a><a href="/collections/hollywood.html">Classic film paper</a><a href="/collections/sets.html">Curated sets</a></nav>'+
  giftGroups.map(g=>'<section class="mk-gift-group"><h2>'+clean(g.title)+'</h2><p>'+clean(g.intro)+'</p><div class="mk-grid">'+g.matches.map(card).join('')+'</div></section>').join('')+
  '<section class="mk-gift-advice"><h2>Before choosing a vintage-paper gift</h2><p>Review dimensions, printing-date qualifications, trimming, and whether an item is framed. Consider an archival sleeve or reversible display rather than an adhesive mount. For more detail, read our <a href="/guides/collecting-vintage-ads.html">collecting guide</a> and <a href="/guides/caring-for-vintage-paper.html">paper-care guide</a>.</p></section>'+
