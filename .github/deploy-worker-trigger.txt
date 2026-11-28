@@ -23,3 +23,5 @@ Deploy guided commercial launch planning wizard and distinguish optional live-ra
 Redeploy mobile owner layout correction. All launch gates unchanged.
 
 Deploy commercial launch safeguards, verified shipping disclosures and required browser release checks; preview-only payment mode preserved.
+
+Canada-first scope selected by owner. Require individually verified listing allowlist for eventual live checkout; leave list empty and all payment approval flags false. Verify approved domestic prices after deployment.
