@@ -11,3 +11,9 @@ test('gift suggestions honor actual current price, stock, format and shared unit
 test('unverified and unknown stock require explicit inclusion, never sold or CMS previews',()=>{const r=G.giftMatches(items,stock,{budget:50,includeEnquiry:true});assert.ok(r.some(x=>x.p.sku==='V'&&x.state.kind==='enquiry'));assert.ok(r.some(x=>x.p.sku==='U'&&x.state.kind==='unknown'));assert.ok(!r.some(x=>['B','D','X'].includes(x.p.sku)));assert.equal(G.giftMatches(items,stock,{interest:'automobiles',budget:50}).length,0);});
 test('comparison is capped at three, warns about shared originals, and shows sold status',()=>{const r=G.comparison(items,['A','S','B','V','A'],stock);assert.equal(r.rows.length,3);assert.equal(r.conflicts.length,2);assert.equal(r.rows[2].state.kind,'unavailable');});
 test('zero saved choices do not trigger generic personalization',()=>{assert.equal(D.recommendations(items,[],stock).length,0);});
+
+test('live-approved automobile stock overrides legacy enquiry-only flags without including sold items',()=>{
+ const snapshot=D.stockMap({configured:true,items:[{sku:'V',available:true,price_cents:1695,checkout_eligible:true},{sku:'A',available:true,price_cents:3000,checkout_eligible:false}]});
+ const r=G.giftMatches(items,snapshot,{interest:'automobiles',budget:25});assert.equal(r.length,1);assert.equal(r[0].state.price,16.95);assert.equal(r[0].state.label,'Available for Canadian checkout');assert.equal(D.state(items[0],snapshot).kind,'enquiry');
+ const sold=D.stockMap({configured:true,items:[{sku:'V',available:false,price_cents:1695,checkout_eligible:true}]});assert.equal(G.giftMatches(items,sold,{interest:'automobiles',budget:25,includeEnquiry:true}).length,0);assert.equal(D.watchlist(items,['V'],sold)[0].state.kind,'unavailable');
+});
