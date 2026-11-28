@@ -24,9 +24,17 @@ jobs:
         run: |
           python3 - <<'PY'
           import os,re,json,urllib.request,urllib.error,sys
-          key=os.environ.get("BF_LIVE_KEY","")
+          key=os.environ.get("BF_LIVE_KEY","").strip()
+          if not key:
+              sys.exit("ACTION REQUIRED: GitHub did not supply BF_STRIPE_LIVE_SECRET_KEY. Check repository-level Actions secrets, exact name, and repository.")
+          if key.startswith("pk_"):
+              sys.exit("ACTION REQUIRED: a publishable key was supplied; use the live secret key instead.")
+          if key.startswith("sk_test_") or key.startswith("rk_test_"):
+              sys.exit("ACTION REQUIRED: a sandbox key was supplied; use the live key instead.")
+          if key.startswith("rk_live_"):
+              sys.exit("ACTION REQUIRED: a restricted live key was supplied. This preflight is configured for the standard live secret key; review required permissions before using a restricted key.")
           if not re.fullmatch(r"sk_live_[A-Za-z0-9]+",key):
-              sys.exit("ACTION REQUIRED: save the Burton & Found live Stripe secret key as the encrypted GitHub Actions secret BF_STRIPE_LIVE_SECRET_KEY. No payment changes made.")
+              sys.exit("ACTION REQUIRED: the supplied value is not a valid live secret key format. Save only the key value, without quotes or labels.")
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self,*args,**kwargs):return None
           opener=urllib.request.build_opener(NoRedirect())
