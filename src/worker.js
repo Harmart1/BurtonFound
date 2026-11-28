@@ -1,6 +1,7 @@
 /* Cloudflare Workers entry point. Reuses the Pages API handlers; assets are served by ASSETS. */
 import {onRequestGet as health} from '../functions/api/health.js';
 import {onRequestGet as publicAccountConfig} from '../functions/api/public-account-config.js';
+import {onRequestGet as merchantFeed} from '../functions/api/merchant-feed.js';
 import {onRequestGet as catalog} from '../functions/api/catalog.js';
 import {onRequestGet as accountOrders} from '../functions/api/account-orders.js';
 import {onRequestGet as checkoutStatus} from '../functions/api/checkout-status.js';
@@ -68,6 +69,10 @@ export default {
   async fetch(request,env,ctx){
     env=paymentEnvironment(env);
     const path=new URL(request.url).pathname;
+    if(path==='/merchant-feed.xml'){
+      if(!['GET','HEAD'].includes(request.method))return response('Method not allowed',405,{allow:'GET, HEAD'});
+      return merchantFeed({request,env,ctx});
+    }
     if(path==='/sitemap.xml'||path==='/robots.txt'){
       if(!['GET','HEAD'].includes(request.method))return response('Method not allowed',405,{allow:'GET, HEAD'});
       const sitemap=path==='/sitemap.xml';
