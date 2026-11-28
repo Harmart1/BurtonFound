@@ -26,7 +26,8 @@ jobs:
         run: |
           python3 - <<'PY'
           import json,subprocess,sys,os
-          base="https://burtonfound.timharmar.workers.dev"
+          origins=("https://burtonandfound.ca","https://www.burtonandfound.ca","https://burtonfound.timharmar.workers.dev")
+          base=origins[0]
           checks=[]
           def get(path):
               p=subprocess.run(["curl","--silent","--show-error","--max-time","20","--retry","1","-w","\n%{http_code}",base+path],capture_output=True,timeout=50)
@@ -49,15 +50,17 @@ jobs:
           def account(b):
               j=json.loads(b)
               return j.get("configured") is True
-          check("Homepage HTML","/",200,lambda b:b"Burton" in b and b"<html" in b.lower() and b"cf-chl-" not in b.lower())
-          check("Checkout remains preview-only","/api/health",200,health)
-          check("Public account configuration","/api/public-account-config",200,account)
-          check("Public inventory feed","/api/catalog",200,stock)
-          check("Private bookkeeping protected","/api/admin/bookkeeping",403,lambda b:bool(json.loads(b).get("error")))
-          check("Private Stripe reconciliation protected","/api/admin/stripe-reconciliation",403,lambda b:bool(json.loads(b).get("error")))
-          check("Private orders protected","/api/admin/orders",403,lambda b:bool(json.loads(b).get("error")))
-          check("Private readiness protected","/api/admin/readiness",403,lambda b:bool(json.loads(b).get("error")))
-          check("Private CMS studio protected","/api/cms/studio",403,lambda b:bool(json.loads(b).get("error")))
+          for base in origins:
+              check(base+" — Homepage HTML","/",200,lambda b:b"Burton" in b and b"<html" in b.lower() and b"cf-chl-" not in b.lower())
+              check(base+" — Checkout remains preview-only","/api/health",200,health)
+              check(base+" — Public account configuration","/api/public-account-config",200,account)
+              check(base+" — Public inventory feed","/api/catalog",200,stock)
+              check(base+" — Private bookkeeping protected","/api/admin/bookkeeping",403,lambda b:bool(json.loads(b).get("error")))
+              check(base+" — Private Stripe reconciliation protected","/api/admin/stripe-reconciliation",403,lambda b:bool(json.loads(b).get("error")))
+              check(base+" — Private orders protected","/api/admin/orders",403,lambda b:bool(json.loads(b).get("error")))
+              check(base+" — Private readiness protected","/api/admin/readiness",403,lambda b:bool(json.loads(b).get("error")))
+              check(base+" — Private CMS studio protected","/api/cms/studio",403,lambda b:bool(json.loads(b).get("error")))
+              check(base+" — Customer account page","/account",200,lambda b:b'id="signInForm"' in b and b'id="signUpForm"' in b)
           lines=["## Daily public storefront check","","| Check | Result |","|---|---|"]+["| "+name+" | "+("PASS" if ok else "FAIL")+" |" for name,ok in checks]
           report="\n".join(lines)+"\n"
           print(report)
