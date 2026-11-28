@@ -2,3 +2,5 @@
 2026-11-25 — Recheck 229 listing inventory and protected admin after owner launch dashboard and merchant identity guard. No stock or payment mutation.
 
 Refresh inventory reconciliation for commercial preparation; no inventory updates.
+
+Generate current catalogue and 56 shipping comparison cases for owner review.
