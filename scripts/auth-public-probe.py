@@ -1,6 +1,6 @@
 """Public read-only checks against deployed account UI and actual Auth settings."""
 import json, subprocess, sys
-BASE="https://burtonfound.timharmar.workers.dev"
+BASES=("https://burtonandfound.ca","https://www.burtonandfound.ca","https://burtonfound.timharmar.workers.dev")
 PROJECT="https://nyvdrgpcwfasajyncnhi.supabase.co"
 def get(url,headers=None):
     cmd=["curl","--silent","--show-error","--max-time","20","--retry","1","-w","\\n%{http_code}"]
@@ -11,7 +11,7 @@ def get(url,headers=None):
     raw,status=result.stdout.rsplit(b"\n",1)
     if status!=b"200":raise RuntimeError("Public request "+label+" returned HTTP "+status.decode("ascii"))
     return raw
-def main():
+def probe(BASE):
     cfg=json.loads(get(BASE+"/api/public-account-config"))
     assert cfg.get("configured") is True and cfg.get("supabaseUrl")==PROJECT
     key=cfg.get("supabasePublishableKey","")
@@ -25,7 +25,9 @@ def main():
         assert marker in page,"Missing deployed account feature: "+marker
     assert 'finishRecovery' in get(BASE+"/account-core.js").decode()
     assert json.loads(get(BASE+"/api/health")).get("checkout")=="preview_only"
-    print("PASS: deployed forms, live email provider, signup enabled, email confirmation required, preview-only payments.")
+    print("PASS: "+BASE+" — deployed forms, live email provider, signup enabled, email confirmation required, preview-only payments.")
+def main():
+    for base in BASES:probe(base)
     print("Not checked: management-only redirect settings, SMTP credentials, inbox delivery.")
 if __name__=="__main__":
     try:main()
