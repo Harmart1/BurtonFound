@@ -25,14 +25,16 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import json,subprocess,sys,os
+          import json,subprocess,sys,os,urllib.parse
           origins=("https://burtonandfound.ca","https://www.burtonandfound.ca","https://burtonfound.timharmar.workers.dev")
           base=origins[0]
           checks=[]
           def get(path):
-              p=subprocess.run(["curl","--silent","--show-error","--max-time","20","--retry","1","-w","\n%{http_code}",base+path],capture_output=True,timeout=50)
+              p=subprocess.run(["curl","--silent","--show-error","--max-time","20","--retry","1","--location","--max-redirs","2","--proto-redir","=https","-w","\n%{http_code}\n%{url_effective}",base+path],capture_output=True,timeout=50)
               if p.returncode: raise RuntimeError("Connection failed")
-              raw,code=p.stdout.rsplit(b"\n",1)
+              raw,code,final=p.stdout.rsplit(b"\n",2)
+              u=urllib.parse.urlsplit(final.decode("ascii"))
+              if u.scheme!="https" or u.netloc!=urllib.parse.urlsplit(base).netloc:raise RuntimeError("Unexpected redirect origin")
               return int(code),raw
           def check(label,path,expected,validator):
               try:
@@ -61,6 +63,12 @@ jobs:
               check(base+" — Private readiness protected","/api/admin/readiness",403,lambda b:bool(json.loads(b).get("error")))
               check(base+" — Private CMS studio protected","/api/cms/studio",403,lambda b:bool(json.loads(b).get("error")))
               check(base+" — Customer account page","/account",200,lambda b:b'id="signInForm"' in b and b'id="signUpForm"' in b)
+              check(base+" — Branded canonical homepage","/",200,lambda b:b'rel="canonical" href="https://burtonandfound.ca/"' in b)
+              check(base+" — Branded sitemap","/sitemap.xml",200,lambda b:b"<loc>https://burtonandfound.ca/products/" in b and b"workers.dev" not in b)
+              check(base+" — Collection preview","/preview.html",200,lambda b:b"prFeaturedGrid" in b and b"<html" in b.lower())
+              check(base+" — Hollywood collection","/old-hollywood-new.html",200,lambda b:b"Old Hollywood" in b and b"<html" in b.lower())
+              check(base+" — Preview script","/preview-launch.js",200,lambda b:b"prFeaturedGrid" in b and b"BURTON_FEATURED" in b)
+              check(base+" — Real product photo","/assets/images/old-hollywood/ohnew-003-01.webp",200,lambda b:b[:4]==b"RIFF" and b[8:12]==b"WEBP")
           lines=["## Daily public storefront check","","| Check | Result |","|---|---|"]+["| "+name+" | "+("PASS" if ok else "FAIL")+" |" for name,ok in checks]
           report="\n".join(lines)+"\n"
           print(report)
