@@ -33,3 +33,26 @@ test('new tools are integrated into owner dashboard without a new public order e
  assert.match(admin,/F\?\.shippingReady/);assert.match(admin,/case 'summary'/);assert.match(admin,/case 'shipping-cost'/);assert.match(admin,/nothing has been sent by this website/);
  execFileSync(process.execPath,['--check',new URL('../public/admin/admin.js',import.meta.url).pathname]);
 });
+
+test('batch picking sheet excludes unsafe and dispatched orders, escapes listing data and omits buyer details',()=>{
+ const good={...row,customer_name:'PRIVATE CUSTOMER',email:'private@example.invalid',shipping_address:{address:{line1:'PRIVATE ADDRESS'}},id:'eligible-first',created_at:'2026-11-26T12:00:00Z'};
+ const packed={...good,id:'eligible-second',created_at:'2026-11-27T12:00:00Z',fulfillment_status:'packed'};
+ const excluded=[
+ {...good,id:'excluded-sandbox',record_mode:'test'},
+ {...good,id:'excluded-unknown',record_mode:'unknown'},
+ {...good,id:'excluded-unpaid',payment_status:'refunded'},
+ {...good,id:'excluded-review',shipping_review_reason:'Mismatch'},
+ {...good,id:'excluded-shipped',fulfillment_status:'shipped'},
+ {...good,id:'excluded-delivered',fulfillment_status:'delivered'},
+ {...good,id:'excluded-attention',fulfillment_status:'needs_attention'},
+ {...good,id:'excluded-inconsistent',total_cents:1}
+ ];
+ assert.equal(F.pickSheet(excluded),null);assert.equal(F.pickSheet([]),null);
+ const sheet=F.pickSheet([packed,...excluded,good]);
+ assert.match(sheet,/2 eligible order\(s\)/);
+ assert.ok(sheet.indexOf('eligible-first')<sheet.indexOf('eligible-second'));
+ assert.doesNotMatch(sheet,/excluded-|PRIVATE CUSTOMER|PRIVATE ADDRESS|private@example\.invalid|<img src=x>/);
+ assert.match(sheet,/&lt;img src=x&gt;/);
+ assert.match(sheet,/Sets may contain multiple physical pieces/);
+ assert.match(read('public/admin/admin.js'),/F\?\.pickSheet\(filtered\(\)\)/);
+});
