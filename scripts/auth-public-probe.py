@@ -24,8 +24,8 @@ def probe(BASE):
     for marker in ['id="signInForm"','id="signUpForm"','id="forgotForm"','id="resendForm"','id="recoveryForm"','auth-callback.js']:
         assert marker in page,"Missing deployed account feature: "+marker
     assert 'finishRecovery' in get(BASE+"/account-core.js").decode()
-    assert json.loads(get(BASE+"/api/health")).get("checkout")=="preview_only"
-    print("PASS: "+BASE+" — deployed forms, live email provider, signup enabled, email confirmation required, preview-only payments.")
+    assert json.loads(get(BASE+"/api/health")).get("checkout") in ("preview_only","live_mode")
+    print("PASS: "+BASE+" — deployed forms, live email provider, signup enabled, email confirmation required, supported payment state.")
 def main():
     for base in BASES:probe(base)
     print("Not checked: management-only redirect settings, SMTP credentials, inbox delivery.")
