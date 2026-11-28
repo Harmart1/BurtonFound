@@ -10,7 +10,7 @@ test('Workers configuration publishes static assets and invokes API routes',()=>
   const cfg=JSON.parse(readFileSync(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
   assert.equal(cfg.name,'burtonfound');
   assert.equal(cfg.assets.directory,'./public');
-  assert.deepEqual(cfg.assets.run_worker_first,['/api/*','/sitemap.xml','/robots.txt']);
+  assert.deepEqual(cfg.assets.run_worker_first,['/api/*','/sitemap.xml','/robots.txt','/merchant-feed.xml']);
   assert.equal(cfg.vars.LIVE_CHECKOUT_ENABLED,'false');
   assert.equal(cfg.vars.LIVE_PAYMENTS_APPROVED,'false');
 });
