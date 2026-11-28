@@ -1,3 +1,5 @@
 2026-11-27 — deploy tested local enquiry composer and weekly draft promotional graphics; retain preview-only safety gates.
 
 Deploy branded canonical links and sitemap; retain both Cloudflare custom domains and all existing preview-only gates.
+
+Deploy validated Canada/US flat-rate checkout support with payment and US customs gates disabled; no merchant price changes.
