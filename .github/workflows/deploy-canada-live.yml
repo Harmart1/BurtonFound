@@ -168,12 +168,15 @@ jobs:
           set -euo pipefail
           for base in https://burtonandfound.ca https://www.burtonandfound.ca https://burtonfound.timharmar.workers.dev; do
             curl --fail --silent --show-error --max-time 20 "$base/api/health" | python3 -c 'import json,sys;v=json.load(sys.stdin);assert v["checkout"]=="live_mode";assert v["shippingCountries"]==["CA"];assert [(r["country"],r["standard"],r["express"]) for r in v["flatRates"]]==[("CA",1995,3495)]'
+            echo "PASS $base — live health and exact Canadian rates"
             curl --fail --silent --show-error --max-time 20 "$base/api/catalog" | python3 -c 'import json,sys;v=json.load(sys.stdin);assert v["configured"] is True;assert sum(r.get("checkout_eligible") is True for r in v["items"])==131'
+            echo "PASS $base — approved stock count"
             status="$(curl --silent --show-error --max-time 20 -o /tmp/bf-invalid-cart.json -w '%{http_code}' -H "Origin: $base" -H 'Content-Type: application/json' -d '{"skus":[]}' "$base/api/checkout")"
-            test "$status" = 400
+            echo "$base empty cart HTTP $status"
+            if [[ "$status" != 400 ]]; then python3 -c 'import json;v=json.load(open("/tmp/bf-invalid-cart.json"));print("Checkout error:",str(v.get("error",""))[:200])' || true; exit 1; fi
+            echo "PASS $base — invalid cart blocked"
             curl --fail --silent --show-error --max-time 20 "$base/policies/shipping-returns.html" -o /tmp/bf-terms.html
-            grep -q '249-700-1871' /tmp/bf-terms.html
-            grep -q '2-356 Queen Street East' /tmp/bf-terms.html
+            if ! grep -q '249-700-1871' /tmp/bf-terms.html || ! grep -q '2-356 Queen Street East' /tmp/bf-terms.html; then echo "Seller disclosures unavailable in response from $base (possible stale cache or browser challenge)"; exit 1; fi
             echo "PASS $base — live health, Canada only, 131 approved SKUs, invalid cart blocked, published seller details"
           done
       - name: Return to disabled checkout on failed live deployment or postflight
