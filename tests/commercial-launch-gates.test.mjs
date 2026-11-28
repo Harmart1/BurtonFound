@@ -4,9 +4,11 @@ import {readFileSync} from 'node:fs';
 import {secure,LIVE_LAUNCH_GATES,approvedLiveSkus} from '../functions/_lib/core.js';
 import {onRequestPost as checkout} from '../functions/api/checkout.js';
 const base='https://burtonandfound.ca';
-const live={SHIPPING_ALLOWED_COUNTRIES:'CA',LIVE_APPROVED_SKUS_JSON:'["CC-010"]',STRIPE_SECRET_KEY:'sk_live_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',STRIPE_WEBHOOK_MODE:'live',STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_fixture',LIVE_PAYMENTS_APPROVED:'true',STRIPE_PAYOUTS_VERIFIED:'true',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true',SHIPPING_MODE:'flat_rate',FLAT_RATE_PRICES_APPROVED:'true',SHIPPING_STANDARD_CA_CENTS:'1995',...Object.fromEntries(LIVE_LAUNCH_GATES.map(k=>[k,'true']))};
+const live={GUEST_CHECKOUT_EMAIL_DEFERRED:'true',CUSTOMER_EMAIL_DELIVERY_APPROVED:'false',SHIPPING_ALLOWED_COUNTRIES:'CA',LIVE_APPROVED_SKUS_JSON:'["CC-010"]',STRIPE_SECRET_KEY:'sk_live_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',STRIPE_WEBHOOK_MODE:'live',STRIPE_EXPECTED_ACCOUNT_ID:'acct_1SN2j92NSH96TjSa',SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SECRET_KEY:'sb_secret_fixture',LIVE_PAYMENTS_APPROVED:'true',STRIPE_PAYOUTS_VERIFIED:'true',LIVE_CHECKOUT_ENABLED:'true',TAX_CONFIGURATION_APPROVED:'true',SHIPPING_MODE:'flat_rate',FLAT_RATE_PRICES_APPROVED:'true',SHIPPING_STANDARD_CA_CENTS:'1995',...Object.fromEntries(LIVE_LAUNCH_GATES.map(k=>[k,'true']))};
 test('all separate production readiness gates and webhook mode are required',()=>{
  assert.equal(secure(live),true);
+ assert.equal(secure({...live,GUEST_CHECKOUT_EMAIL_DEFERRED:'false'}),false);
+ assert.equal(secure({...live,GUEST_CHECKOUT_EMAIL_DEFERRED:'false',CUSTOMER_EMAIL_DELIVERY_APPROVED:'true'}),true);
  for(const k of LIVE_LAUNCH_GATES){assert.equal(secure({...live,[k]:'false'}),false,k);assert.equal(secure({...live,[k]:undefined}),false,k);}
  assert.equal(secure({...live,STRIPE_WEBHOOK_MODE:'test'}),false);
  const cfg=JSON.parse(readFileSync(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
