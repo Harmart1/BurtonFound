@@ -20,7 +20,7 @@
   let toastTimer;
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
   let checkoutReady=false,checkoutMode='preview_only',inventoryConnected=false,shippingMode='flat_rate',allowedShippingCountries=['CA'];
-  let activeShippingQuote=null,liveOptions=[],shippingRequestId=0,flatRates=[],flatCountry='CA';
+  let activeShippingQuote=null,liveOptions=[],shippingRequestId=0,flatRates=[],flatCountry='CA',checkoutInFlight=false;
   let liveApprovedSkus=new Set();
   const baseNeedsVerification=p=>p?.requiresVerification===true||p?.availableForCheckout===false;
   const needsVerification=p=>baseNeedsVerification(p)||(checkoutMode==='live_mode'&&!liveApprovedSkus.has(p?.sku));
@@ -177,20 +177,21 @@
       return `<div class="cart-item"><img src="${safe(p.image)}" alt=""><div><small>${safe(p.collection==='automobiles'?'VINTAGE AUTOMOBILE ADVERTISING':p.type==='bundle'?'CURATED SET':p.collection==='hollywood'?'OLD HOLLYWOOD EPHEMERA':'ORIGINAL · '+p.year)}</small><strong>${safe(p.title)}</strong><small>${safe(p.sku)} · Qty 1</small><button type="button" data-remove="${safe(p.sku)}">Remove</button></div><b>${money(p.price)}</b></div>`;
     }).join(''):`<div class="cart-empty"><span>✳</span><h3>Your bag is a blank page.</h3><p>A good find is just around the corner.</p><button type="button" class="btn btn-outline" id="bagBrowse">Explore the shelves ↗</button></div>`;
     const enquiryOnly=bagNeedsVerification();
-    const b=$('checkoutButton');b.disabled=!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
+    const b=$('checkoutButton');b.disabled=checkoutInFlight||!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
     const flat=$('flatShipping'),flatMenu=$('flatShipCountry'),flatPrice=$('flatShippingPrice');
     if(flat&&flatMenu&&flatPrice){
-      flat.hidden=!bag.length||enquiryOnly||shippingMode!=='flat_rate'||!checkoutReady||!flatRates.length;
+      flat.hidden=!bag.length||enquiryOnly||shippingMode!=='flat_rate'||!flatRates.length;
       flatMenu.replaceChildren(...flatRates.map(rate=>{const opt=document.createElement('option');opt.value=rate.country;opt.textContent=rate.country==='CA'?'Canada':'United States';return opt;}));
       flatMenu.value=flatCountry;
       const rate=flatRates.find(r=>r.country===flatCountry);
-      flatPrice.textContent=rate?'Standard '+money(rate.standard/100)+(Number.isInteger(rate.express)?' · Express '+money(rate.express/100):'')+(rate.country==='US'?' · Customs terms apply; review the shipping policy before purchase.':''):'Shipping will be confirmed before payment.';
+      const subtotal=bag.reduce((sum,id)=>sum+Math.round((bySku.get(id)?.price||0)*100),0);
+      flatPrice.textContent=rate?'Standard '+money(rate.standard/100)+' · Items + shipping '+money((subtotal+rate.standard)/100)+(Number.isInteger(rate.express)?' | Express '+money(rate.express/100)+' · Items + shipping '+money((subtotal+rate.express)/100):'')+(rate.country==='US'?' · Customs terms apply; review the shipping policy before purchase.':''):'Shipping will be confirmed before payment.';
     }
     const estimator=$('shippingEstimator');if(estimator)estimator.hidden=!bag.length||enquiryOnly||shippingMode!=='live_carrier';
     if(enquiryOnly){
       $('cartSubtotal').textContent=money(bag.reduce((n,id)=>n+(bySku.get(id)?.price||0),0));
       b.innerHTML='Prepare purchase enquiry'+' <span>↗</span>';
-      $('checkoutHelp').textContent='Your automobile selections are in the bag at their listed CAD prices. Send or copy a purchase request to arrange next steps; no payment is taken on this site.';
+      $('checkoutHelp').textContent='One or more items need seller verification. Send or copy a purchase request to arrange next steps; no payment is taken for this bag.';
     }
     else if(checkoutReady){b.innerHTML=(checkoutMode==='test_mode'?'Stripe test checkout':'Secure checkout with Stripe')+' <span>↗</span>';$('checkoutHelp').textContent=checkoutMode==='test_mode'?'TEST MODE ONLY · No real payments. Use Stripe test card details.':shippingMode==='live_carrier'?'Select a shipping quote, then enter the SAME destination at Stripe checkout. Different details will hold your paid order for review.':'Shipping and any configured taxes are shown before payment. Inventory is checked again securely.';}
     else if(C.sellerEmail){b.innerHTML='Prepare purchase enquiry <span>↗</span>';$('checkoutHelp').textContent='Online payment is not yet available. We will confirm availability and shipping before proceeding.';}
@@ -216,17 +217,18 @@
     catch(err){if(requestId!==shippingRequestId)return;target.textContent=err.message||'Rates unavailable · Contact the shop for a shipping quote';renderCart();}
   }
   async function handleCheckout(){
-    if(!bag.length||bagHasOverlappingUnits())return;
+    if(checkoutInFlight||!bag.length||bagHasOverlappingUnits())return;
     if(checkoutReady&&!bagNeedsVerification()){
       if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Please remove unavailable items first.');return;}
-      const btn=$('checkoutButton');btn.disabled=true;btn.textContent='Connecting securely…';
+      const btn=$('checkoutButton');checkoutInFlight=true;btn.disabled=true;btn.textContent='Connecting securely…';
+      const checkoutSkus=[...bag],checkoutCountry=flatCountry,checkoutQuote=activeShippingQuote;
       try {
         const token=await window.BURTON_ACCOUNT?.authToken?.();
-        const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:bag,...(shippingMode==='live_carrier'?{shipping_quote:activeShippingQuote}:{shipping_country:flatCountry})})});
+        const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:checkoutSkus,...(shippingMode==='live_carrier'?{shipping_quote:checkoutQuote}:{shipping_country:checkoutCountry})})});
         const data=await response.json();if(!response.ok||!/^https:\/\/checkout\.stripe\.com\//.test(data.url||''))throw Error(data.error||'Checkout unavailable');
         location.assign(data.url);return;
       }catch(e){toast(e.message||'Checkout unavailable. No payment taken.');await loadLiveStatus();}
-      finally{btn.disabled=false;renderCart();}
+      finally{checkoutInFlight=false;renderCart();}
       return;
     }
     if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Remove sold or reserved items first.');return;}
