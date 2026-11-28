@@ -12,6 +12,10 @@ const viewButton=document.getElementById('viewComfort'),compactButton=document.g
 const map=new Map(items.map(x=>[x.sku,x]));
 let shown=24,compact=false,dialogIndex=0,visibleItems=[],showOriginal=false;
 let activeSet=null;
+let stock=new Map();
+const liveRow=sku=>stock.get(sku);
+const displayPrice=(sku,fallback)=>Number.isSafeInteger(liveRow(sku)?.price_cents)?liveRow(sku).price_cents/100:fallback;
+const saleStatus=sku=>liveRow(sku)?.checkout_eligible===true?(liveRow(sku).available===true?'Available to purchase':'Sold or reserved'):'Check current availability in the shop';
 const cad=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n);
 const themeButton=document.getElementById('themeToggle');
 function applyTheme(theme){
@@ -71,7 +75,7 @@ function renderCuratedSets(){
   const price=makeElement('div','archive-bundle-price');
   const label=makeElement('div','');
   label.appendChild(makeElement('span','archive-bundle-label','Set price · CAD'));
-  label.appendChild(makeElement('strong','',cad(set.suggestedSetPriceCAD)));
+  label.appendChild(makeElement('strong','',cad(displayPrice(set.sku,set.suggestedSetPriceCAD))));
   price.appendChild(label);
   const total=makeElement('p','',cad(set.individualSuggestedTotalCAD)+' separately · Potential saving '+cad(set.potentialSavingsCAD));
   price.appendChild(total);
@@ -80,12 +84,12 @@ function renderCuratedSets(){
   action.type='button';action.dataset.setSku=set.sku;
   action.setAttribute('aria-label','View pages in proposed set '+set.title);
   copy.appendChild(action);
-  if(listedSetSkus.has(set.sku)){
+  if(listedSetSkus.has(set.sku)&&!(liveRow(set.sku)?.checkout_eligible===true&&liveRow(set.sku).available!==true)){
     const add=makeElement('a','archive-bag-action','Add set to bag ↗');
     add.href=addUrl(set.sku);add.setAttribute('aria-label','Add '+set.title+' curated set to bag');
     copy.appendChild(add);
   }
-  copy.appendChild(makeElement('p','archive-bundle-review','Curated automobile advertising · CAD asking price'));
+  copy.appendChild(makeElement('p','archive-bundle-review','Curated automobile advertising · '+saleStatus(set.sku)+''));
   card.append(gallery,copy);grid.appendChild(card);
  }
  const expand=document.getElementById('showAllSets');
@@ -143,7 +147,7 @@ function update(){
     body.appendChild(description);
     const price=makeElement('div','archive-page-price');
     price.appendChild(makeElement('span','archive-price-label','Price · CAD'));
-    price.appendChild(makeElement('strong','',cad(x.suggestedPriceCAD)));
+    price.appendChild(makeElement('strong','',cad(displayPrice(x.sku,x.suggestedPriceCAD))));
     body.appendChild(price);
     const details=makeElement('details','archive-page-details');
     const detailsLabel=makeElement('summary','','More about this page');
@@ -152,7 +156,7 @@ function update(){
     details.append(detailsLabel,detailsCopy,condition);body.appendChild(details);
 
     const button=document.createElement('button');button.type='button';button.className='gallery-view-button';button.dataset.sku=x.sku;button.textContent='View full photograph ↗';button.setAttribute('aria-label','Enlarge photograph of '+title(x));body.appendChild(button);
-    if(listedSkus.has(x.sku)){
+    if(listedSkus.has(x.sku)&&!(liveRow(x.sku)?.checkout_eligible===true&&liveRow(x.sku).available!==true)){
       const buy=makeElement('a','archive-bag-action','Add to bag ↗');
       buy.href=addUrl(x.sku);
       buy.setAttribute('aria-label','Add '+title(x)+' to bag');
@@ -162,7 +166,7 @@ function update(){
       body.appendChild(detail);
     }
     const pending=document.createElement('p');pending.className='small';
-    pending.textContent='Vintage automobile advertising · priced in Canadian dollars';
+    pending.textContent='Vintage automobile advertising · '+saleStatus(x.sku);
     body.appendChild(pending);
     card.appendChild(body);root.appendChild(card);
   }
@@ -244,4 +248,6 @@ async function refreshPublishedEditorial(){
 renderCuratedSets();
 update();
 refreshPublishedEditorial();
+async function refreshStock(){try{const r=await fetch('/api/catalog',{cache:'no-store'});if(!r.ok)return;const v=await r.json();if(v.configured!==true||!Array.isArray(v.items))return;stock=new Map(v.items.filter(x=>listedSkus.has(x.sku)||listedSetSkus.has(x.sku)).map(x=>[x.sku,x]));renderCuratedSets();update();}catch{stock=new Map();renderCuratedSets();update();}}
+refreshStock();document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshStock()});
 })();
