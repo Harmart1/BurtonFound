@@ -23,7 +23,8 @@
   let activeShippingQuote=null,liveOptions=[],shippingRequestId=0,flatRates=[],flatCountry='CA',checkoutInFlight=false;
   let liveApprovedSkus=new Set();
   const baseNeedsVerification=p=>p?.requiresVerification===true||p?.availableForCheckout===false;
-  const needsVerification=p=>baseNeedsVerification(p)||(checkoutMode==='live_mode'&&!liveApprovedSkus.has(p?.sku));
+  const autoApproved=p=>p?.collection==='automobiles'&&checkoutMode==='live_mode'&&liveApprovedSkus.has(p.sku);
+  const needsVerification=p=>!autoApproved(p)&&(baseNeedsVerification(p)||(checkoutMode==='live_mode'&&!liveApprovedSkus.has(p?.sku)));
   const bagNeedsVerification=()=>bag.some(id=>needsVerification(bySku.get(id)));
   const bagHasOverlappingUnits=()=>{
     const chosen=new Set();
@@ -40,7 +41,7 @@
       if(health.ok){const v=await health.json();checkoutMode=v.checkout||'preview_only';shippingMode=v.shippingMode||'flat_rate';checkoutReady=['test_mode','live_mode','configured'].includes(checkoutMode);allowedShippingCountries=Array.isArray(v.shippingCountries)?v.shippingCountries:['CA'];flatRates=Array.isArray(v.flatRates)?v.flatRates.filter(r=>['CA','US'].includes(r.country)&&Number.isInteger(r.standard)&&r.standard>0):[];if(!flatRates.some(r=>r.country===flatCountry))flatCountry=flatRates[0]?.country||'CA';const menu=$('shipCountry');if(menu){for(const opt of menu.options){opt.disabled=!allowedShippingCountries.includes(opt.value);}if(!allowedShippingCountries.includes(menu.value)){menu.value=allowedShippingCountries.find(c=>[...menu.options].some(o=>o.value===c))||'CA';}}}else{checkoutReady=false;checkoutMode='preview_only';}
       const res=await fetch('/api/catalog',{cache:'no-store'});
       if(res.ok){const v=await res.json();if(v.configured&&Array.isArray(v.items)){
-        window.BURTON_DISCOVERY_VIEW?.setStock(v);inventoryConnected=true;liveApprovedSkus=new Set(v.items.filter(row=>row.checkout_eligible===true).map(row=>row.sku));for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly||baseNeedsVerification(p))continue;
+        window.BURTON_DISCOVERY_VIEW?.setStock(v);inventoryConnected=true;liveApprovedSkus=new Set(v.items.filter(row=>row.checkout_eligible===true).map(row=>row.sku));for(const row of v.items){const p=bySku.get(row.sku);if(!p||p.cmsOnly||(baseNeedsVerification(p)&&!autoApproved(p)))continue;
           if(Number.isInteger(row.price_cents))p.price=row.price_cents/100;
           p.stockState=row.available?'available':'unavailable';
         }
