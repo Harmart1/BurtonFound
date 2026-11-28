@@ -24,7 +24,7 @@ test('Research-backed prices are posted as real CAD asking prices for all 98 veh
    assert.ok(p.shortDescription.length>45,p.sku);
  }
 });
-test('Publication changes only customer messaging: unresolved automobile units remain excluded from payment',()=>{
+test('Automobile sales require the current server-side approval; offline records stay enquiry-only',()=>{
  for(const p of vehicles){
    assert.equal(p.availableForCheckout,false,p.sku);
    assert.equal(p.requiresVerification,true,p.sku);
@@ -34,7 +34,8 @@ test('Publication changes only customer messaging: unresolved automobile units r
  const store=read('public/store.js');
  assert.match(store,/const bagNeedsVerification=/);
  assert.match(store,/if\(checkoutReady&&!bagNeedsVerification\(\)\)/);
- assert.match(store,/if\(!p\|\|p\.cmsOnly\|\|baseNeedsVerification\(p\)\)continue/);
+ assert.match(store,/const autoApproved=p=>p\?\.collection==='automobiles'&&checkoutMode==='live_mode'&&liveApprovedSkus\.has\(p\.sku\)/);
+ assert.match(store,/baseNeedsVerification\(p\)&&!autoApproved\(p\)/);
  const flags=JSON.parse(read('wrangler.jsonc')).vars;
  for(const key of ['LIVE_CHECKOUT_ENABLED','LIVE_PAYMENTS_APPROVED','TAX_CONFIGURATION_APPROVED','CARRIER_QUOTES_ENABLED'])
    assert.equal(flags[key],'false',key);
@@ -43,7 +44,7 @@ test('Automobile storefront, gallery and preview remove price/status warnings bu
  const gallery=read('public/vintage-cars.html');
  assert.doesNotMatch(gallery,/indicative|suggested asking|stock confirmation|stock to verify|stock must|physical stock/i);
  assert.match(gallery,/CAD asking prices|CAD price/);
- assert.match(gallery,/Online card checkout is not enabled/);
+ assert.match(gallery,/Available items can be purchased through secure Canadian checkout/);
  const rendered=read('public/vintage-cars-refined.js');
  for(const phrase of ['Indicative price','Suggested asking price','Stock to verify','physical pages and final availability'])
    assert.ok(!rendered.includes(phrase),phrase);
