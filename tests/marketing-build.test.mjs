@@ -11,7 +11,7 @@ test('marketing build creates real unique product URLs and SEO metadata without 
  assert.equal(new Set(items).size,229);
  for(const file of items){
    const html=read('public/products/'+file);
-   assert.ok(html.includes('<link rel="canonical" href="https://burtonfound.timharmar.workers.dev/products/'),file);
+   assert.ok(html.includes('<link rel="canonical" href="https://burtonandfound.ca/products/'),file);
    assert.ok(html.includes('name="description"'),file);
    assert.ok(html.includes('property="og:image"'),file);
    assert.ok(html.includes('https://schema.org'),file);
@@ -51,10 +51,10 @@ test('sitemap is complete but public indexing remains disabled pending approval'
  const entries=[...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(x=>x[1]);
  assert.equal(entries.length,238,'Home, 229 products, 4 collections, 3 guides, 1 gift landing page');
  assert.equal(new Set(entries).size,entries.length);
- for(const url of entries)assert.ok(url.startsWith('https://burtonfound.timharmar.workers.dev/'),url);
+ for(const url of entries)assert.ok(url.startsWith('https://burtonandfound.ca/'),url);
  assert.ok(sitemap.includes('/products/'));
  const robots=read('public/robots.txt');
- assert.ok(robots.includes('Sitemap: https://burtonfound.timharmar.workers.dev/sitemap.xml'));
+ assert.ok(robots.includes('Sitemap: https://burtonandfound.ca/sitemap.xml'));
  assert.ok(robots.includes('Disallow: /api/'));
  assert.ok(robots.includes('Disallow: /account.html'));
  assert.ok(read('public/index.html').includes('name="robots"'));
