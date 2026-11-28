@@ -26,6 +26,9 @@ def main():
         except urllib.error.HTTPError as e:raise RuntimeError("Stripe read failed HTTP "+str(e.code))
     account=stripe("account")
     require(account.get("id")=="acct_1SN2j92NSH96TjSa" and account.get("charges_enabled") is True and account.get("payouts_enabled") is True,"Stripe merchant or payment eligibility requires review")
+    require(account.get("business_profile",{}).get("name")=="Burton and Found","Stripe public business name differs; inspect public business settings")
+    require(account.get("settings",{}).get("payments",{}).get("statement_descriptor")=="BURTON & FOUND","Stripe statement descriptor differs; inspect customer-facing settings")
+    print("PASS Stripe public name and statement descriptor match Burton and Found.")
     endpoints=stripe("webhook_endpoints?limit=100")
     required={"checkout.session.completed","checkout.session.expired","checkout.session.async_payment_succeeded","checkout.session.async_payment_failed"}
     exact=[e for e in endpoints.get("data",[]) if e.get("livemode") is True and e.get("status")=="enabled" and e.get("url")==ORIGINS[0]+"/api/stripe-webhook" and required.issubset(set(e.get("enabled_events",[])))]
