@@ -1,1 +1,3 @@
 Refresh live collection cards and product stock display, retain exact existing 229 SKU approvals, Canadian shipping, tax and Stripe settings. Deploy only after software and isolated browser checks; rollback to prior live version if postflight fails.
+
+Owner requested correction of Stripe-hosted customer-facing name to Burton and Found. No legal identity, account, payout, tax, pricing or shipping changes. Verify unpaid provider session and actual live storefront, rollback on failure.
