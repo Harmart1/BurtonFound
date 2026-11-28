@@ -1,3 +1,5 @@
 2026-11-27 — recheck Stripe sandbox credentials and payment-disabled Worker following payout verification.
 
 2026-11-27 — post-domain launch commercial readiness audit; no live activation.
+
+Run destination and signing audit after branded deployment; no provider credential changes or charges.
