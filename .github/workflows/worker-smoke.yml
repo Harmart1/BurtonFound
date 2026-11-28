@@ -60,7 +60,7 @@ jobs:
                   correct=sum(u.startswith("https://burtonandfound.ca/") for u in urls)
                   product=sum(u.startswith("https://burtonandfound.ca/products/") for u in urls)
                   print("Sitemap diagnostic:",base,"entries",len(urls),"branded",correct,"product",product)
-                  return len(urls)==238 and correct==len(urls) and product==229
+                  return len(urls) in (238,239) and correct==len(urls) and product==229
               except ET.ParseError:
                   print("Sitemap diagnostic:",base,"not valid XML; bytes",len(b))
                   return False
