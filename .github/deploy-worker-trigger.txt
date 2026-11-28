@@ -21,3 +21,5 @@ Deploy owner fulfillment documents, draft email and shipping expense calculator;
 Deploy guided commercial launch planning wizard and distinguish optional live-rate integrations. All existing payment and customs gates remain unchanged.
 
 Redeploy mobile owner layout correction. All launch gates unchanged.
+
+Deploy commercial launch safeguards, verified shipping disclosures and required browser release checks; preview-only payment mode preserved.
