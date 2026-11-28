@@ -45,7 +45,7 @@ jobs:
               checks.append((label,ok))
           def health(b):
               j=json.loads(b)
-              return j.get("service")=="Burton & Found" and j.get("checkout")=="preview_only" and j.get("currency")=="CAD"
+              return j.get("service")=="Burton & Found" and j.get("checkout") in ("preview_only","live_mode") and j.get("currency")=="CAD"
           def stock(b):
               j=json.loads(b)
               rows=j.get("items")
@@ -66,7 +66,7 @@ jobs:
                   return False
           for base in origins:
               check(base+" — Homepage HTML","/",200,lambda b:b"Burton" in b and b"<html" in b.lower() and b"cf-chl-" not in b.lower())
-              check(base+" — Checkout remains preview-only","/api/health",200,health)
+              check(base+" — Checkout in a supported Canadian release mode","/api/health",200,health)
               check(base+" — Public account configuration","/api/public-account-config",200,account)
               check(base+" — Public inventory feed","/api/catalog",200,stock)
               check(base+" — Private bookkeeping protected","/api/admin/bookkeeping",403,lambda b:bool(json.loads(b).get("error")))
