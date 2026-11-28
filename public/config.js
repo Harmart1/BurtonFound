@@ -1,6 +1,6 @@
 /* Public configuration only. No Stripe secret or Supabase service key here. */
 window.BURTON_CONFIG = {
-  sellerEmail: "",
+  sellerEmail: "harmartim@gmail.com",
   feedbackEmail: "",
   previewPublicUrl: "",
   supabaseUrl: "",             // Fill in your Supabase project HTTPS URL
