@@ -14,9 +14,12 @@ function stockMap(body){
 }
 function state(p,stock){
  if(p?.cmsOnly)return {kind:'unknown',label:'Awaiting catalogue review',price:p.price};
- if(enquiry(p))return {kind:'enquiry',label:'Enquiry only',price:p.price};
  const r=stock?.get(p?.sku);
+ // Explicit server approval overrides the historical enquiry-only catalogue flag.
+ if(r?.checkout_eligible===true)return {kind:r.available?'available':'unavailable',label:r.available?'Available for Canadian checkout':'Sold or reserved',price:r.price_cents/100};
+ if(enquiry(p))return {kind:'enquiry',label:'Enquiry only',price:p.price};
  if(!r)return {kind:'unknown',label:'Stock not confirmed',price:p.price};
+ if(r.checkout_eligible===false&&r.available)return {kind:'enquiry',label:'Enquiry only',price:r.price_cents/100};
  return {kind:r.available?'available':'unavailable',label:r.available?'Available to enquire':'Sold or reserved',price:r.price_cents/100};
 }
 function recommendations(products,seeds,stock,limit=4,extraExcluded=[]){
