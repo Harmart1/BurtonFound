@@ -192,6 +192,26 @@ try{
      assert.match(await panel.locator('[role="status"]').textContent(),/Enter all four costs/);
 
    });
+   for(const checkoutPage of ['/', '/storefront.html']) await test(size+' Stripe checkout on '+checkoutPage,viewport,async page=>{
+     await page.route('**/api/health',route=>route.fulfill({json:{service:'Burton & Found',checkout:'live_mode',currency:'CAD',shippingCountries:['CA'],shippingMode:'flat_rate',flatRates:[{country:'CA',standard:1995,express:3495,label:'Canada'}]}}));
+     await page.route('**/api/catalog',route=>route.fulfill({json:{configured:true,items:[{sku:'CC-010',price_cents:3995,available:true,checkout_eligible:true}]}}));
+     let calls=0;
+     await page.route('**/api/checkout',route=>{calls++;const body=route.request().postDataJSON();assert.deepEqual(body.skus,['CC-010']);assert.equal(body.terms_version,'CA-2026-11-28');assert.equal(body.shipping_country,'CA');return calls===1?route.fulfill({status:503,json:{error:'Fixture payment connection unavailable'}}):route.fulfill({json:{url:'https://checkout.stripe.com/c/pay/cs_test_fixture',session_id:'cs_test_fixture'}});});
+     // This route is synthetic and never contacts Stripe.
+     await page.route('https://checkout.stripe.com/**',route=>route.fulfill({contentType:'text/html',body:'<title>Isolated hosted checkout fixture</title>'}));
+     await page.addInitScript(()=>localStorage.setItem('bf_guest_active_bag_v2','["CC-010"]'));
+     await page.goto(origin+checkoutPage+'#shop');await ready(page);
+     await page.locator('#cartOpen').click();await visible(page,'#cartDrawer');await visible(page,'#livePurchaseTerms');
+     await page.locator('#checkoutButton').click();
+     assert.equal(calls,0);assert.match(await page.locator('#checkoutHelp').textContent(),/confirm the purchase terms/);
+     await page.locator('#liveTermsAccepted').check();await page.locator('#checkoutButton').click();
+     await page.waitForFunction(()=>document.querySelector('#checkoutHelp')?.textContent.includes('Fixture payment connection unavailable')&&!document.querySelector('#checkoutButton')?.disabled);
+     assert.equal(calls,1);
+     // A failing optional analytics implementation must not interrupt navigation.
+     await page.evaluate(()=>{window.BURTON_ACTIVITY={record(){throw Error('Fixture analytics failure')}}});
+     await page.locator('#liveTermsAccepted').check();await page.locator('#checkoutButton').click();
+     await page.waitForURL('https://checkout.stripe.com/**');assert.equal(calls,2);
+   });
    await test(size+' browse catalogue and guest shopping bag',viewport,async page=>{
      await page.goto(origin+'/#shop');await ready(page);await page.locator('#productGrid .product-card').first().waitFor({state:'visible'});
      assert((await page.locator('#productGrid .product-card').count())>0);
