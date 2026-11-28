@@ -43,7 +43,8 @@
     "CUSTOMER_EMAIL_DELIVERY_APPROVED": "false",
     "SELLER_TERMS_APPROVED": "false",
     "PRODUCTION_WEBHOOK_READY": "false",
-    "LIVE_APPROVED_SKUS_JSON": "[]"
+    "LIVE_APPROVED_SKUS_JSON": "[]",
+    "OWNER_TEST_CHECKOUT_ENABLED": "true"
   },
   "ratelimits": [
     {
