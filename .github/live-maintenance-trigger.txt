@@ -9,3 +9,5 @@ Deploy initial conservative live Merchant feed for individually documented vinta
 Deploy optional first-party aggregate activity and private owner reporting. Analytics off by default, no IDs or third-party trackers, honor GPC/DNT, retain existing live commerce settings.
 
 Deploy private batch picking sheet for paid, unshipped live orders only. No customer details in the sheet; no changes to checkout, inventory, shipping settings, Stripe or analytics. Run existing maintenance checks.
+
+Urgent owner-reported Stripe checkout repair: restore alternate storefront stock validation, make terms and connection errors explicit, isolate optional analytics, and run live unpaid Checkout verification including branding and exact Canadian shipping rates. Preserve existing approvals and expire only the verification session; never charge a card.
