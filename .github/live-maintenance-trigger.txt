@@ -1,0 +1,1 @@
+Refresh live collection cards and product stock display, retain exact existing 229 SKU approvals, Canadian shipping, tax and Stripe settings. Deploy only after software and isolated browser checks; rollback to prior live version if postflight fails.
