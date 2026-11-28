@@ -44,7 +44,7 @@
     "SELLER_TERMS_APPROVED": "false",
     "PRODUCTION_WEBHOOK_READY": "false",
     "LIVE_APPROVED_SKUS_JSON": "[]",
-    "OWNER_TEST_CHECKOUT_ENABLED": "true"
+    "GUEST_CHECKOUT_EMAIL_DEFERRED": "true"
   },
   "ratelimits": [
     {
