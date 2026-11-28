@@ -47,6 +47,9 @@ def main():
         check(re.fullmatch(r"cs_live_[A-Za-z0-9_]{12,160}",sid or "") and str(r.get("url","")).startswith("https://checkout.stripe.com/"),"Live Checkout URL not verified; inspect holds if necessary")
         s=stripe("checkout/sessions/"+sid)
         check(s.get("id")==sid and s.get("livemode") is True and s.get("status")=="open" and s.get("payment_status")=="unpaid" and s.get("currency")=="cad" and s.get("metadata",{}).get("source")=="burton-found" and s.get("metadata",{}).get("bf_terms_version")=="CA-2026-11-28" and s.get("amount_subtotal")==before["price_cents"] and s.get("shipping_address_collection",{}).get("allowed_countries")==["CA"],"Live session identity, subtotal or shipping destination mismatch")
+        if os.environ.get("BF_VERIFY_BRANDING")=="true":
+            check(s.get("branding_settings",{}).get("display_name")=="Burton and Found","Stripe Checkout display name not confirmed")
+            print("PASS live Stripe Checkout display name is Burton and Found.")
         opts=s.get("shipping_options") or []
         prices=[]
         for o in opts:
