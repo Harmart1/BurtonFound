@@ -1,1 +1,3 @@
 Owner-authorized branded account callbacks; preserve all existing email and security settings.
+
+Read-only public authentication recheck before owner onboarding; no management or SMTP changes.
