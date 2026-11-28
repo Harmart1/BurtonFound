@@ -17,3 +17,5 @@ Refresh deployment after updating obsolete no-contact inventory audit expectatio
 Deploy owner-only GST/HST screening and additional public launch readiness checks. All payment, tax and US customs gates remain off.
 
 Deploy owner fulfillment documents, draft email and shipping expense calculator; retain all preview-only checkout and customs safety gates.
+
+Deploy guided commercial launch planning wizard and distinguish optional live-rate integrations. All existing payment and customs gates remain unchanged.
