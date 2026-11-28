@@ -1,1 +1,3 @@
 2026-11-27 — owner reported branded website unavailable; diagnose exact apex and www public DNS/HTTPS and verify Worker routing; attach only after existing conflict and permission checks.
+
+Owner-authorized follow-up: verify existing apex, safely attach www only if no conflicts, and check HTTPS storefront and preview-only health on both hostnames.
