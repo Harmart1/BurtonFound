@@ -2,3 +2,10 @@ import test from 'node:test';import assert from 'node:assert/strict';import {rea
 const read=p=>readFileSync(new URL('../public/'+p,import.meta.url),'utf8');const ctx={window:{},Intl};runInNewContext(read('enquiry.js'),ctx);const E=ctx.window.BURTON_ENQUIRY;
 test('enquiry includes deduplicated SKU, listed price and explicit unverified status',()=>{const p={sku:'VA-001',title:'Vintage motoring',price:12.5,requiresVerification:true};const s=E.compose([p,p,{sku:'UNKNOWN',price:99,cmsOnly:true}],['condition','bogus'],'Dimensions?');assert.match(s,/VA-001/);assert.equal(s.match(/VA-001/g).length,1);assert.match(s,/\$12.50 CAD/);assert.match(s,/physical inventory unverified/);assert.match(s,/not an order or reservation/);assert.doesNotMatch(s,/UNKNOWN|bogus/);assert.match(s,/Dimensions\?/);});
 test('empty email is not a sending channel and website makes no network or storage requests',()=>{assert.equal(E.validEmail(''),false);assert.equal(E.validEmail('name@example.invalid'),true);assert.equal(E.validEmail('a@example.invalid\nBcc:x'),false);assert.doesNotMatch(read('enquiry.js'),/\bfetch\s*\(|localStorage|sessionStorage|sendBeacon/);for(const p of ['index.html','storefront.html'])assert.match(read(p),/src="enquiry.js"/);});
+
+test('configured owner support email is valid and matches public contact and policy links',()=>{
+ const config={window:{}};runInNewContext(read('config.js'),config);const email=config.window.BURTON_CONFIG.sellerEmail;
+ assert.ok(E.validEmail(email));
+ for(const path of ['index.html','storefront.html','policies/privacy.html','policies/terms.html','policies/shipping-returns.html','policies/accessibility.html','policies/cookies.html'])assert.ok(read(path).includes('mailto:'+email),path);
+ assert.doesNotMatch(read('policies/privacy.html'),/email address has not yet been configured/);
+});
