@@ -64,9 +64,11 @@ test('sitemap is complete but public indexing remains disabled pending approval'
 });
 test('automated marketing kit contains reusable product links and accurately discloses that nothing was published or sent',()=>{
  const csv=read('marketing-output/pinterest-and-social-catalog.csv');
- assert.equal(csv.trim().split('\n').length,132,'header + 131 products');
- assert.ok(csv.includes('CC-NEW-001'));
- assert.ok(csv.includes('OH-NEW-003-01'));
+ const readiness=JSON.parse(read('marketing-output/marketing-readiness.json'));
+ assert.equal(csv.trim().split('\n').length,1+readiness.promotionEligibleListings);
+ assert.ok(readiness.promotionEligibleListings<=131);
+ if(!readiness.liveStockSnapshotUsed){assert.equal(readiness.promotionEligibleListings,131);assert.ok(csv.includes('CC-NEW-001'));assert.ok(csv.includes('OH-NEW-003-01'));}
+ else {const raw=JSON.parse(read('marketing-stock-snapshot.json'));const available=new Set(raw.items.filter(x=>x.available).map(x=>x.sku));for(const line of csv.trim().split('\n').slice(1))assert.ok(available.has(line.split(',')[0].replaceAll('"','')));for(const sku of readiness.weeklyDraftItems)assert.ok(available.has(sku));}
  assert.ok(csv.includes('product_url'));
  const calendar=read('marketing-output/14-day-social-calendar.md');
  assert.equal((calendar.match(/### Day /g)||[]).length,14);
