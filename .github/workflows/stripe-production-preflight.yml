@@ -71,3 +71,9 @@ jobs:
           for name in ("LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED","PHYSICAL_STOCK_APPROVED","DOMESTIC_POSTAGE_VERIFIED","SELLER_TERMS_APPROVED","TAX_CONFIGURATION_APPROVED","PRODUCTION_WEBHOOK_READY"):
               print(name+": "+flag_status(bindings,name))
           PY
+      - name: Verify the deployed production signature using a harmless non-order probe
+        env:
+          BF_LIVE_WEBHOOK: ${{ secrets.BF_STRIPE_LIVE_WEBHOOK_SECRET }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 scripts/verify-production-webhook.py
