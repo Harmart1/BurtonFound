@@ -4,3 +4,5 @@
 Refresh inventory reconciliation for commercial preparation; no inventory updates.
 
 Generate current catalogue and 56 shipping comparison cases for owner review.
+
+Generate Canada-first suggested physical inspection shortlist; no stock approvals.
