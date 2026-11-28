@@ -5,14 +5,21 @@
 'use strict';
 async function update(){
  const info=document.querySelector('[data-bf-stock-sku]');
- if(!info)return;
- const sku=info.getAttribute('data-bf-stock-sku');
+ const cards=[...document.querySelectorAll('[data-bf-card-sku]')];
+ if(!info&&!cards.length)return;
+ const sku=info?.getAttribute('data-bf-stock-sku');
  try{
   const response=await fetch('/api/catalog',{cache:'no-store',headers:{accept:'application/json'}});
   if(!response.ok)return;
   const data=await response.json();
   if(data?.configured!==true||!Array.isArray(data.items))return;
-  const record=data.items.find(x=>x.sku===sku);
+  const records=new Map(data.items.map(x=>[x.sku,x]));
+  for(const card of cards){const row=records.get(card.getAttribute('data-bf-card-sku'));const status=card.querySelector('[data-bf-card-status]'),price=card.querySelector('[data-bf-card-price]');if(!row)continue;
+   if(status){status.textContent=row.checkout_eligible===true?(row.available?'Available · Canadian checkout':'Sold or reserved'):'Check availability';status.classList.toggle('mk-enquiry',row.checkout_eligible!==true);}
+   if(price&&Number.isSafeInteger(row.price_cents)&&row.price_cents>0)price.textContent=new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(row.price_cents/100)+' CAD';
+  }
+  if(!info)return;
+  const record=records.get(sku);
   if(!record)return;
   const status=document.querySelector('[data-bf-availability]');
   const link=document.querySelector('[data-bf-shop-link]');
@@ -33,4 +40,5 @@ async function update(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',update,{once:true});
 else update();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
 })();
