@@ -10,7 +10,7 @@ test('Workers configuration publishes static assets and invokes API routes',()=>
   const cfg=JSON.parse(readFileSync(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
   assert.equal(cfg.name,'burtonfound');
   assert.equal(cfg.assets.directory,'./public');
-  assert.deepEqual(cfg.assets.run_worker_first,['/api/*']);
+  assert.deepEqual(cfg.assets.run_worker_first,['/api/*','/sitemap.xml','/robots.txt']);
   assert.equal(cfg.vars.LIVE_CHECKOUT_ENABLED,'false');
   assert.equal(cfg.vars.LIVE_PAYMENTS_APPROVED,'false');
 });
@@ -49,4 +49,14 @@ test('Worker does not create Stripe payments without backend credentials',async(
     body:JSON.stringify({skus:['OH-003']})
   }),env,{});
   assert.equal(r.status,503);
+});
+
+test('Worker serves generated branded sitemap and robots independently of static assets',async()=>{
+  const sitemap=await worker.fetch(new Request(base+'/sitemap.xml'),{},{});
+  assert.equal(sitemap.status,200);assert.match(sitemap.headers.get('content-type'),/application\/xml/);
+  assert.equal(sitemap.headers.get('x-robots-tag'),'noindex');
+  const xml=await sitemap.text();assert.equal((xml.match(/<loc>/g)||[]).length,238);assert.equal((xml.match(/<loc>https:\/\/burtonandfound\.ca\/products\//g)||[]).length,229);
+  const robots=await worker.fetch(new Request(base+'/robots.txt'),{},{});assert.match(await robots.text(),/Sitemap: https:\/\/burtonandfound\.ca\/sitemap\.xml/);
+  const head=await worker.fetch(new Request(base+'/sitemap.xml',{method:'HEAD'}),{},{});assert.equal(await head.text(),'');
+  const bad=await worker.fetch(new Request(base+'/sitemap.xml',{method:'POST'}),{},{});assert.equal(bad.status,405);
 });
