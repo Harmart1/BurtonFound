@@ -2,7 +2,7 @@
 import {readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 export const expectedPreviewVars=Object.freeze({
- OWNER_TEST_CHECKOUT_ENABLED:'true',
+ GUEST_CHECKOUT_EMAIL_DEFERRED:'true',
  LIVE_CHECKOUT_ENABLED:'false',
  STRIPE_WEBHOOK_MODE:'test',
  LIVE_PAYMENTS_APPROVED:'false',
