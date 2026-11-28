@@ -7,7 +7,7 @@ export function hasVerifiedPackages(env){
     return Object.values(profiles).some(p=>p&&p.verified===true&&[p.weightKg,p.lengthCm,p.widthCm,p.heightCm].every(v=>Number.isFinite(Number(v))&&Number(v)>0));
   }catch{return false}
 }
-export const LIVE_LAUNCH_GATES=Object.freeze(["PHYSICAL_STOCK_APPROVED","DOMESTIC_POSTAGE_VERIFIED","CUSTOMER_EMAIL_DELIVERY_APPROVED","SELLER_TERMS_APPROVED","PRODUCTION_WEBHOOK_READY"]);
+export const LIVE_LAUNCH_GATES=Object.freeze(["PHYSICAL_STOCK_APPROVED","DOMESTIC_POSTAGE_VERIFIED","SELLER_TERMS_APPROVED","PRODUCTION_WEBHOOK_READY"]);
 // Only owner-verified individual listing SKUs may enter real-money checkout.
 export function approvedLiveSkus(env){
  try{
@@ -20,6 +20,8 @@ export function secure(env){
   // A separate explicit approval is required before any sk_live_* key can enable checkout.
   const liveMoney=String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_');
   if(liveMoney&&(env.STRIPE_WEBHOOK_MODE!=='live'||!approvedLiveSkus(env).size||LIVE_LAUNCH_GATES.some(k=>env[k]!=='true')))return false;
+  // Guest Checkout does not depend on Supabase registration or recovery mail.
+  if(liveMoney&&env.CUSTOMER_EMAIL_DELIVERY_APPROVED!=='true'&&env.GUEST_CHECKOUT_EMAIL_DEFERRED!=='true')return false;
   if(liveMoney&&(env.LIVE_PAYMENTS_APPROVED!=='true'||env.STRIPE_PAYOUTS_VERIFIED!=='true'))return false;
   if(env.SHIPPING_MODE!=='live_carrier'&&(env.FLAT_RATE_PRICES_APPROVED==='false'||(liveMoney&&env.FLAT_RATE_PRICES_APPROVED!=='true')))return false;
   // A valid API key or a synthetic quote is not evidence of verified commercial rates.
