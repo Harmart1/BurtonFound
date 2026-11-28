@@ -1,7 +1,8 @@
 """Explicitly authorized, unpaid live Checkout smoke test. Creates one temporary stock hold and expires only its own session. Never supplies a card or creates a payment."""
 import json,os,re,sys,time,subprocess,urllib.request,urllib.error
 BASE="https://burtonandfound.ca"
-SKU="CC-010"
+SKU=os.environ.get("BF_SMOKE_SKU","CC-010")
+if SKU not in ("CC-010","VA-001","BF-VA-SET01"):sys.exit("Unsupported verification SKU")
 KEY=os.environ.get("BF_LIVE_KEY","").strip()
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):return None
