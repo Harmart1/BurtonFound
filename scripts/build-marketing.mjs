@@ -98,7 +98,7 @@ const head=(title,desc,path,photo='',type='website',ld=null,unverified=false)=>{
   '<meta name="twitter:image" content="'+clean(abs(img))+'"><meta name="twitter:image:alt" content="'+clean(title+' · Burton & Found catalogue')+'">'+
   '<link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'+
   '<link rel="stylesheet" href="/marketing.css"><link rel="stylesheet" href="/policy-modal.css"><script defer src="/policy-modal.js"></script><script defer src="/marketing-share.js"></script>'+
-  '<script defer src="/marketing-stock.js"></script><script defer src="/activity.js"></script>'+
+  '<script defer src="/marketing-stock.js"></script><script defer src="/activity.js"></script><link rel="stylesheet" href="/back-to-top.css"><script defer src="/back-to-top.js"></script>'+
   (ld?'<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'</script>':'')+'</head>';
 };
 const header='<header class="mk-head"><div class="mk-wrap mk-head-inner"><a class="mk-logo" href="/">B<span>&amp;</span>F <small>Burton &amp; Found</small></a><nav aria-label="Explore the collections"><a href="/collections/coca-cola.html">Coca-Cola</a><a href="/collections/hollywood.html">Old Hollywood</a><a href="/collections/automobiles.html">Automobiles</a><a href="/collections/sets.html">Curated sets</a><a href="/guides/collecting-vintage-ads.html">Collector guides</a><a href="/gifts/vintage-gifts-for-collectors.html">Gift ideas</a><a href="/#shop">Shop</a></nav></div></header>';
