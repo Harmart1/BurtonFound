@@ -13,6 +13,7 @@ on:
     paths:
       - .github/live-maintenance-trigger.txt
       - .github/live-automobile-trigger.txt
+      - .github/live-search-trigger.txt
 
 permissions:
   contents: read
@@ -23,7 +24,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm_maintenance) || (github.event_name == 'push' && (github.event.head_commit.message == 'Deploy live storefront maintenance' || github.event.head_commit.message == 'Enable owner-requested automobile checkout')))
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm_maintenance) || (github.event_name == 'push' && (github.event.head_commit.message == 'Deploy live storefront maintenance' || github.event.head_commit.message == 'Enable owner-requested automobile checkout' || github.event.head_commit.message == 'Enable approved public search indexing')))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -152,10 +153,18 @@ jobs:
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SEO_EXPANSION: ${{ github.event_name == 'push' && github.event.head_commit.message == 'Enable approved public search indexing' }}
           AUTO_EXPANSION: ${{ github.event_name == 'push' && github.event.head_commit.message == 'Enable owner-requested automobile checkout' }}
         run: |
-          if [[ "$AUTO_EXPANSION" == true ]]; then python3 scripts/prepare-live-maintenance.py --add-auto; else python3 scripts/prepare-live-maintenance.py; fi
+          if [[ "$AUTO_EXPANSION" == true ]]; then python3 scripts/prepare-live-maintenance.py --add-auto; elif [[ "$SEO_EXPANSION" == true ]]; then python3 scripts/prepare-live-maintenance.py --enable-indexing; else python3 scripts/prepare-live-maintenance.py; fi
           python3 -c 'import json; c=json.load(open("wrangler.maintenance.generated.jsonc")); print("BF_APPROVED_COUNT="+str(len(json.loads(c["vars"]["LIVE_APPROVED_SKUS_JSON"]))))' >> "$GITHUB_ENV"
+      - name: Build and verify authorized indexable public catalogue
+        run: |
+          if [[ "$(python3 -c 'import json;print(json.load(open("wrangler.maintenance.generated.jsonc"))["vars"]["MARKETING_INDEXING_APPROVED"])')" == true ]]; then
+            BF_INDEX_PUBLIC=true npm run build:marketing
+            python3 scripts/verify-public-search.py
+            echo 'BF_INDEX_PUBLIC=true' >> "$GITHUB_ENV"
+          fi
       - name: Deploy real Canadian checkout
         id: live_deploy
         uses: cloudflare/wrangler-action@v4
@@ -187,6 +196,9 @@ jobs:
             if ! grep -q '249-700-1871' /tmp/bf-terms.html || ! grep -q '2-356 Queen Street East' /tmp/bf-terms.html; then echo "Seller disclosures unavailable in response from $base (possible stale cache or browser challenge)"; exit 1; fi
             echo "PASS $base — live health, Canada only, approved SKU count, invalid cart blocked, published seller details"
           done
+      - name: Verify published canonical search pages
+        if: env.BF_INDEX_PUBLIC == 'true'
+        run: python3 scripts/verify-public-search.py --live
       - name: Restore previous live version on failed maintenance deployment or postflight
         if: failure() && steps.live_deploy.outcome != 'skipped' && steps.live_deploy.outcome != ''
         uses: cloudflare/wrangler-action@v4
