@@ -23,14 +23,14 @@ test('launch command center identifies each real blocker without changing paymen
  const m=build(sample,{sellerEmail:''},'burtonfound.timharmar.workers.dev');
  assert.equal(m.storefrontBaseline,229);
  assert.equal(m.backendListings,131);
- assert.equal(m.items.length,10);
- assert.equal(m.actionCount,10);
+ assert.equal(m.items.length,11);
+ assert.equal(m.actionCount,11);
  assert.equal(m.checkout,'preview_only');
  assert.match(m.headline,/Payments are safely disabled/);
  const catalog=m.items.find(x=>x.id==='stock');
  assert.equal(catalog.status,'attention');
  assert.match(catalog.detail,/98 published listings have no matching checkout SKU/);
- for(const name of ['payouts','tax','canada-post','fedex','parcels','customs','email','domain'])
+ for(const name of ['payouts','tax','flat-rate','canada-post','fedex','parcels','customs','email','domain'])
   assert.equal(m.items.find(x=>x.id===name).status,'attention',name);
  assert.match(m.items.find(x=>x.id==='stripe').detail,/validity must be checked separately/);
  assert.match(m.items.find(x=>x.id==='email').detail,/not configured/);
@@ -69,4 +69,10 @@ test('private dashboard loads and renders launch module with authenticated readi
  assert.match(css,/\.launch-overview/);
  assert.match(css,/--ui-surface/);
  assert.doesNotMatch(source,/sk_live_[A-Za-z0-9]{8,}|sb_secret_[A-Za-z0-9]{8,}|whsec_[A-Za-z0-9]{8,}/);
+});
+
+test('owner sees provisional shipping rates without representing them as approved',()=>{
+ const v=JSON.parse(JSON.stringify(sample));v.shipping.flatRates={approved:false,CA:{standard:1995,express:3495},US:{standard:2995,express:4995}};
+ const row=build(v).items.find(x=>x.id==='flat-rate');
+ assert.equal(row.status,'attention');assert.match(row.detail,/CAD 19\.95/);assert.match(row.detail,/CAD 29\.95/);assert.match(row.detail,/Draft amounts only/);
 });
