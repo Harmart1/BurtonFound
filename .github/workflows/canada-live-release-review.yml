@@ -1,0 +1,26 @@
+name: Prepare Canadian live release review (no charges)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/canada-live-review-trigger.txt'
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/assert-preview-release.mjs
+      - run: node scripts/prepare-canada-live-release.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: canada-live-release-review
+          path: release-review/canada-live-candidates.json
+          retention-days: 7
+          if-no-files-found: error
