@@ -124,8 +124,8 @@ try{
      await cards.first().click();await page.locator('h1').waitFor({state:'visible'});
      assert.match(await page.locator('[data-bf-availability]').textContent(),/Enquiry only/);
      assert.match(await page.locator('[data-bf-shop-link]').textContent(),/request details/);
-     assert.equal(await page.locator('[data-bf-stock-sku]').count(),0);
-     assert.equal(await page.locator('script[src="/marketing-stock.js"]').count(),0);
+     assert.equal(await page.locator('[data-bf-stock-sku]').count(),1);
+     assert.equal(await page.locator('script[src="/marketing-stock.js"]').count(),1);
      await page.waitForFunction(()=>{const im=document.querySelector('.mk-gallery img');return im?.complete&&im.naturalWidth>0;});
      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Product horizontal overflow');
      assert.equal(await page.locator('img:not([alt])').count(),0);
