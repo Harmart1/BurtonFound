@@ -41,9 +41,10 @@ function render(){
 async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Recent order records, including review and test records');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness();loadHolds()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
 async function loadReadiness(){
  const el=$('readinessResults');if(!el)return;
- el.textContent='Checking connected services…';
+ el.textContent='Checking connected services…';if($('launchWizard'))$('launchWizard').textContent='Checking authenticated launch configuration…';
  try{
   const v=await request('/api/admin/readiness');
+  window.BURTON_LAUNCH_WIZARD?.render(v,$('launchWizard'),window.BURTON_CONFIG||{});
   if(window.BURTON_LAUNCH_READINESS?.render){window.BURTON_LAUNCH_READINESS.render(v,el,esc);return;}
   const rows=[
    {title:'Supabase inventory',good:v.supabase?.connected===true,detail:v.supabase?.connected?`${v.supabase.listings} listings · ${v.supabase.available} currently available`:'Private catalogue connection unavailable'},
@@ -55,7 +56,7 @@ async function loadReadiness(){
    {title:'Checkout launch',good:v.checkout!=='preview_only',detail:v.checkout==='preview_only'?'Safely disabled pending launch approval':`Mode: ${v.checkout}`}
   ];
   el.innerHTML='<div class="readiness-grid">'+rows.map(r=>`<div class="readiness-row"><span class="readiness-state">${r.good?'Ready':'Needs review'}</span><strong>${esc(r.title)}</strong><small>${esc(r.detail)}</small></div>`).join('')+'</div><p class="readiness-note">Readiness is informational. No configuration, tax, carrier, or payment settings are changed here.</p>';
- }catch(ex){el.textContent=ex.message||'Launch readiness temporarily unavailable';}
+ }catch(ex){el.textContent=ex.message||'Launch readiness temporarily unavailable';if($('launchWizard'))$('launchWizard').textContent='Launch checks unavailable. Refresh checks after signing in.';}
 }
 
 function openDraft(o,type){
