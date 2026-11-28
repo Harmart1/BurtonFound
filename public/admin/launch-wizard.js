@@ -17,7 +17,7 @@ function plan(scope='CA'){
  return rows;
 }
 function checks(v={},config={}){
- const flat=v.shipping?.flatRates||{};
+ const flat=v.shipping?.flatRates||{},approvals=v.approvals||{};
  const prices=flat.approved===true&&flat.CA?.standard===1995&&flat.CA?.express===3495&&flat.US?.standard===2995&&flat.US?.express===4995;
  const closed=v.checkout==='preview_only'&&v.approvals?.checkoutEnabled===false&&v.approvals?.livePaymentApproved===false;
  return [
@@ -25,7 +25,8 @@ function checks(v={},config={}){
  {label:'Database connection',ok:v.supabase?.connected===true,detail:'Authenticated readiness response; not physical stock proof.'},
  {label:'Approved flat prices',ok:prices,detail:'Canada $19.95 / $34.95; US $29.95 / $49.95 CAD.'},
  {label:'Contact address configured',ok:typeof config.sellerEmail==='string'&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.sellerEmail),detail:'Configuration only; actual delivery requires testing.'},
- {label:'US checkout remains blocked',ok:v.shipping?.crossBorderCheckoutApproved===false&&v.shipping?.canadaPostUsDutiesApproved===false,detail:'Both cross-border approval flags must remain off until verified.'}
+ {label:'US checkout remains blocked',ok:v.shipping?.crossBorderCheckoutApproved===false&&v.shipping?.canadaPostUsDutiesApproved===false,detail:'Both cross-border approval flags must remain off until verified.'},
+ ...[['Physical inventory approval','physicalStockApproved'],['Domestic postage approval','domesticPostageVerified'],['Customer email delivery approval','customerEmailDeliveryApproved'],['Seller terms approval','sellerTermsApproved'],['Production webhook approval','productionWebhookReady']].map(([label,key])=>({label,ok:approvals[key]===true,detail:approvals[key]===true?'Owner approval flag recorded; verify evidence separately.':'Required before live checkout; not approved.'}))
  ];
 }
 const evidence=[
