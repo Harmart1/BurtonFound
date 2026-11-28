@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm_maintenance) || (github.event_name == 'push' && (github.event.head_commit.message == 'Deploy live storefront maintenance' || github.event.head_commit.message == 'Enable owner-requested automobile checkout' || github.event.head_commit.message == 'Enable approved public search indexing')))
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm_maintenance) || (github.event_name == 'push' && (github.event.head_commit.message == 'Deploy live storefront maintenance' || github.event.head_commit.message == 'Enable owner-requested automobile checkout' || github.event.head_commit.message == 'Enable approved public search indexing' || github.event.head_commit.message == 'Deploy Checkout branding correction')))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -165,6 +165,11 @@ jobs:
             python3 scripts/verify-public-search.py
             echo 'BF_INDEX_PUBLIC=true' >> "$GITHUB_ENV"
           fi
+      - name: Confirm Checkout branding support before publishing
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, 'Checkout branding')
+        env:
+          BF_LIVE_KEY: ${{ secrets.BF_STRIPE_LIVE_SECRET_KEY }}
+        run: python3 scripts/verify-stripe-checkout-brand.py
       - name: Deploy real Canadian checkout
         id: live_deploy
         uses: cloudflare/wrangler-action@v4
@@ -199,6 +204,12 @@ jobs:
       - name: Verify published canonical search pages
         if: env.BF_INDEX_PUBLIC == 'true'
         run: python3 scripts/verify-public-search.py --live
+      - name: Verify actual live store Checkout branding and expire unpaid
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, 'Checkout branding')
+        env:
+          BF_LIVE_KEY: ${{ secrets.BF_STRIPE_LIVE_SECRET_KEY }}
+          BF_VERIFY_BRANDING: 'true'
+        run: python3 scripts/verify-live-cart-unpaid.py
       - name: Restore previous live version on failed maintenance deployment or postflight
         if: failure() && steps.live_deploy.outcome != 'skipped' && steps.live_deploy.outcome != ''
         uses: cloudflare/wrangler-action@v4
