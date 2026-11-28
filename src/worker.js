@@ -7,7 +7,6 @@ import {onRequestGet as checkoutStatus} from '../functions/api/checkout-status.j
 import {onRequestPost as checkout} from '../functions/api/checkout.js';
 import {onRequestPost as shippingQuotes} from '../functions/api/shipping-quotes.js';
 import {onRequestPost as stripeWebhook} from '../functions/api/stripe-webhook.js';
-import {onRequestPost as ownerTestCheckout,onRequestGet as ownerTestStatus} from '../functions/api/admin/test-checkout.js';
 import {onRequestGet as adminMe} from '../functions/api/admin/me.js';
 import {onRequestGet as adminReadiness} from '../functions/api/admin/readiness.js';
 import {onRequestGet as bookkeeping} from '../functions/api/admin/bookkeeping.js';
@@ -36,7 +35,6 @@ const routes = {
   '/api/checkout': {POST: checkout},
   '/api/shipping-quotes': {POST: shippingQuotes},
   '/api/stripe-webhook': {POST: stripeWebhook},
-  '/api/admin/test-checkout': {POST: ownerTestCheckout,GET: ownerTestStatus},
   '/api/admin/me': {GET: adminMe},
   '/api/admin/readiness': {GET: adminReadiness},
   '/api/admin/orders': {GET: adminOrders},
