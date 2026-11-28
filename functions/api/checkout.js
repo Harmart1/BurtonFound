@@ -33,6 +33,8 @@ export async function onRequestPost({request,env}){
     console.error('Checkout blocked: Stripe merchant credentials could not be verified');
     return error(503,'Payment merchant verification is unavailable. No payment has been taken.');
   }
+  const live=String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_');
+  if(live&&body.terms_version!=='CA-2026-11-28')return error(400,'Review the current purchase terms before checkout.');
   const user=await verifiedUser(request,env);
   let hold=null,session=null,creationAttempted=false;
   try{
@@ -40,6 +42,7 @@ export async function onRequestPost({request,env}){
     if(!hold?.id||!Array.isArray(hold.lines))throw Error(hold?.error||'Those originals are not currently available');
     const origin=safeReturnUrl(request),created=Math.floor(Date.now()/1000);
     const args={mode:'payment','payment_method_types[0]':'card',success_url:`${origin}/checkout-success.html?session_id={CHECKOUT_SESSION_ID}`,cancel_url:`${origin}/index.html?checkout=cancelled#shop`,'shipping_address_collection[allowed_countries][0]':country,'phone_number_collection[enabled]':'true',expires_at:String(created+1860),client_reference_id:hold.id,'metadata[bf_hold_id]':hold.id,'metadata[source]':'burton-found'};
+    if(live){args['metadata[bf_terms_version]']='CA-2026-11-28';args['custom_text[submit][message]']='Canadian delivery only. Review items and shipping before payment. Seller: Burton and Found, 249-700-1871. No GST/HST currently charged. No voluntary change-of-mind returns unless agreed; statutory rights preserved.';}
     hold.lines.forEach((p,i)=>{
       args[`line_items[${i}][price_data][currency]`]='cad';args[`line_items[${i}][price_data][unit_amount]`]=String(p.price_cents);
       args[`line_items[${i}][price_data][product_data][name]`]=`${p.title} (${p.sku})`;
@@ -55,7 +58,7 @@ export async function onRequestPost({request,env}){
     if(env.STRIPE_AUTOMATIC_TAX==='true')args['automatic_tax[enabled]']='true';
     creationAttempted=true;
     session=await stripe(env,'checkout/sessions',args,'POST',{'Idempotency-Key':`bf-checkout-${hold.id}`});
-    if(!/^cs_(test|live)_/.test(session.id)||!/^https:\/\/checkout\.stripe\.com\//.test(session.url||''))throw Error('Stripe did not return a usable checkout URL');
+    if(!(live?/^cs_live_/:/^cs_test_/).test(session.id)||!/^https:\/\/checkout\.stripe\.com\//.test(session.url||''))throw Error('Stripe did not return a usable checkout URL');
     if(await rpc(env,'bf_bind_stripe_session',{p_hold_id:hold.id,p_session_id:session.id})!==true)
       throw Error('Checkout reservation could not be bound');
     return json({url:session.url,session_id:session.id});
