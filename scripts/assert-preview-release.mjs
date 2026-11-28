@@ -28,7 +28,8 @@ export const expectedPreviewVars=Object.freeze({
  SHIPPING_EXPRESS_CA_CENTS:'3495',
  SHIPPING_STANDARD_US_CENTS:'2995',
  SHIPPING_EXPRESS_US_CENTS:'4995',
- SHIPPING_ALLOWED_COUNTRIES:'CA,US'
+ LIVE_APPROVED_SKUS_JSON:'[]',
+ SHIPPING_ALLOWED_COUNTRIES:'CA'
 });
 export function assertPreviewRelease(config){
  const vars=config?.vars;
