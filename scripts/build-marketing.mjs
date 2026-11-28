@@ -216,7 +216,7 @@ mk('feeds/collectibles.json',JSON.stringify({
  items:feedItems
 },null,2)+'\n');
 if(indexable)urls.push('/vintage-cars.html');
-const sitemapXml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+urls.map(u=>'  <url><loc>'+clean(abs(u))+'</loc></url>').join('\n')+'\n</urlset>\n';
+const sitemapXml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+urls.map(u=>'  <url><loc>'+clean(abs(indexable?u.replace(/\.html$/,''):u))+'</loc></url>').join('\n')+'\n</urlset>\n';
 const robotsText='User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\nDisallow: /checkout-success\nDisallow: /checkout-success.html\nDisallow: /account\nDisallow: /account.html\nDisallow: /preview\nDisallow: /preview.html\nSitemap: '+abs('/sitemap.xml')+'\n';
 mk('sitemap.xml',sitemapXml);
 mk('robots.txt',robotsText);
@@ -230,12 +230,13 @@ if(indexable){
   let html=readFileSync(file,'utf8');
   html=html.replace(/<meta\b(?=[^>]*\bname="robots")[^>]*>/i,'<meta name="robots" content="index,follow,max-image-preview:large">');
   if(name==='vintage-cars.html'&&!/rel="canonical"/.test(html))html=html.replace('</head>','<link rel="canonical" href="'+base+'/vintage-cars"></head>');
+  if(name==='index.html')html=html.replace('Shop the Coca-Cola vintage advertising collection and Old Hollywood ephemera at Burton &amp; Found in Sault Ste. Marie, Ontario. Actual-item photos, CAD prices and condition details. Books and collectibles coming soon.','Shop vintage Coca-Cola ads, Old Hollywood paper and classic automobile advertising. Canadian checkout, real item photographs and curated collector sets.');
   writeFileSync(file,html);
  }
 }
 mkdirSync(out,{recursive:true});
 const csv=x=>'"'+String(x??'').replace(/"/g,'""').replace(/[\r\n]+/g,' ')+'"';
-const pinCopy=p=>short((p.collection==='hollywood'?'Old Hollywood printed-paper collectible':p.type==='bundle'?'Curated vintage-paper collector set':'Vintage Coca-Cola advertising')+': '+p.title+'. '+text(p.shortDescription)+'. See the actual item photograph, condition notes and CAD asking price at Burton & Found.',410);
+const pinCopy=p=>short((p.collection==='hollywood'?'Old Hollywood printed-paper collectible':p.type==='bundle'?'Curated vintage-paper collector set':p.collection==='automobiles'?'Vintage automobile advertising':'Vintage Coca-Cola advertising')+': '+p.title+'. '+text(p.shortDescription)+'. See the actual item photograph, condition notes and CAD asking price at Burton & Found.',410);
 const socialCopy=p=>short((p.collection==='hollywood'?'For classic-film collectors: ':p.type==='bundle'?'For lovers of themed paper collections: ':'For vintage advertising enthusiasts: ')+p.title+'. '+text(p.shortDescription)+'. Explore the item photos and condition details at Burton & Found; confirm current availability before purchasing.',330);
 const eligible=(liveCommerceSnapshot?items:saleItems).filter(marketable);
 const rows=eligible.map(p=>[p.sku,p.title,p.collection,p.type,dollar(p.price),abs(urlOf(p)),abs(p.image),
