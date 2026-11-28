@@ -80,6 +80,10 @@ jobs:
               check(base+" — Collection preview","/preview.html",200,lambda b:b"prFeaturedGrid" in b and b"<html" in b.lower())
               check(base+" — Hollywood collection","/old-hollywood-new.html",200,lambda b:b"Old Hollywood" in b and b"<html" in b.lower())
               check(base+" — Preview script","/preview-launch.js",200,lambda b:b"prFeaturedGrid" in b and b"BURTON_FEATURED" in b)
+              check(base+" — Canadian flat-rate configuration","/api/health",200,lambda b: any(r.get("country")=="CA" and r.get("standard")==1995 and r.get("express")==3495 for r in json.loads(b).get("flatRates",[])))
+              check(base+" — US customs gate remains closed","/api/health",200,lambda b: not any(r.get("country")=="US" for r in json.loads(b).get("flatRates",[])))
+              check(base+" — Customer contact configured","/",200,lambda b:b'mailto:harmartim@gmail.com' in b)
+              check(base+" — Privacy contact configured","/policies/privacy.html",200,lambda b:b'mailto:harmartim@gmail.com' in b)
               check(base+" — Real product photo","/assets/images/old-hollywood/ohnew-003-01.webp",200,lambda b:b[:4]==b"RIFF" and b[8:12]==b"WEBP")
           lines=["## Daily public storefront check","","| Check | Result |","|---|---|"]+["| "+name+" | "+("PASS" if ok else "FAIL")+" |" for name,ok in checks]
           report="\n".join(lines)+"\n"
