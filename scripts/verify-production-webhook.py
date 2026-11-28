@@ -9,8 +9,10 @@ def main():
     for name in ("STRIPE_LIVE_SECRET_KEY","STRIPE_LIVE_WEBHOOK_SECRET"):
         if secret_status(bindings,name)!="Present as encrypted secret":
             sys.exit("Required encrypted Worker binding missing or not secret: "+name)
+    expected_live=os.environ.get("BF_EXPECT_LIVE")=="true"
+    expected_flag="true" if expected_live else "false"
     for name in ("LIVE_CHECKOUT_ENABLED","LIVE_PAYMENTS_APPROVED"):
-        if bindings.get(name,{}).get("text")!="false":
+        if bindings.get(name,{}).get("text")!=expected_flag:
             sys.exit("Unexpected checkout configuration; stop staging verification.")
     payload=json.dumps({"id":"evt_bf_live_staging_probe","type":"bf.integration.live_probe","livemode":True},separators=(",",":")).encode()
     stamp=str(int(time.time()))
@@ -33,11 +35,11 @@ def main():
     for base in ("https://burtonandfound.ca","https://www.burtonandfound.ca","https://burtonfound.timharmar.workers.dev"):
         status,health=call(base,"/api/health")
         if status!=200:sys.exit("Health probe rejected at "+base+" (HTTP "+str(status)+")")
-        if health.get("checkout")!="preview_only":sys.exit("Unexpected payment state at "+base)
+        if health.get("checkout")!=("live_mode" if expected_live else "preview_only"):sys.exit("Unexpected payment state at "+base)
         status,body=probe(base,signature)
         if status!=200 or body.get("live_probe") is not True:sys.exit("Production signature probe rejected at "+base+" (HTTP "+str(status)+")")
         if probe(base,"0"*64)[0]!=400:sys.exit("Invalid signature not rejected at "+base)
-        print("PASS "+base+" — production signature accepted, invalid signature rejected, checkout remains disabled.")
+        print("PASS "+base+" — production signature accepted, invalid signature rejected, checkout state verified.")
     print("No real Stripe events, orders, inventory reservations, payments or refunds created.")
 if __name__=="__main__":
     try:main()
