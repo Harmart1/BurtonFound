@@ -1,6 +1,6 @@
 import {boundedJson} from '../_lib/bounded-json.js';
 import {verifyQuote} from '../_lib/shipping.js';
-import {json,error,secure,checkSameOrigin,rpc,db,stripe,safeReturnUrl,verifiedUser} from '../_lib/core.js';
+import {json,error,secure,checkSameOrigin,rpc,db,stripe,safeReturnUrl,verifiedUser,approvedLiveSkus} from '../_lib/core.js';
 import {flatRateFor} from '../_lib/flat-shipping.js';
 export async function onRequestPost({request,env}){
   if(!checkSameOrigin(request))return error(403,'Invalid checkout origin');
@@ -8,6 +8,10 @@ export async function onRequestPost({request,env}){
   let body;try{body=await boundedJson(request,8192)}catch(e){return e.status===413?error(413,'Checkout request too large'):error(400,'Invalid shopping bag')}
   const skus=body?.skus;
   if(!Array.isArray(skus)||!skus.length||skus.length>12||skus.some(s=>typeof s!=='string'||!/^[A-Z0-9-]{2,24}$/.test(s))||new Set(skus).size!==skus.length)return error(400,'Invalid or duplicate item IDs');
+  if(String(env.STRIPE_SECRET_KEY||'').startsWith('sk_live_')){
+    const approved=approvedLiveSkus(env);
+    if(skus.some(s=>!approved.has(s)))return error(409,'An item requires seller verification before purchase. Please send a product enquiry.');
+  }
   const liveShipping=env.SHIPPING_MODE==='live_carrier';
   let ship,express=null,quote=null,country,label;
   if(liveShipping){try{quote=await verifyQuote(env,body?.shipping_quote,skus);ship=quote.amount_cents;country=quote.to.country;}catch(e){return error(400,e.message)}}
