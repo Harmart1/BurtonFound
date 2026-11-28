@@ -6,7 +6,7 @@ const task=(id,title,steps,link,label)=>({id,title,steps,link,label});
 function plan(scope='CA'){
  const rows=[
  task('contact','Verify customer email',['Send a test enquiry from the store and confirm you receive it.','Create a Google app password and enter it directly in Supabase SMTP. Never paste passwords into chat or GitHub.','Using a separate mailbox you control, register, follow the confirmation link, sign in and test password recovery.'],'https://supabase.com/dashboard/project/nyvdrgpcwfasajyncnhi/auth/smtp','Open SMTP settings'),
- task('stock','Confirm physical originals',['Download the inventory review. Inspect only items intended for paid sale; verify original, condition, quantity and shared physical units.','Keep unverified listings enquiry-only; flag missing or damaged pieces for controlled reconciliation.'],repo+'/actions/workflows/launch-inventory-audit.yml','Download current inventory review'),
+ task('stock','Confirm physical originals',['Download the inventory review. Start with a manageable selection of originals; verify condition, quantity, shared physical units and packaging. Return the completed SKU review for inclusion in the live checkout allowlist.','Keep unverified listings enquiry-only; flag missing or damaged pieces for controlled reconciliation.'],repo+'/actions/workflows/launch-inventory-audit.yml','Download current inventory review'),
  task('pack','Validate shipping costs',['Measure and weigh four representative protected parcels; obtain actual tracked postage quotes.','Compare postage and packaging with approved flat prices. Identify oversized, fragile and remote shipments needing individual review.'],'https://www.canadapost-postescanada.ca/cpc/en/tools/find-a-rate.page','Get real postage quotes'),
  task('tax','Confirm seller and tax treatment',['Confirm the legal seller identity, business contact and appropriate return address.','Review GST/HST small-supplier eligibility and other applicable sales tax obligations using actual business-wide taxable supplies; do not activate tax just because Stripe Tax settings are active.'],'https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge.html','Read CRA guidance'),
  task('policies','Approve customer terms',['Confirm shipping service, dispatch estimates, returns, damage and cancellation procedures, and correct contact information.','Review the checkout disclosures and order-summary process against the actual business practices.'],'/policies/shipping-returns.html','Review shipping and returns'),
@@ -22,10 +22,10 @@ function checks(v={},config={}){
  const closed=v.checkout==='preview_only'&&v.approvals?.checkoutEnabled===false&&v.approvals?.livePaymentApproved===false;
  return [
  {label:'Checkout locked',ok:closed,detail:closed?'Preview only; payment switches off.':'Not confirmed; stop and review.'},
- {label:'Database connection',ok:v.supabase?.connected===true,detail:'Authenticated readiness response; not physical stock proof.'},
+ {label:'Database connection',ok:v.supabase?.connected===true,detail:'Authenticated readiness response; not physical stock proof. Live-approved SKUs: '+(Number.isInteger(v.supabase?.approvedLiveSkuCount)?v.supabase.approvedLiveSkuCount:'not checked')+'.'},
  {label:'Approved flat prices',ok:prices,detail:'Canada $19.95 / $34.95; US $29.95 / $49.95 CAD.'},
  {label:'Contact address configured',ok:typeof config.sellerEmail==='string'&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.sellerEmail),detail:'Configuration only; actual delivery requires testing.'},
- {label:'US checkout remains blocked',ok:v.shipping?.crossBorderCheckoutApproved===false&&v.shipping?.canadaPostUsDutiesApproved===false,detail:'Both cross-border approval flags must remain off until verified.'},
+ {label:'US checkout remains blocked',ok:v.shipping?.crossBorderCheckoutApproved===false&&v.shipping?.canadaPostUsDutiesApproved===false,detail:'Canada is the initial selling territory; US expansion requires a separate configuration change and customs approvals.'},
  ...[['Physical inventory approval','physicalStockApproved'],['Domestic postage approval','domesticPostageVerified'],['Customer email delivery approval','customerEmailDeliveryApproved'],['Seller terms approval','sellerTermsApproved'],['Production webhook approval','productionWebhookReady']].map(([label,key])=>({label,ok:approvals[key]===true,detail:approvals[key]===true?'Owner approval flag recorded; verify evidence separately.':'Required before live checkout; not approved.'}))
  ];
 }
@@ -70,7 +70,7 @@ function render(v,el,config={}){
   const l=make('label');l.className='wizard-tick';const box=make('input');box.type='checkbox';box.checked=done.has(r.id);box.addEventListener('change',()=>{if(box.checked)done.add(r.id);else done.delete(r.id);const n=rows.filter(x=>done.has(x.id)).length;bar.value=n;progress.textContent='Step '+(index+1)+' of '+rows.length+' · '+n+' owner-marked reviewed. Not an approval or verification.';});l.append(box,document.createTextNode(' I have reviewed this step (planning only).'));step.append(l);
  }
  select.addEventListener('change',()=>{scope=select.value;index=0;done=new Set();copyResult.textContent='Scope changed; review checklist restarted.';draw();});
- el.append(make('p','Recommended: launch in Canada first if US customs arrangements remain outstanding. Live payments remain disabled until separate authorization.'),current,label,select,progress,bar,step,nav,copyResult,refs,make('p','Checklist resets when readiness is refreshed or the page is reloaded. Download notes before leaving. No settings, payments, tax registrations or stock are changed.'));
+ el.append(make('p','Owner-selected launch plan: Canada first. The US scope below is for future planning only. Live payments remain disabled until separate authorization.'),current,label,select,progress,bar,step,nav,copyResult,refs,make('p','Checklist resets when readiness is refreshed or the page is reloaded. Download notes before leaving. No settings, payments, tax registrations or stock are changed.'));
  draw();
 }
 window.BURTON_LAUNCH_WIZARD=Object.freeze({plan,checks,report,render});
