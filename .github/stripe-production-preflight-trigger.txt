@@ -11,3 +11,5 @@ Owner created production destination; verify live endpoint and inspect encrypted
 Owner reports Cloudflare live bindings added; recheck deployed binding metadata and Stripe destination.
 
 Verify production signing credential with non-order probe after owner-installed Cloudflare secrets.
+
+Repeat signing verification with established public probe transport.
