@@ -21,7 +21,22 @@
  const goodEmail=x=>typeof x==='string'&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.trim());
  const number=x=>Number.isInteger(x)&&x>=0?x:null;
  const item=(id,title,status,detail,action,url)=>({id,title,status,detail,action,url});
+ function liveOperations(v,configuration,hostname){
+  const count=number(v.supabase?.listings),approved=number(v.supabase?.approvedLiveSkuCount),available=number(v.supabase?.approvedAvailableCount),a=v.approvals||{},s=v.shipping||{},f=s.flatRates||{};
+  const ok=(x)=>x?'ready':'attention';
+  const items=[
+   item('stock','Approved live catalogue',ok(v.supabase?.connected&&approved!==null&&approved>0&&available!==null),approved===null?'Approval list unavailable.':approved+' approved listings; '+(available===null?'availability unknown':available+' currently available')+'. Sold/reserved originals cannot be purchased again.','Review inventory',links.stock),
+   item('stripe','Production Stripe connection',ok(v.stripe?.liveMerchantVerified&&v.stripe?.liveSigningKeyPresent&&a.productionWebhookReady),'Merchant eligibility checked by Stripe; '+(v.stripe?.liveMerchantVerified?'charges and payouts permitted.':'current merchant verification unavailable.')+' Signing binding '+(v.stripe?.liveSigningKeyPresent?'present.':'not confirmed.'),'View live monitoring',rootRepo+'/actions/workflows/live-commerce-monitor.yml'),
+   item('tax','Canadian sales tax decision',ok(a.taxApproved),'Owner-approved tax treatment. Review business-wide taxable supplies and registration obligations as sales grow.','Review Stripe Tax',links.tax),
+   item('flat-rate','Canadian shipping',ok(f.approved&&f.CA?.standard===1995&&f.CA?.express===3495&&s.allowedCountries?.length===1&&s.allowedCountries[0]==='CA'),'CAD $19.95 standard / $34.95 express. Reconcile actual postage and packaging for each order.','Review shipping policy','/policies/shipping-returns.html'),
+   item('email','Order confirmation and dispatch','review','Guest checkout is available. Automated SMTP is deferred; send the full agreement and tracking manually, and retain evidence of sending.','Review recent orders','#orderList'),
+   item('parcels','Packaging cost review','review','Record actual package dimensions and shipping contribution. Flat rates are not carrier quotations.','Review parcel worksheet',links.parcels),
+   item('customs','US and international expansion','deferred','Canada only. No cross-border checkout authorized.','Review future expansion',links.ship)
+  ];
+  return {items,actionCount:items.filter(x=>x.status==='attention').length,reviewCount:items.filter(x=>x.status==='review').length,deferredCount:items.filter(x=>x.status==='deferred').length,checkout:'live_mode',storefrontBaseline:229,backendListings:count,headline:'Canadian checkout is live. Review paid orders, shipping costs and customer confirmations.'};
+ }
  function build(v={},configuration={},hostname='burtonfound.timharmar.workers.dev'){
+  if(v.checkout==='live_mode')return liveOperations(v,configuration,hostname);
   const count=number(v?.supabase?.listings),remaining=count===null?null:Math.max(0,229-count);
   const stockDetail=count===null?'Database could not be checked; download the latest SKU reconciliation.':
    count+' database SKUs against the 229-listing launch baseline. Individually approved live SKUs: '+(number(v?.supabase?.approvedLiveSkuCount)??'not checked')+'. '+
@@ -116,7 +131,7 @@
     '<span id="copyLaunchResult" aria-live="polite"></span></div>'+
     '<div class="readiness-grid">'+m.items.map(x=>
       '<article class="readiness-row"><span class="readiness-state launch-state-'+x.status+'">'+
-      escapeHtml(x.status==='attention'?'Needs owner action':x.status==='deferred'?'Optional — deferred':'Verify externally')+'</span>'+
+      escapeHtml(x.status==='ready'?'Operational':x.status==='attention'?'Needs owner action':x.status==='deferred'?'Optional — deferred':'Verify externally')+'</span>'+
       '<strong>'+escapeHtml(x.title)+'</strong><small>'+escapeHtml(x.detail)+'</small>'+
       '<a target="_blank" rel="noopener noreferrer" href="'+x.url+'">'+escapeHtml(x.action)+'</a></article>'
     ).join('')+'</div>'+
