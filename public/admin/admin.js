@@ -93,6 +93,16 @@ async function loadActivity(){
 }
 $('activityRefresh')?.addEventListener('click',loadActivity);
 $('reload').addEventListener('click',refresh);
+const pickButton=document.createElement('button');
+pickButton.type='button';pickButton.className='secondary';pickButton.textContent='Print filtered picking sheet';pickButton.title='Internal sheet for paid live processing or packed orders in the current filter';
+$('reload').after(pickButton);
+pickButton.addEventListener('click',()=>{
+ if($('dashboard').hidden||!A.user()||A.recoveryState()!=='none')return status('Sign in as owner to prepare a picking sheet.');
+ const html=F?.pickSheet(filtered());if(!html)return status('No eligible paid, unshipped live orders in the current filter.');
+ const w=window.open('','_blank');if(!w)return status('Pop-up blocked. Allow pop-ups to print the picking sheet.');
+ w.opener=null;w.document.write(html);w.document.close();w.focus();
+ status('Internal picking sheet opened. Verify each order before dispatch.');
+});
 $('refreshReadiness').addEventListener('click',loadReadiness);$('exportCsv').addEventListener('click',exportCsv);
 $('orderSort')?.addEventListener('change',render);$('statusFilter').addEventListener('change',render);$('orderSearch').addEventListener('input',render);
 $('orders').addEventListener('submit',async e=>{
