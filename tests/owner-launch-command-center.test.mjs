@@ -77,3 +77,10 @@ test('owner sees provisional shipping rates without representing them as approve
  const row=build(v).items.find(x=>x.id==='flat-rate');
  assert.equal(row.status,'attention');assert.match(row.detail,/CAD 19\.95/);assert.match(row.detail,/CAD 29\.95/);assert.match(row.detail,/Draft amounts only/);
 });
+
+test('live command centre reports actual operating status and defers US sales',()=>{
+ const v={...sample,checkout:'live_mode',supabase:{connected:true,listings:131,approvedLiveSkuCount:131,approvedAvailableCount:124},stripe:{liveMerchantVerified:true,liveSigningKeyPresent:true},approvals:{taxApproved:true,productionWebhookReady:true},shipping:{allowedCountries:['CA'],flatRates:{approved:true,CA:{standard:1995,express:3495}}}};
+ const m=build(v,{sellerEmail:'support@example.org'},'burtonandfound.ca');
+ assert.equal(m.actionCount,0);assert.equal(m.items.find(x=>x.id==='stripe').status,'ready');assert.match(m.items.find(x=>x.id==='stock').detail,/124 currently available/);assert.equal(m.items.find(x=>x.id==='customs').status,'deferred');assert.equal(m.items.find(x=>x.id==='email').status,'review');assert.match(m.headline,/checkout is live/);
+ v.stripe.liveMerchantVerified=false;assert.equal(build(v).items.find(x=>x.id==='stripe').status,'attention');
+});
