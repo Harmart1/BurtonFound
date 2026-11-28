@@ -19,3 +19,5 @@ Deploy owner-only GST/HST screening and additional public launch readiness check
 Deploy owner fulfillment documents, draft email and shipping expense calculator; retain all preview-only checkout and customs safety gates.
 
 Deploy guided commercial launch planning wizard and distinguish optional live-rate integrations. All existing payment and customs gates remain unchanged.
+
+Redeploy mobile owner layout correction. All launch gates unchanged.
