@@ -57,7 +57,7 @@ const text=s=>String(s??'').replace(/\s+/g,' ').trim();
 const short=(s,n)=>{const v=text(s);return v.length>n?v.slice(0,n-1).replace(/\s+\S*$/,'')+'…':v};
 const slug=s=>text(s).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,67).replace(/-$/,'');
 const dollar=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n);
-const abs=p=>base+'/'+String(p).replace(/^\/+/,'');
+const abs=p=>base+'/'+(indexable?String(p).replace(/\.html$/,''):String(p)).replace(/^\/+/,'');
 const urlOf=p=>'/products/'+slug(p.title)+'-'+p.sku.toLowerCase()+'.html';
 const bySku=new Map(items.map(p=>[p.sku,p]));
 const robots=indexable?'index,follow,max-image-preview:large':'noindex,follow';
@@ -71,7 +71,7 @@ const collectionUrl=id=>'/collections/'+id+'.html';
 const collectionFor=p=>p.collection==='automobiles'?'automobiles':p.collection==='hollywood'?'hollywood':'coca-cola';
 const categoryLabel=p=>p.collection==='automobiles'?'Vintage automobile advertising':p.collection==='hollywood'?'Old Hollywood printed paper':'Vintage Coca-Cola advertising';
 const navLabel=p=>p.collection==='automobiles'?'Vintage automobiles':p.collection==='hollywood'?'Old Hollywood':'Coca-Cola';
-const mk=(path,data)=>{const full=join(publicRoot,path);mkdirSync(join(full,'..'),{recursive:true});writeFileSync(full,data,'utf8')};
+const mk=(path,data)=>{if(indexable&&path.endsWith('.html'))data=data.replace(/href="(\/(?:products|collections|guides|gifts)\/[a-z0-9-]+)\.html"/g,'href="$1"');const full=join(publicRoot,path);mkdirSync(join(full,'..'),{recursive:true});writeFileSync(full,data,'utf8')};
 const head=(title,desc,path,photo='',type='website',ld=null,unverified=false)=>{
  const img=photo||'assets/brand/burton-found-preview-social.jpg';
  const canonical=abs(indexable?path.replace(/\.html$/,''):path);
