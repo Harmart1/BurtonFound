@@ -28,6 +28,7 @@
    (remaining?remaining+' published listings have no matching checkout SKU; the automobile designs remain enquiry-only until physically verified.':
     'All SKUs are represented, but physical condition and ownership still require seller review.');
   const cp=v?.shipping?.canadaPost||{},fedex=v?.shipping?.fedex||{};
+  const flat=v?.shipping?.flatRates||{},fmt=c=>Number.isSafeInteger(c)&&c>0?'CAD '+(c/100).toFixed(2):'not configured';
   const cpVerified=cp.credentialsPresent===true&&cp.productionRatesVerified===true&&cp.testApp===false;
   const fxVerified=fedex.credentialsPresent===true&&fedex.productionRatesVerified===true&&fedex.sandbox===false;
   const payoutFlag=v?.approvals?.payoutsVerifiedByOwner===true;
@@ -50,6 +51,10 @@
       '. Owner tax approval: '+(taxFlag?'recorded':'not recorded')+
       '. Confirm legal registrations and the appropriate treatment for Canada and the U.S.',
       'Review Stripe Tax',links.tax),
+   item('flat-rate','Canada and U.S. flat-rate prices',flat.approved?'review':'attention',
+      'Canada standard '+fmt(flat.CA?.standard)+' / express '+fmt(flat.CA?.express)+'; U.S. standard '+fmt(flat.US?.standard)+' / express '+fmt(flat.US?.express)+
+      '. '+(flat.approved?'Price approval recorded; verify packaging and customs.':'Draft amounts only; no public payable flat rates until merchant approval.'),
+      'Review flat-rate launch plan',links.ship),
    item('canada-post','Canada Post live rates',cpVerified?'review':'attention',
       'Credentials: '+(cp.credentialsPresent?'present':'missing')+
       ' · Production rate review: '+(cp.productionRatesVerified?'flagged approved':'not approved')+
