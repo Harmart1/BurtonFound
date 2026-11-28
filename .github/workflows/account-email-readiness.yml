@@ -19,6 +19,7 @@ on:
     paths:
       - '.github/workflows/account-email-readiness.yml'
       - '.github/auth-brand-trigger.txt'
+      - 'scripts/auth-public-probe.py'
   schedule:
     - cron: '19 15 * * *'
 permissions:
