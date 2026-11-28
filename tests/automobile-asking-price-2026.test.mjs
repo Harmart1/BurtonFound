@@ -34,7 +34,7 @@ test('Publication changes only customer messaging: unresolved automobile units r
  const store=read('public/store.js');
  assert.match(store,/const bagNeedsVerification=/);
  assert.match(store,/if\(checkoutReady&&!bagNeedsVerification\(\)\)/);
- assert.match(store,/if\(!p\|\|p\.cmsOnly\|\|needsVerification\(p\)\)continue/);
+ assert.match(store,/if\(!p\|\|p\.cmsOnly\|\|baseNeedsVerification\(p\)\)continue/);
  const flags=JSON.parse(read('wrangler.jsonc')).vars;
  for(const key of ['LIVE_CHECKOUT_ENABLED','LIVE_PAYMENTS_APPROVED','TAX_CONFIGURATION_APPROVED','CARRIER_QUOTES_ENABLED'])
    assert.equal(flags[key],'false',key);
