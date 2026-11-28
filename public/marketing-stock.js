@@ -17,9 +17,10 @@ async function update(){
   const status=document.querySelector('[data-bf-availability]');
   const link=document.querySelector('[data-bf-shop-link]');
   const price=document.querySelector('[data-bf-price]');
-  if(status)status.textContent=record.available?'Available to enquire':'Sold or reserved';
-  if(!record.available&&link){
-    link.href='/collections/'+(sku.startsWith('OH-')||sku.startsWith('OHS-')?'hollywood':'coca-cola')+'.html';
+  if(status)status.textContent=record.checkout_eligible===true?(record.available?'Available for Canadian checkout':'Sold or reserved'):record.available?'Available to enquire':'Check availability with the shop';
+  if(link&&record.checkout_eligible===true&&record.available)link.textContent='View in the shop / add to bag';
+  if(record.checkout_eligible===true&&!record.available&&link){
+    link.href='/collections/'+(/^(VA-|BF-VA-)/.test(sku)?'automobiles':sku.startsWith('OH-')||sku.startsWith('OHS-')?'hollywood':'coca-cola')+'.html';
     link.textContent='Browse other available finds';
   }
   if(price&&Number.isInteger(record.price_cents)&&record.price_cents>0){
