@@ -17,7 +17,12 @@ export const expectedPreviewVars=Object.freeze({
  CANADA_POST_TEST_APP:'true',
  FEDEX_SANDBOX:'true',
  SHIPPING_MODE:'flat_rate',
- FLAT_RATE_PRICES_APPROVED:'false',
+ // Owner approved these exact provisional prices; this does not authorize checkout.
+ FLAT_RATE_PRICES_APPROVED:'true',
+ SHIPPING_STANDARD_CA_CENTS:'1995',
+ SHIPPING_EXPRESS_CA_CENTS:'3495',
+ SHIPPING_STANDARD_US_CENTS:'2995',
+ SHIPPING_EXPRESS_US_CENTS:'4995',
  SHIPPING_ALLOWED_COUNTRIES:'CA,US'
 });
 export function assertPreviewRelease(config){
