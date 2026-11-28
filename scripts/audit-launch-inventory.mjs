@@ -167,6 +167,21 @@ const report=[
 mkdirSync(outDir,{recursive:true});
 writeFileSync(resolve(outDir,'launch-inventory-review.csv'),csv,'utf8');
 writeFileSync(resolve(outDir,'launch-inventory-reconciliation.md'),report,'utf8');
+ // Suggested starting subset: only available, matching-price individual records.
+ // Never equate a database record with physical verification. No flags are written.
+ const chosen=[],units=new Set();
+ if(api!==null)for(const collection of ['coca-cola','hollywood']){
+  let n=0;
+  for(const p of all){
+   if(n>=8)break;
+   const d=backend.get(p.sku),ids=p.catalogIds;
+   if(p.collection!==collection||p.type!=='original'||p.requiresVerification===true||p.availableForCheckout===false||p.stockState==='verification_required'||p.stockState==='unavailable'||d?.available!==true||d.price_cents!==Math.round(p.price*100)||!Array.isArray(ids)||ids.length!==1||typeof ids[0]!=='string'||!ids[0]||units.has(ids[0]))continue;
+   units.add(ids[0]);chosen.push([p.sku,p.collection,p.title,(d.price_cents/100).toFixed(2),ids[0],p.image||'','','','','','','','','']);n++;
+  }
+ }
+ const shortHeader=['SKU','Collection','Listing title','Asking CAD','Physical unit ID','Catalogue image path','Original physically located (yes/no)','Condition matches description (yes/no)','Quantity and unit ID confirmed (yes/no)','Packed kg','Packed length cm','Packed width cm','Packed height cm','Owner notes and approval'];
+ writeFileSync(resolve(outDir,'canada-first-shortlist.csv'),[shortHeader,...chosen].map(row=>row.map(csvCell).join(',')).join('\n')+'\n','utf8');
+ console.log('Canada-first suggested inspection shortlist:',chosen.length,'listings; no physical stock approvals granted.');
 console.log('Storefront SKU count:',counts.storefront,
   '| public database:',counts.backend??'not checked',
   '| missing database:',api===null?'unknown':counts.storeOnly,
