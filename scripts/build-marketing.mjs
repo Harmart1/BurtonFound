@@ -8,7 +8,7 @@ import {runInNewContext} from 'node:vm';
 const root=process.cwd(),publicRoot=join(root,'public'),out=join(root,'marketing-output');
 const config=JSON.parse(readFileSync(join(root,'wrangler.jsonc'),'utf8'));
 const vars=config.vars||{};
-const base=String(vars.MARKETING_SITE_URL||'https://burtonfound.timharmar.workers.dev').replace(/\/+$/,'');
+const base=String(vars.MARKETING_SITE_URL||'https://burtonandfound.ca').replace(/\/+$/,'');
 if(!/^https:\/\/[a-z0-9.-]+$/i.test(base))throw Error('MARKETING_SITE_URL must be an HTTPS origin');
 const indexable=vars.MARKETING_INDEXING_APPROVED==='true';
 const checkoutApproved=['LIVE_CHECKOUT_ENABLED','LIVE_PAYMENTS_APPROVED','TAX_CONFIGURATION_APPROVED'].every(k=>vars[k]==='true');
