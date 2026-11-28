@@ -18,3 +18,9 @@ test('Flat rate webhook detects country and amount mismatch',()=>{
  assert.equal(shippingMismatch(metadata,{country:'US'},1995),true);
  assert.equal(shippingMismatch(metadata,{},2995),true);
 });
+
+test('Proposed flat rates are staged and cannot become payable without price approval',()=>{
+ assert.deepEqual(flatRateOptions({...env,FLAT_RATE_PRICES_APPROVED:'false'}),[]);
+ assert.throws(()=>flatRateFor({...env,STRIPE_SECRET_KEY:'sk_live_fixture'},'CA'),/awaiting merchant approval/);
+ assert.equal(flatRateFor({...env,STRIPE_SECRET_KEY:'sk_live_fixture',FLAT_RATE_PRICES_APPROVED:'true'},'CA').standard,1995);
+});
