@@ -38,12 +38,19 @@ export function classifyStripeEvent(evt,env){
  return {action:'release',session};
 }
 export async function onRequestPost({request,env}){
-  if(!env.STRIPE_WEBHOOK_SECRET||!env.SUPABASE_SECRET_KEY)return error(503,'Webhook is not configured');
+  if((!env.STRIPE_WEBHOOK_SECRET&&!env.STRIPE_LIVE_WEBHOOK_SECRET)||!env.SUPABASE_SECRET_KEY)return error(503,'Webhook is not configured');
   let payload;try{payload=await boundedText(request,300000)}catch(e){return e.status===413?error(413,'Event too large'):error(400,'Malformed webhook');}
-  if(!await verifyStripe(payload,request.headers.get('Stripe-Signature'),env.STRIPE_WEBHOOK_SECRET))return error(400,'Invalid Stripe webhook signature');
+  const sig=request.headers.get('Stripe-Signature');
+  const liveBinding=!!env.STRIPE_LIVE_WEBHOOK_SECRET&&await verifyStripe(payload,sig,env.STRIPE_LIVE_WEBHOOK_SECRET);
+  if(!liveBinding&&(!env.STRIPE_WEBHOOK_SECRET||!await verifyStripe(payload,sig,env.STRIPE_WEBHOOK_SECRET)))return error(400,'Invalid Stripe webhook signature');
+  // Separate live signature binding permits staging without disrupting sandbox delivery.
+  // Signature determines mode, not untrusted request data.
+  if(liveBinding)env={...env,STRIPE_WEBHOOK_MODE:'live'};
   let evt;try{evt=JSON.parse(payload)}catch{return error(400,'Malformed webhook')}
   const result=classifyStripeEvent(evt,env);
   if(result.error)return error(result.status,result.error);
+  if(liveBinding&&evt.type==='bf.integration.live_probe'&&evt.livemode===true)return json({received:true,live_probe:true});
+  if(liveBinding&&checkoutEvents.has(evt.type)&&evt.data?.object?.metadata?.source!=='burton-found')return json({received:true});
   if(result.action==='qa-isolated')return json({received:true,qa_isolated:true});
   if(result.action==='ignore')return json({received:true});
   const session=result.session;
