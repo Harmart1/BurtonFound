@@ -32,7 +32,9 @@ test('offline launch inventory review enumerates 229 actual storefront SKUs with
  assert.match(report,/offline-only/);
  assert.match(report,/Published storefront listing records \| 229/);
  assert.match(report,/Database SKU records \| Not verified/);
- assert.match(report,/Seller enquiry email \| Not configured/);
+ const contact=readFileSync(new URL('../public/config.js',import.meta.url),'utf8');
+ const unset=/sellerEmail\s*:\s*["']\s*["']/.test(contact);
+ assert.match(report,unset?/Seller enquiry email \| Not configured/:/Seller enquiry email \| Present in public\/config\.js — delivery untested/);
  assert.match(report,/Stripe payout verification flag \| Not approved/);
  assert.ok(csv.includes('Not checked'));
  assert.ok(csv.includes('Owner inspected'));
