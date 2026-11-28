@@ -13,3 +13,5 @@ Deploy private batch picking sheet for paid, unshipped live orders only. No cust
 Urgent owner-reported Stripe checkout repair: restore alternate storefront stock validation, make terms and connection errors explicit, isolate optional analytics, and run live unpaid Checkout verification including branding and exact Canadian shipping rates. Preserve existing approvals and expire only the verification session; never charge a card.
 
 Release an original immediately when its own unpaid Stripe checkout is cancelled or an item is removed after return. Require capability authorization, Stripe-confirmed unpaid expiry and authoritative stock refresh. Run live reservation release and browser tests, preserve all approved commercial settings and roll back on verification failure.
+
+Retry cancellation release after correcting the synthetic carrier session ID to a realistic Stripe shape; all production checks remain required.
