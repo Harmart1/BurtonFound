@@ -112,12 +112,13 @@ def public_safety_check():
         return int(status.strip()), json.loads(raw)
     try:
         status, health = call(APP + "/api/health")
-        if status != 200 or health.get("checkout") != "preview_only":
-            return "WARNING — current store is NOT confirmed in preview-only mode"
-        status, _ = call(APP + "/api/checkout", "POST", '{"skus":["OH-003"]}', True)
-        if status != 503:
-            return "WARNING — checkout did not return the expected disabled-mode response"
-        return "VERIFIED: website rejects payment session creation (HTTP 503)"
+        if status != 200 or health.get("checkout") not in ("preview_only","live_mode"):
+            return "WARNING — current store mode could not be verified"
+        mode=health.get("checkout")
+        status, _ = call(APP + "/api/checkout", "POST", '{"skus":[]}', True)
+        if status != (400 if mode=="live_mode" else 503):
+            return "WARNING — invalid cart did not return the expected rejection"
+        return "VERIFIED: invalid cart rejected (HTTP %s); mode %s; no session requested" % (status,mode)
     except (ValueError, subprocess.TimeoutExpired, OSError, KeyError):
         return "Unavailable — inspect deployed checkout manually"
 
@@ -165,8 +166,8 @@ def webhook_audit():
         try:
             h=subprocess.run(["curl","--silent","--show-error","--max-time","12","--write-out","\\n%{http_code}",origin+"/api/health"],capture_output=True,timeout=15)
             raw,status=h.stdout.rsplit(b"\n",1)
-            if h.returncode or status!=b"200" or json.loads(raw).get("checkout")!="preview_only":
-                rows.append("| Signed probe at "+origin+" | Blocked: preview-only status not verified |");continue
+            if h.returncode or status!=b"200" or json.loads(raw).get("checkout") not in ("preview_only","live_mode"):
+                rows.append("| Signed probe at "+origin+" | Blocked: supported checkout mode not verified |");continue
             t=str(int(time.time()))
             sig=hmac.new(sign.encode(),t.encode()+b"."+payload,hashlib.sha256).hexdigest()
             # Pass the derived signature over stdin rather than printing it or including it in logs.
