@@ -60,6 +60,14 @@ def main():
             prices.append(fixed.get("amount"))
         check(sorted(prices)==[1995,3495],"Live shipping amounts mismatch")
         print("PASS actual live storefront created an unpaid Stripe-hosted Checkout session with correct product price and both approved Canadian shipping options.")
+        if os.environ.get("BF_VERIFY_CANCELLATION")=="true":
+            token=r.get("cancel_token")
+            check(re.fullmatch(r"[a-f0-9]{64}",token or ""),"Cancellation capability missing")
+            check(stock().get("available") is False,"Reserved original not protected")
+            release=public("/api/checkout-cancel",{"session_id":sid,"cancel_token":token})
+            check(release.get("released") is True,"Customer cancellation did not confirm unpaid release")
+            check(stock().get("available") is True,"Cancelled original did not return to available inventory")
+            print("PASS live shopper cancellation restored the reserved original to available stock without charging a card.")
     finally:
         if isinstance(sid,str) and re.fullmatch(r"cs_live_[A-Za-z0-9_]{12,160}",sid):
             s=stripe("checkout/sessions/"+sid)
