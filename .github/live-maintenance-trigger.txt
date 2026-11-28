@@ -7,3 +7,5 @@ Correct live discovery and gift availability; validate catalogue refresh before 
 Deploy initial conservative live Merchant feed for individually documented vintage Coca-Cola magazine pages; no Google submission or advertising. Preserve all live catalogue and payment approvals.
 
 Deploy optional first-party aggregate activity and private owner reporting. Analytics off by default, no IDs or third-party trackers, honor GPC/DNT, retain existing live commerce settings.
+
+Deploy private batch picking sheet for paid, unshipped live orders only. No customer details in the sheet; no changes to checkout, inventory, shipping settings, Stripe or analytics. Run existing maintenance checks.
