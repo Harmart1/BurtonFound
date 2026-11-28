@@ -15,12 +15,12 @@
   let bag=[];
   try {bag=window.BURTON_ACCOUNT?.getLocalBag?.()||JSON.parse(localStorage.getItem('bf_guest_active_bag_v2')||'[]');if(!Array.isArray(bag))bag=[];}catch{bag=[];}
   bag=[...new Set(bag.filter(s=>bySku.has(s)&&!bySku.get(s)?.cmsOnly))];
-  const saveBag=(fromAccount=false)=>{const terms=document.getElementById('liveTermsAccepted');if(terms)terms.checked=false;shippingRequestId++;activeShippingQuote=null;liveOptions=[];const e=document.getElementById('shippingResults');if(e)e.textContent='Bag changed · Compare rates again for an accurate estimate';const t=document.getElementById('shippingEstimateTotal');if(t)t.hidden=true;if(!fromAccount){if(window.BURTON_ACCOUNT?.saveActiveBag)window.BURTON_ACCOUNT.saveActiveBag(bag);else try{localStorage.setItem('bf_guest_active_bag_v2',JSON.stringify(bag));}catch{}}};
+  const saveBag=(fromAccount=false)=>{checkoutError='';const terms=document.getElementById('liveTermsAccepted');if(terms)terms.checked=false;shippingRequestId++;activeShippingQuote=null;liveOptions=[];const e=document.getElementById('shippingResults');if(e)e.textContent='Bag changed · Compare rates again for an accurate estimate';const t=document.getElementById('shippingEstimateTotal');if(t)t.hidden=true;if(!fromAccount){if(window.BURTON_ACCOUNT?.saveActiveBag)window.BURTON_ACCOUNT.saveActiveBag(bag);else try{localStorage.setItem('bf_guest_active_bag_v2',JSON.stringify(bag));}catch{}}};
   window.BURTON_STORE_API={getBag:()=>[...bag],setBag:(next)=>{bag=[...new Set((next||[]).filter(id=>bySku.has(id)&&!bySku.get(id)?.cmsOnly))];saveBag(true);renderProducts();renderCart();}};
   let toastTimer;
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
   let checkoutReady=false,checkoutMode='preview_only',inventoryConnected=false,shippingMode='flat_rate',allowedShippingCountries=['CA'];
-  let activeShippingQuote=null,liveOptions=[],shippingRequestId=0,flatRates=[],flatCountry='CA',checkoutInFlight=false;
+  let activeShippingQuote=null,liveOptions=[],shippingRequestId=0,flatRates=[],flatCountry='CA',checkoutInFlight=false,checkoutError='';
   let liveApprovedSkus=new Set();
   const baseNeedsVerification=p=>p?.requiresVerification===true||p?.availableForCheckout===false;
   const autoApproved=p=>p?.collection==='automobiles'&&checkoutMode==='live_mode'&&liveApprovedSkus.has(p.sku);
@@ -190,7 +190,7 @@
     const enquiryOnly=bagNeedsVerification();
     const b=$('checkoutButton');b.disabled=stockRefreshing||checkoutInFlight||!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
     const terms=$('livePurchaseTerms'),accept=$('liveTermsAccepted');const liveReview=checkoutMode==='live_mode'&&checkoutReady&&bag.length>0&&!enquiryOnly;
-    if(terms)terms.hidden=!liveReview;if(liveReview&&(!accept||!accept.checked))b.disabled=true;
+    if(terms)terms.hidden=!liveReview; // Keep the button actionable so an unchecked terms box receives a clear prompt; handleCheckout still requires consent.
     const flat=$('flatShipping'),flatMenu=$('flatShipCountry'),flatPrice=$('flatShippingPrice');
     if(flat&&flatMenu&&flatPrice){
       flat.hidden=!bag.length||enquiryOnly||shippingMode!=='flat_rate'||!flatRates.length;
@@ -211,6 +211,10 @@
     else {b.innerHTML='Prepare purchase enquiry <span>↗</span>';$('checkoutHelp').textContent='Online payments are not enabled. You may save your bag or copy a purchase request; no payment is taken.';}
     if(bagHasOverlappingUnits())$('checkoutHelp').textContent='Two selections contain the same pictured page. Remove one selection before proceeding.';
     else if(bag.some(sku=>bySku.get(sku)?.stockState==='unavailable'))$('checkoutHelp').textContent='An item in your bag is sold or reserved. Remove it before checking out.';
+    if(stockRefreshing)$('checkoutHelp').textContent='Checking current stock and secure payment availability…';
+    else if(liveReview&&!accept?.checked)$('checkoutHelp').textContent='Tick the purchase terms checkbox above before continuing to Stripe.';
+    if(checkoutError)$('checkoutHelp').textContent=checkoutError+' '+$('checkoutHelp').textContent;
+    $('checkoutHelp').setAttribute('role','status');
   }
   function drawShippingOptions(data){
     liveOptions=data.options||[];activeShippingQuote=null;
@@ -233,16 +237,16 @@
     if(stockRefreshing||checkoutInFlight||!bag.length||bagHasOverlappingUnits())return;
     if(checkoutReady&&!bagNeedsVerification()){
       if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Please remove unavailable items first.');return;}
-      if(checkoutMode==='live_mode'&&!$('liveTermsAccepted')?.checked){toast('Please review and confirm the purchase terms.');return;}
-      const btn=$('checkoutButton');checkoutInFlight=true;btn.disabled=true;btn.textContent='Connecting securely…';
+      if(checkoutMode==='live_mode'&&!$('liveTermsAccepted')?.checked){checkoutError='Please review and confirm the purchase terms.';renderCart();$('liveTermsAccepted')?.focus();return;}
+      const btn=$('checkoutButton');checkoutError='';checkoutInFlight=true;btn.disabled=true;btn.textContent='Connecting securely…';$('checkoutHelp').textContent='Connecting to Stripe. Please do not submit again.';
       const checkoutSkus=[...bag],checkoutCountry=flatCountry,checkoutQuote=activeShippingQuote;
       try {
         const token=await window.BURTON_ACCOUNT?.authToken?.();
         const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:checkoutSkus,...(checkoutMode==='live_mode'?{terms_version:'CA-2026-11-28'}:{}),...(shippingMode==='live_carrier'?{shipping_quote:checkoutQuote}:{shipping_country:checkoutCountry})})});
         const data=await response.json();if(!response.ok||!/^https:\/\/checkout\.stripe\.com\//.test(data.url||''))throw Error(data.error||'Checkout unavailable');
-        if(checkoutMode==='live_mode')window.BURTON_ACTIVITY?.record('checkout_open','other');
+        if(checkoutMode==='live_mode'){try{window.BURTON_ACTIVITY?.record('checkout_open','other');}catch{/* Optional analytics must never prevent payment navigation. */}}
         location.assign(data.url);return;
-      }catch(e){toast(e.message||'Checkout unavailable. No payment taken.');await loadLiveStatus();}
+      }catch(e){checkoutError=e.message||'Checkout could not be confirmed. Please contact the shop before trying again.';renderCart();await loadLiveStatus();}
       finally{checkoutInFlight=false;renderCart();}
       return;
     }
@@ -328,7 +332,7 @@
     document.addEventListener('bf:auth-change',()=>{const signedIn=!!window.BURTON_ACCOUNT?.user?.()?.email;const label=document.getElementById('accountNavLabel');if(label)label.textContent=signedIn?'MY ACCOUNT':'SIGN IN';const c=document.querySelector('.account-create-header');if(c)c.hidden=signedIn;const a=document.querySelector('.account-header-link');if(a)a.href=signedIn?'account.html':'account.html#signin';});$('cartClose').addEventListener('click',closeCart);$('scrim').addEventListener('click',closeCart);
     $('cartItems').addEventListener('click',e=>{if(e.target.closest('[data-remove]'))removeItem(e.target.closest('[data-remove]').dataset.remove);if(e.target.closest('#bagBrowse')){closeCart();$('shop').scrollIntoView({behavior:'smooth'});}});
     $('checkoutButton').addEventListener('click',handleCheckout);
-    $('liveTermsAccepted')?.addEventListener('change',renderCart);
+    $('liveTermsAccepted')?.addEventListener('change',()=>{checkoutError='';renderCart();});
     $('flatShipCountry')?.addEventListener('change',e=>{flatCountry=e.target.value;renderCart();});
     $('shippingForm')?.addEventListener('submit',getShippingQuote);
     $('shippingForm')?.addEventListener('input',()=>{shippingRequestId++;if(activeShippingQuote||liveOptions.length){activeShippingQuote=null;liveOptions=[];$('shippingResults').textContent='Destination changed · Compare rates again';$('shippingEstimateTotal').hidden=true;renderCart();}});
