@@ -1,5 +1,5 @@
 import {boundedText} from '../_lib/bounded-json.js';
-import {error,json,rpc,verifyStripe} from '../_lib/core.js';
+import {error,json,rpc,verifyStripe,stripe} from '../_lib/core.js';
 import {cleanPostal} from '../_lib/shipping.js';
 export const normalizeCity=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
 export function shippingMismatch(metadata,address,amount){
@@ -50,6 +50,9 @@ export async function onRequestPost({request,env}){
   const result=classifyStripeEvent(evt,env);
   if(result.error)return error(result.status,result.error);
   if(liveBinding&&evt.type==='bf.integration.live_probe'&&evt.livemode===true)return json({received:true,live_probe:true});
+  if(liveBinding&&evt.type==='bf.integration.live_merchant_probe'&&evt.livemode===true){
+    try{if(!/^sk_live_[A-Za-z0-9]+$/.test(env.STRIPE_LIVE_SECRET_KEY||''))throw Error('No live key');const a=await stripe({...env,STRIPE_SECRET_KEY:env.STRIPE_LIVE_SECRET_KEY},'account',null,'GET');if(a?.id!==env.STRIPE_EXPECTED_ACCOUNT_ID||a.charges_enabled!==true||a.payouts_enabled!==true)throw Error('Merchant mismatch');return json({received:true,merchant_verified:true});}catch{return error(503,'Live merchant verification unavailable');}
+  }
   if(liveBinding&&checkoutEvents.has(evt.type)&&evt.data?.object?.metadata?.source!=='burton-found')return json({received:true});
   if(result.action==='qa-isolated')return json({received:true,qa_isolated:true});
   if(result.action==='ignore')return json({received:true});
