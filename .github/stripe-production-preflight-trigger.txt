@@ -1,0 +1,1 @@
+Read-only live Stripe readiness check requested by owner. No charges or configuration changes.
