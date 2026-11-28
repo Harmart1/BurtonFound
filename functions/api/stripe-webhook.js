@@ -4,6 +4,7 @@ import {cleanPostal} from '../_lib/shipping.js';
 export const normalizeCity=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
 export function shippingMismatch(metadata,address,amount){
  const expected=metadata||{},a=address||{};
+ if(expected.bf_flat_country){const prices=[expected.bf_flat_standard,expected.bf_flat_express].filter(v=>typeof v==='string'&&/^\d+$/.test(v)).map(Number);return String(a.country||'').toUpperCase()!==expected.bf_flat_country||!prices.includes(Number(amount));}
  if(!expected.bf_ship_carrier)return false;
  if(!a.country||!a.postal_code)return true;
  if(a.country.toUpperCase()!==expected.bf_ship_country||cleanPostal(a.postal_code)!==expected.bf_ship_postal||Number(amount)!==Number(expected.bf_ship_amount))return true;
@@ -53,7 +54,7 @@ export async function onRequestPost({request,env}){
       if(result?.status==='review')console.error('MANUAL REVIEW REQUIRED: possible inventory conflict on Stripe session',session.id);
       const expected=session.metadata||{};const actual=shipping.address||session.customer_details?.address||{};
       if(expected.bf_ship_carrier){await rpc(env,'bf_record_shipping_selection',{p_session_id:session.id,p_carrier:expected.bf_ship_carrier,p_service:expected.bf_ship_service||'',p_eta:expected.bf_ship_eta||null});}
-      if(expected.bf_ship_country&&shippingMismatch(expected,actual,session.shipping_cost?.amount_total||0)){
+      if((expected.bf_ship_country||expected.bf_flat_country)&&shippingMismatch(expected,actual,session.shipping_cost?.amount_total||0)){
         await rpc(env,'bf_flag_shipping_mismatch',{p_session_id:session.id,p_reason:'Payment received but the Stripe delivery address or shipping amount differs from the quoted destination. Hold fulfillment and contact customer to confirm before shipping.'});
         console.error('SHIPPING REVIEW REQUIRED: quote differs from Stripe checkout destination',session.id);
       }
