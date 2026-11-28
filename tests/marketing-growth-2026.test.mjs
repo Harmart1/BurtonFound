@@ -17,7 +17,7 @@ test('Evergreen gift page includes real catalogue links, search metadata and hon
   assert.match(html,/meta name="twitter:image"/);
   assert.match(html,/data-bf-copy-link/);
   assert.match(html,/data-bf-share-platform="pinterest"/);
-  assert.match(html,/Online card checkout is not yet enabled/);
+  assert.match(html,/Check current checkout availability in the shop/);
   assert.match(html,/noindex,follow/);
   assert.match(read('public/sitemap.xml'),/\/gifts\/vintage-gifts-for-collectors\.html/);
 });
