@@ -74,28 +74,44 @@ def main():
     ensure(bool(ns) and bool(assigned) and set(ns)==set(assigned),"BLOCKED: public NS delegation does not match the active zone; no routing change")
     zone=z["id"]
     path="/accounts/"+account+"/workers/domains"
-    existing=request(path+"?"+urllib.parse.urlencode({"hostname":DOMAIN}))["result"]
-    target=[v for v in existing if v.get("hostname")==DOMAIN]
-    print('Exact apex Worker bindings: '+str(len(target)))
-    if target:
-        ensure(len(target)==1 and target[0].get("service")==WORKER and target[0].get("zone_id")==zone and target[0].get("enabled") is True,"BLOCKED: existing hostname binding belongs elsewhere or is disabled")
-        print("PASS apex hostname already attached to intended Worker")
-    else:
-        try:records=request("/zones/"+zone+"/dns_records?"+urllib.parse.urlencode({"name.exact":DOMAIN,"per_page":100}))
-        except RuntimeError as e:
-            raise RuntimeError(str(e)+"; BLOCKED: DNS Read permission required to check conflicts before attachment. Use dashboard Custom Domain or scoped token. No DNS mutation.") from None
-        ensure(not records.get("result_info",{}).get("total_pages",1)>1,"BLOCKED: DNS inventory incomplete")
-        conflicts=[x for x in records["result"] if x.get("name")==DOMAIN and x.get("type") in ("A","AAAA","CNAME","HTTPS","SVCB")]
-        ensure(not conflicts,"BLOCKED: existing apex website DNS records require owner review; no records overwritten")
-        routes=request("/zones/"+zone+"/workers/routes")["result"]
-        ensure(not routes,"BLOCKED: existing zone Worker routes require owner review; none changed")
-        obj=request(path,"PUT",{"hostname":DOMAIN,"service":WORKER,"zone_id":zone,"enabled":True,"previews_enabled":False})["result"]
-        ensure(obj.get("hostname")==DOMAIN and obj.get("service")==WORKER and obj.get("zone_id")==zone and obj.get("enabled") is True,"Custom domain attachment response unexpected")
-        print("PASS apex custom domain attached to existing Worker; Cloudflare manages its DNS and TLS")
+    for host in (DOMAIN, "www."+DOMAIN):
+        existing=request(path+"?"+urllib.parse.urlencode({"hostname":host}))["result"]
+        target=[v for v in existing if v.get("hostname")==host]
+        print('Exact Worker bindings for '+host+': '+str(len(target)))
+        if target:
+            ensure(len(target)==1 and target[0].get("service")==WORKER and target[0].get("zone_id")==zone and target[0].get("enabled") is True,"BLOCKED: existing hostname binding belongs elsewhere or is disabled")
+            print("PASS "+host+" already attached to intended Worker")
+        else:
+            try:records=request("/zones/"+zone+"/dns_records?"+urllib.parse.urlencode({"name.exact":host,"per_page":100}))
+            except RuntimeError as e:
+                raise RuntimeError(str(e)+"; BLOCKED: DNS Read permission required to check conflicts before attachment. Use dashboard Custom Domain or scoped token. No DNS mutation.") from None
+            ensure(not records.get("result_info",{}).get("total_pages",1)>1,"BLOCKED: DNS inventory incomplete")
+            conflicts=[x for x in records["result"] if x.get("name")==host and x.get("type") in ("A","AAAA","CNAME","HTTPS","SVCB")]
+            ensure(not conflicts,"BLOCKED: existing website DNS records require owner review; no records overwritten")
+            routes=request("/zones/"+zone+"/workers/routes")["result"]
+            ensure(not routes,"BLOCKED: existing zone Worker routes require owner review; none changed")
+            obj=request(path,"PUT",{"hostname":host,"service":WORKER,"zone_id":zone,"enabled":True,"previews_enabled":False})["result"]
+            ensure(obj.get("hostname")==host and obj.get("service")==WORKER and obj.get("zone_id")==zone and obj.get("enabled") is True,"Custom domain attachment response unexpected")
+            print("PASS "+host+" custom domain attached to existing Worker; Cloudflare manages its DNS and TLS")
     ensure(public_check(OLD),"REVIEW: previous preview health could not be verified")
     print("PASS previous preview URL preserved")
-    if public_check("https://"+DOMAIN):print("PASS branded HTTPS domain serves Burton & Found preview-only API")
-    else:print("REVIEW: domain attachment is present but branded HTTPS health is not yet verified; do not change canonical URLs or auth until verified")
+    pending={DOMAIN,"www."+DOMAIN}
+    for attempt in range(3):
+        for host in sorted(pending):
+            if public_check("https://"+host):
+                print("PASS branded HTTPS preview-only API: "+host)
+                pending.remove(host)
+        if not pending:break
+        if attempt<2:time.sleep(8)
+    for host in sorted(pending):
+        dns_status(host)
+        print("REVIEW: HTTPS health not yet verified: "+host)
+    ensure(not pending,"HTTPS verification incomplete; no canonical URL or auth changes made")
+    for host in (DOMAIN,"www."+DOMAIN):
+        r=subprocess.run(["curl","--silent","--show-error","--fail","--max-time","12","https://"+host+"/"],capture_output=True,timeout=16)
+        ensure(r.returncode==0 and b"Browse the collection" in r.stdout,"Homepage not verified: "+host)
+        print("PASS branded homepage: "+host)
+    ensure(public_check(OLD),"Previous preview health not confirmed")
 if __name__=="__main__":
     try:main()
     except RuntimeError as e:sys.exit(str(e))
