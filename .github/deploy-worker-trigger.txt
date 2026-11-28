@@ -9,3 +9,5 @@ Deploy provisional CAD flat-rate pricing behind disabled price approval gate, ow
 Deploy Worker-bundled sitemap and robots routing; validate preview release and public site, retain all commercial approval gates.
 
 Owner approved four starting flat rates. Deploy with exact approved prices and all checkout, US duty, live carrier, tax and indexing gates off.
+
+Deploy owner-authorized temporary customer email configuration and verified contact links; retain all payment and US customs gates.
