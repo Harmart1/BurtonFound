@@ -156,7 +156,7 @@
     const units=new Set(p.catalogIds||[sku]);
     const conflict=bag.map(id=>bySku.get(id)).find(existing=>existing&&(existing.catalogIds||[existing.sku]).some(unit=>units.has(unit)));
     if(conflict){toast('A selected item is already included in '+conflict.title+'. Remove that item or set first.');return;}
-    bag.push(sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();
+    bag.push(sku);window.BURTON_ACTIVITY?.record('add_to_bag',p.type==='bundle'?'sets':p.collection||'other');saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();
     toast('A good find! Added to your paper bag.');
   }
   function removeItem(sku){bag=bag.filter(s=>s!==sku);saveBag();renderProducts();renderCart();window.BURTON_DISCOVERY_VIEW?.renderSaved();}
@@ -240,6 +240,7 @@
         const token=await window.BURTON_ACCOUNT?.authToken?.();
         const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:checkoutSkus,...(checkoutMode==='live_mode'?{terms_version:'CA-2026-11-28'}:{}),...(shippingMode==='live_carrier'?{shipping_quote:checkoutQuote}:{shipping_country:checkoutCountry})})});
         const data=await response.json();if(!response.ok||!/^https:\/\/checkout\.stripe\.com\//.test(data.url||''))throw Error(data.error||'Checkout unavailable');
+        if(checkoutMode==='live_mode')window.BURTON_ACTIVITY?.record('checkout_open','other');
         location.assign(data.url);return;
       }catch(e){toast(e.message||'Checkout unavailable. No payment taken.');await loadLiveStatus();}
       finally{checkoutInFlight=false;renderCart();}
