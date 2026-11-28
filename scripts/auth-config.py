@@ -4,9 +4,12 @@ Never prints API response bodies, credentials, or customer information.
 import argparse, json, os, re, sys, urllib.request, urllib.error
 from urllib.parse import urlsplit
 REF="nyvdrgpcwfasajyncnhi"
-SITE="https://burtonfound.timharmar.workers.dev"
+SITE="https://burtonandfound.ca"
+PREVIEW="https://burtonfound.timharmar.workers.dev"
+WWW="https://www.burtonandfound.ca"
 CALLBACK=SITE+"/account"
 LEGACY_CALLBACK=SITE+"/account.html"
+REQUIRED_CALLBACKS=tuple(origin+suffix for origin in (SITE,WWW,PREVIEW) for suffix in ("/account","/account.html"))
 ENDPOINT="https://api.supabase.com/v1/projects/"+REF+"/config/auth"
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):
@@ -30,25 +33,27 @@ def redirects(cfg):
     raise ValueError("Unexpected allow-list type; refusing to overwrite.")
 def report(cfg):
     return {"Canonical site URL":str(cfg.get("site_url","")).rstrip("/")==SITE,
-            "Exact account callback present":CALLBACK in redirects(cfg),
+            "All six exact account callbacks present":all(x in redirects(cfg) for x in REQUIRED_CALLBACKS),
             "Email authentication enabled":cfg.get("external_email_enabled") is True,
             "Signup permitted":cfg.get("disable_signup") is False,
             "Email confirmation required":cfg.get("mailer_autoconfirm") is False,
             "Custom SMTP host and sender present":bool(cfg.get("smtp_host") and cfg.get("smtp_admin_email")),
             "Secure email change enabled":cfg.get("mailer_secure_email_change_enabled") is True}
-def make_patch(cfg,apply_smtp=False,environ=None):
-    environ=os.environ if environ is None else environ
+def make_brand_patch(cfg):
     patch={}
     existing=str(cfg.get("site_url") or "").strip()
-    # Preserve deliberately configured external/custom domain; explicit owner review required.
     if existing.rstrip("/")!=SITE:
         u=urlsplit(existing)
-        if existing and u.hostname not in ("localhost","127.0.0.1","::1"):
+        if existing and existing.rstrip("/") not in (PREVIEW,WWW) and u.hostname not in ("localhost","127.0.0.1","::1"):
             raise ValueError("Different configured Site URL detected; review in dashboard before overwriting.")
         patch["site_url"]=SITE
     allowed=redirects(cfg)
-    missing=[x for x in (CALLBACK,LEGACY_CALLBACK) if x not in allowed]
+    missing=[x for x in REQUIRED_CALLBACKS if x not in allowed]
     if missing:patch["uri_allow_list"]=",".join([*allowed,*missing])
+    return patch
+def make_patch(cfg,apply_smtp=False,environ=None):
+    environ=os.environ if environ is None else environ
+    patch=make_brand_patch(cfg)
     for k,v in {"external_email_enabled":True,"disable_signup":False,"mailer_autoconfirm":False,"mailer_secure_email_change_enabled":True}.items():
         if cfg.get(k) is not v:patch[k]=v
     if apply_smtp:
@@ -61,7 +66,8 @@ def make_patch(cfg,apply_smtp=False,environ=None):
         patch.update(values,smtp_port=int(port),smtp_sender_name="Burton & Found")
     return patch
 def main():
-    p=argparse.ArgumentParser();p.add_argument("--apply",action="store_true");p.add_argument("--smtp",action="store_true");args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument("--apply",action="store_true");p.add_argument("--smtp",action="store_true");p.add_argument("--brand-only",action="store_true");args=p.parse_args()
+    if args.brand_only and (not args.apply or args.smtp):raise ValueError("--brand-only requires --apply without --smtp.")
     if args.smtp and not args.apply:raise ValueError("--smtp requires --apply.")
     token=os.environ.get("BF_SUPABASE_MANAGEMENT_TOKEN","").strip()
     if not token:
@@ -70,7 +76,7 @@ def main():
     cfg=request(token)
     for label,ok in report(cfg).items():print(label+": "+("PASS" if ok else "REVIEW"))
     if not args.apply:return 0 if all(report(cfg).values()) else 2
-    patch=make_patch(cfg,args.smtp)
+    patch=make_brand_patch(cfg) if args.brand_only else make_patch(cfg,args.smtp)
     if patch:
         # Never log patch values. Only update narrowly scoped fields.
         print("Applying approved authentication settings:",", ".join(sorted(patch)))
@@ -81,6 +87,10 @@ def main():
     if args.smtp and any(current.get(k)!=patch.get(k) for k in ("smtp_host","smtp_user","smtp_admin_email","smtp_port")):
         raise RuntimeError("SMTP settings did not match expected values after repair.")
     print("Actual inbox delivery remains unverified; test with an owner-controlled mailbox.")
+    if args.brand_only:
+        if make_brand_patch(current):raise RuntimeError("Branded redirect verification failed.")
+        print("PASS: branded site URL and all six exact callbacks verified; no email, signup, or SMTP settings changed.")
+        return 0
     return 0 if all(results.values()) else 2
 if __name__=="__main__":
     try:sys.exit(main())
