@@ -30,8 +30,8 @@ def main():
         previous=json.loads(config["vars"]["LIVE_APPROVED_SKUS_JSON"])
         manifest=json.loads(Path("release-review/vintage-auto-candidates.json").read_text())
         rows=manifest["products"]
-        units={r["sku"] for r in rows if re.fullmatch(r"VA-\\d{3}",r["sku"])}
-        sets={r["sku"] for r in rows if re.fullmatch(r"BF-VA-SET\\d{2}",r["sku"])}
+        units={r["sku"] for r in rows if re.fullmatch(r"VA-[0-9]{3}",r["sku"])}
+        sets={r["sku"] for r in rows if re.fullmatch(r"BF-VA-SET[0-9]{2}",r["sku"])}
         if len(rows)!=98 or len(units)!=80 or len(sets)!=18 or any(not r["units"] or len(set(r["units"]))!=len(r["units"]) or not set(r["units"]).issubset(units) or type(r["price_cents"]) is not int or r["price_cents"]<=0 for r in rows):raise ValueError("Automobile manifest invalid")
         if len(previous)!=131 or set(previous)&(units|sets):raise ValueError("Automobile expansion requires existing 131-item release")
         config["vars"]["LIVE_APPROVED_SKUS_JSON"]=json.dumps(sorted(set(previous)|units|sets),separators=(",",":"))
