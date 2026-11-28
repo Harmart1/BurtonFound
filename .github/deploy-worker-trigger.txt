@@ -11,3 +11,5 @@ Deploy Worker-bundled sitemap and robots routing; validate preview release and p
 Owner approved four starting flat rates. Deploy with exact approved prices and all checkout, US duty, live carrier, tax and indexing gates off.
 
 Deploy owner-authorized temporary customer email configuration and verified contact links; retain all payment and US customs gates.
+
+Refresh deployment after updating obsolete no-contact inventory audit expectation; no payment activation.
