@@ -29,7 +29,7 @@
     "STRIPE_AUTOMATIC_TAX": "false",
     "SUPABASE_URL": "https://nyvdrgpcwfasajyncnhi.supabase.co",
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_xGxEm5fncVZbHUhepQSpSg_3n7vnsbA",
-    "MARKETING_SITE_URL": "https://burtonfound.timharmar.workers.dev",
+    "MARKETING_SITE_URL": "https://burtonandfound.ca",
     "MARKETING_INDEXING_APPROVED": "false"
   },
   "ratelimits": [
