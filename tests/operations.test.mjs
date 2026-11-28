@@ -45,7 +45,7 @@ test('database and dashboard include fulfillment history and print helpers',()=>
  assert.match(sql,/REVOKE EXECUTE ON FUNCTION public\.bf_update_fulfillment/);
  assert.match(sql,/EXISTS\(SELECT 1 FROM public\.bf_product_units/);
  const ui=readFileSync(new URL('../public/admin/admin.js',import.meta.url),'utf8');
- assert.match(ui,/packingSlip\(/);assert.match(ui,/exportCsv\(/);assert.match(ui,/customerEmail\(/);
+ assert.match(ui,/packingSlip\(/);assert.match(ui,/exportCsv\(/);assert.match(ui,/openDraft\(/);
  assert.ok(existsSync(new URL('../public/admin/orders.html',import.meta.url)));
 });
 
