@@ -1,1 +1,3 @@
 Owner explicitly authorized real Canadian checkout and publication of Burton and Found, 249-700-1871, 2-356 Queen Street East, Sault Ste. Marie, Ontario, P6A 1Z1. Approved 131 eligible listings, Canadian flat rates, small supplier tax treatment, existing policies. Production credentials verified. Run controlled release; no test charges.
+
+Retry after initial rollback with explicit safe postflight diagnostics.
