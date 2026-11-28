@@ -153,6 +153,8 @@ jobs:
           data=json.load(open("/tmp/burton-health.json"))
           assert data.get("service")=="Burton & Found", data
           assert data.get("checkout")=="preview_only", "Checkout must remain disabled"
+          assert data.get("shippingCountries")==["CA"], "Canada-first launch scope not confirmed"
+          assert [(x.get("country"),x.get("standard"),x.get("express")) for x in data.get("flatRates",[])]==[("CA",1995,3495)], "Approved Canadian rates or US exclusion not confirmed"
           print("Verified Burton & Found health:",data.get("checkout"))
           PY
               then
