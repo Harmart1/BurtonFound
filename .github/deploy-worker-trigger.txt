@@ -31,3 +31,5 @@ Deploy photo-based physical inspection workflow and read-only owner review valid
 Deploy Canadian cart shipping totals, duplicate checkout click protection, and owner-authorized guest email deferral. Live checkout remains locked pending live credentials and remaining operational approvals.
 
 Deploy independent live webhook signature support while retaining sandbox checkout and preview-only payments.
+
+Deploy separate live key selection with no test-key fallback. Preview-only settings unchanged.
