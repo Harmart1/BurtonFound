@@ -66,9 +66,9 @@ test('automated marketing kit contains reusable product links and accurately dis
  const csv=read('marketing-output/pinterest-and-social-catalog.csv');
  const readiness=JSON.parse(read('marketing-output/marketing-readiness.json'));
  assert.equal(csv.trim().split('\n').length,1+readiness.promotionEligibleListings);
- assert.ok(readiness.promotionEligibleListings<=131);
+ assert.ok(readiness.promotionEligibleListings<=(readiness.liveCommerceSnapshot?229:131));
  if(!readiness.liveStockSnapshotUsed){assert.equal(readiness.promotionEligibleListings,131);assert.ok(csv.includes('CC-NEW-001'));assert.ok(csv.includes('OH-NEW-003-01'));}
- else {const raw=JSON.parse(read('marketing-stock-snapshot.json'));const available=new Set(raw.items.filter(x=>x.available).map(x=>x.sku));for(const line of csv.trim().split('\n').slice(1))assert.ok(available.has(line.split(',')[0].replaceAll('"','')));for(const sku of readiness.weeklyDraftItems)assert.ok(available.has(sku));}
+ else {const raw=JSON.parse(read('marketing-stock-snapshot.json'));const available=new Set(raw.items.filter(x=>x.available&&(!readiness.liveCommerceSnapshot||x.checkout_eligible===true)).map(x=>x.sku));for(const line of csv.trim().split('\n').slice(1))assert.ok(available.has(line.split(',')[0].replaceAll('"','')));for(const sku of readiness.weeklyDraftItems)assert.ok(available.has(sku));}
  assert.ok(csv.includes('product_url'));
  const calendar=read('marketing-output/14-day-social-calendar.md');
  assert.equal((calendar.match(/### Day /g)||[]).length,14);
