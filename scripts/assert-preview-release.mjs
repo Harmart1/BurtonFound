@@ -17,6 +17,7 @@ export const expectedPreviewVars=Object.freeze({
  CANADA_POST_TEST_APP:'true',
  FEDEX_SANDBOX:'true',
  SHIPPING_MODE:'flat_rate',
+ FLAT_RATE_PRICES_APPROVED:'false',
  SHIPPING_ALLOWED_COUNTRIES:'CA,US'
 });
 export function assertPreviewRelease(config){
