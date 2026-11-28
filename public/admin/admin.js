@@ -121,7 +121,7 @@ $('orders').addEventListener('click',async e=>{
    if(!panel.hidden){panel.hidden=true;panel.replaceChildren();break;}
    panel.hidden=false;panel.innerHTML='<h3>Shipping contribution (CAD)</h3><p>Customer shipping charge: '+esc(dollars(o.shipping_cents))+' · Enter actual or quoted expenses. No estimate is implied.</p><div class="operations-form">'+['Postage','Packaging','Duties and customs fees','Other shipping expenses'].map((label,i)=>'<label>'+label+'<input type="number" min="0" step="0.01" inputmode="decimal" data-expense="'+i+'" placeholder="0.00"></label>').join('')+'</div><p role="status">Enter all four costs, including zero where applicable.</p><small>Local calculation only. Excludes item margin, payment fees and taxes; not stored or posted to bookkeeping.</small>';
    const result=panel.querySelector('[role="status"]'),inputs=[...panel.querySelectorAll('input')];
-   panel.addEventListener('input',()=>{const vals=inputs.map(x=>F.parseCAD(x.value));const v=F.contribution(o.shipping_cents,...vals);result.textContent=v?'Total shipping expense '+dollars(v.costs)+' · '+(v.contribution<0?'Shipping shortfall ':'Shipping contribution ')+dollars(Math.abs(v.contribution)):'Enter all four costs, including zero where applicable.';},{signal:undefined});break;
+   panel.oninput=()=>{const vals=inputs.map(x=>F.parseCAD(x.value));const v=F.contribution(o.shipping_cents,...vals);result.textContent=v?'Total shipping expense '+dollars(v.costs)+' · '+(v.contribution<0?'Shipping shortfall ':'Shipping contribution ')+dollars(Math.abs(v.contribution)):'Enter all four costs, including zero where applicable.';};break;
   }
   case 'history':{
    const box=btn.closest('.order').querySelector('.history');if(!box.hidden){box.hidden=true;break;}
