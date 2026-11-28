@@ -15,7 +15,7 @@
   let bag=[];
   try {bag=window.BURTON_ACCOUNT?.getLocalBag?.()||JSON.parse(localStorage.getItem('bf_guest_active_bag_v2')||'[]');if(!Array.isArray(bag))bag=[];}catch{bag=[];}
   bag=[...new Set(bag.filter(s=>bySku.has(s)&&!bySku.get(s)?.cmsOnly))];
-  const saveBag=(fromAccount=false)=>{shippingRequestId++;activeShippingQuote=null;liveOptions=[];const e=document.getElementById('shippingResults');if(e)e.textContent='Bag changed · Compare rates again for an accurate estimate';const t=document.getElementById('shippingEstimateTotal');if(t)t.hidden=true;if(!fromAccount){if(window.BURTON_ACCOUNT?.saveActiveBag)window.BURTON_ACCOUNT.saveActiveBag(bag);else try{localStorage.setItem('bf_guest_active_bag_v2',JSON.stringify(bag));}catch{}}};
+  const saveBag=(fromAccount=false)=>{const terms=document.getElementById('liveTermsAccepted');if(terms)terms.checked=false;shippingRequestId++;activeShippingQuote=null;liveOptions=[];const e=document.getElementById('shippingResults');if(e)e.textContent='Bag changed · Compare rates again for an accurate estimate';const t=document.getElementById('shippingEstimateTotal');if(t)t.hidden=true;if(!fromAccount){if(window.BURTON_ACCOUNT?.saveActiveBag)window.BURTON_ACCOUNT.saveActiveBag(bag);else try{localStorage.setItem('bf_guest_active_bag_v2',JSON.stringify(bag));}catch{}}};
   window.BURTON_STORE_API={getBag:()=>[...bag],setBag:(next)=>{bag=[...new Set((next||[]).filter(id=>bySku.has(id)&&!bySku.get(id)?.cmsOnly))];saveBag(true);renderProducts();renderCart();}};
   let toastTimer;
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
@@ -178,6 +178,8 @@
     }).join(''):`<div class="cart-empty"><span>✳</span><h3>Your bag is a blank page.</h3><p>A good find is just around the corner.</p><button type="button" class="btn btn-outline" id="bagBrowse">Explore the shelves ↗</button></div>`;
     const enquiryOnly=bagNeedsVerification();
     const b=$('checkoutButton');b.disabled=checkoutInFlight||!bag.length||bagHasOverlappingUnits()||bag.some(sku=>bySku.get(sku)?.stockState==='unavailable')||(checkoutReady&&!enquiryOnly&&shippingMode==='live_carrier'&&!activeShippingQuote);
+    const terms=$('livePurchaseTerms'),accept=$('liveTermsAccepted');const liveReview=checkoutMode==='live_mode'&&checkoutReady&&bag.length>0&&!enquiryOnly;
+    if(terms)terms.hidden=!liveReview;if(liveReview&&(!accept||!accept.checked))b.disabled=true;
     const flat=$('flatShipping'),flatMenu=$('flatShipCountry'),flatPrice=$('flatShippingPrice');
     if(flat&&flatMenu&&flatPrice){
       flat.hidden=!bag.length||enquiryOnly||shippingMode!=='flat_rate'||!flatRates.length;
@@ -220,11 +222,12 @@
     if(checkoutInFlight||!bag.length||bagHasOverlappingUnits())return;
     if(checkoutReady&&!bagNeedsVerification()){
       if(bag.some(id=>bySku.get(id)?.stockState==='unavailable')){toast('Please remove unavailable items first.');return;}
+      if(checkoutMode==='live_mode'&&!$('liveTermsAccepted')?.checked){toast('Please review and confirm the purchase terms.');return;}
       const btn=$('checkoutButton');checkoutInFlight=true;btn.disabled=true;btn.textContent='Connecting securely…';
       const checkoutSkus=[...bag],checkoutCountry=flatCountry,checkoutQuote=activeShippingQuote;
       try {
         const token=await window.BURTON_ACCOUNT?.authToken?.();
-        const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:checkoutSkus,...(shippingMode==='live_carrier'?{shipping_quote:checkoutQuote}:{shipping_country:checkoutCountry})})});
+        const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({skus:checkoutSkus,...(checkoutMode==='live_mode'?{terms_version:'CA-2026-11-28'}:{}),...(shippingMode==='live_carrier'?{shipping_quote:checkoutQuote}:{shipping_country:checkoutCountry})})});
         const data=await response.json();if(!response.ok||!/^https:\/\/checkout\.stripe\.com\//.test(data.url||''))throw Error(data.error||'Checkout unavailable');
         location.assign(data.url);return;
       }catch(e){toast(e.message||'Checkout unavailable. No payment taken.');await loadLiveStatus();}
@@ -313,6 +316,7 @@
     document.addEventListener('bf:auth-change',()=>{const signedIn=!!window.BURTON_ACCOUNT?.user?.()?.email;const label=document.getElementById('accountNavLabel');if(label)label.textContent=signedIn?'MY ACCOUNT':'SIGN IN';const c=document.querySelector('.account-create-header');if(c)c.hidden=signedIn;const a=document.querySelector('.account-header-link');if(a)a.href=signedIn?'account.html':'account.html#signin';});$('cartClose').addEventListener('click',closeCart);$('scrim').addEventListener('click',closeCart);
     $('cartItems').addEventListener('click',e=>{if(e.target.closest('[data-remove]'))removeItem(e.target.closest('[data-remove]').dataset.remove);if(e.target.closest('#bagBrowse')){closeCart();$('shop').scrollIntoView({behavior:'smooth'});}});
     $('checkoutButton').addEventListener('click',handleCheckout);
+    $('liveTermsAccepted')?.addEventListener('change',renderCart);
     $('flatShipCountry')?.addEventListener('change',e=>{flatCountry=e.target.value;renderCart();});
     $('shippingForm')?.addEventListener('submit',getShippingQuote);
     $('shippingForm')?.addEventListener('input',()=>{shippingRequestId++;if(activeShippingQuote||liveOptions.length){activeShippingQuote=null;liveOptions=[];$('shippingResults').textContent='Destination changed · Compare rates again';$('shippingEstimateTotal').hidden=true;renderCart();}});
