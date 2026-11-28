@@ -13,3 +13,5 @@ Owner approved four starting flat rates. Deploy with exact approved prices and a
 Deploy owner-authorized temporary customer email configuration and verified contact links; retain all payment and US customs gates.
 
 Refresh deployment after updating obsolete no-contact inventory audit expectation; no payment activation.
+
+Deploy owner-only GST/HST screening and additional public launch readiness checks. All payment, tax and US customs gates remain off.
