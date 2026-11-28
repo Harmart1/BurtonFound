@@ -7,6 +7,10 @@ def prepare(base,bindings):
     if base.get("name")!="burtonfound":raise ValueError("Wrong Worker")
     vars=base["vars"]
     expected={**vars,**{name:"true" for name in LIVE_FLAGS},"STRIPE_WEBHOOK_MODE":"live"}
+    # Preserve existing approved search visibility on every subsequent live release.
+    indexing=bindings.get("MARKETING_INDEXING_APPROVED",{}).get("text")
+    if indexing not in ("true","false"):raise ValueError("Unverified deployed indexing flag")
+    expected["MARKETING_INDEXING_APPROVED"]=indexing
     for name,value in expected.items():
         if name=="LIVE_APPROVED_SKUS_JSON":continue
         row=bindings.get(name,{})
@@ -26,6 +30,9 @@ def prepare(base,bindings):
 def main():
     base=json.loads(Path("wrangler.jsonc").read_text())
     config=prepare(base,cloudflare_bindings())
+    if "--enable-indexing" in sys.argv:
+        config["vars"]["MARKETING_INDEXING_APPROVED"]="true"
+        print("PASS explicit owner-approved public indexing enabled; commercial settings unchanged.")
     if "--add-auto" in sys.argv:
         previous=json.loads(config["vars"]["LIVE_APPROVED_SKUS_JSON"])
         manifest=json.loads(Path("release-review/vintage-auto-candidates.json").read_text())
