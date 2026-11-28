@@ -1,6 +1,5 @@
 {
   "scope": "CA",
-  "physical_inventory_confirmation_required": true,
   "products": [
     {
       "sku": "VA-001",
@@ -821,5 +820,7 @@
         "VA-091"
       ]
     }
-  ]
+  ],
+  "owner_sale_instruction": "Owner requested the Vintage Automobile collection be purchasable. One physical unit per distinct catalogue design is assumed for sale purposes; the owner must ensure actual availability and disclose condition.",
+  "independent_physical_inventory_verification": false
 }
