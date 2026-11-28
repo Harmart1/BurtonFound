@@ -7,3 +7,5 @@ Deploy validated Canada/US flat-rate checkout support with payment and US custom
 Deploy provisional CAD flat-rate pricing behind disabled price approval gate, owner dashboard and redirect-aware checks; retain all preview, tax, US customs and live-payment gates.
 
 Deploy Worker-bundled sitemap and robots routing; validate preview release and public site, retain all commercial approval gates.
+
+Owner approved four starting flat rates. Deploy with exact approved prices and all checkout, US duty, live carrier, tax and indexing gates off.
