@@ -9,3 +9,5 @@ Owner reports corrected live key; fresh production credential check.
 Owner created production destination; verify live endpoint and inspect encrypted Worker binding presence.
 
 Owner reports Cloudflare live bindings added; recheck deployed binding metadata and Stripe destination.
+
+Verify production signing credential with non-order probe after owner-installed Cloudflare secrets.
