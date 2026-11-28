@@ -27,3 +27,5 @@ Deploy commercial launch safeguards, verified shipping disclosures and required 
 Canada-first scope selected by owner. Require individually verified listing allowlist for eventual live checkout; leave list empty and all payment approval flags false. Verify approved domestic prices after deployment.
 
 Deploy photo-based physical inspection workflow and read-only owner review validator. Keep individual SKU allowlist empty and all checkout/production/customs approval switches disabled.
+
+Deploy Canadian cart shipping totals, duplicate checkout click protection, and owner-authorized guest email deferral. Live checkout remains locked pending live credentials and remaining operational approvals.
