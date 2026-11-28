@@ -1,1 +1,3 @@
 2026-11-27 — retry owner-authorized sandbox lifecycle using curl safety preflight; fail closed before transactions.
+
+Post-domain commercial readiness test using disposable database and Stripe TEST credentials only; no production orders or charges.
