@@ -5,3 +5,5 @@ Deploy branded canonical links and sitemap; retain both Cloudflare custom domain
 Deploy validated Canada/US flat-rate checkout support with payment and US customs gates disabled; no merchant price changes.
 
 Deploy provisional CAD flat-rate pricing behind disabled price approval gate, owner dashboard and redirect-aware checks; retain all preview, tax, US customs and live-payment gates.
+
+Deploy Worker-bundled sitemap and robots routing; validate preview release and public site, retain all commercial approval gates.
