@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import worker from '../src/worker.js';
+import worker,{paymentEnvironment} from '../src/worker.js';
 
 const base='https://burtonfound.timharmar.workers.dev';
 const env={ASSETS:{fetch:async()=>new Response('Storefront asset',{status:200})}};
@@ -59,4 +59,12 @@ test('Worker serves generated branded sitemap and robots independently of static
   const robots=await worker.fetch(new Request(base+'/robots.txt'),{},{});assert.match(await robots.text(),/Sitemap: https:\/\/burtonandfound\.ca\/sitemap\.xml/);
   const head=await worker.fetch(new Request(base+'/sitemap.xml',{method:'HEAD'}),{},{});assert.equal(await head.text(),'');
   const bad=await worker.fetch(new Request(base+'/sitemap.xml',{method:'POST'}),{},{});assert.equal(bad.status,405);
+});
+
+test('live runtime never falls back to sandbox credentials and staging leaves preview untouched',()=>{
+ const staging={STRIPE_WEBHOOK_MODE:'test',STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_LIVE_SECRET_KEY:'sk_live_fixture',STRIPE_LIVE_WEBHOOK_SECRET:'whsec_fixture'};
+ assert.equal(paymentEnvironment(staging).STRIPE_SECRET_KEY,'sk_test_fixture');
+ assert.equal(paymentEnvironment({...staging,STRIPE_WEBHOOK_MODE:'live'}).STRIPE_SECRET_KEY,'sk_live_fixture');
+ assert.equal(paymentEnvironment({...staging,STRIPE_WEBHOOK_MODE:'live',STRIPE_LIVE_WEBHOOK_SECRET:''}).STRIPE_SECRET_KEY,'');
+ assert.equal(paymentEnvironment({...staging,STRIPE_WEBHOOK_MODE:'live',STRIPE_LIVE_SECRET_KEY:'sk_test_fixture'}).STRIPE_SECRET_KEY,'');
 });
