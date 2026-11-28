@@ -44,7 +44,7 @@ async function loadReadiness(){
  el.textContent='Checking connected services…';if($('launchWizard'))$('launchWizard').textContent='Checking authenticated launch configuration…';
  try{
   const v=await request('/api/admin/readiness');
-  window.BURTON_LAUNCH_WIZARD?.render(v,$('launchWizard'),window.BURTON_CONFIG||{});
+  if(v.checkout==='live_mode'){$('launchWizard').textContent='Live Canadian storefront · Review new orders, confirm payments, prepare the purchase agreement, and record shipping and tracking. Do not use the launch checklist to change live settings.';}else window.BURTON_LAUNCH_WIZARD?.render(v,$('launchWizard'),window.BURTON_CONFIG||{});
   if(window.BURTON_LAUNCH_READINESS?.render){window.BURTON_LAUNCH_READINESS.render(v,el,esc);return;}
   const rows=[
    {title:'Supabase inventory',good:v.supabase?.connected===true,detail:v.supabase?.connected?`${v.supabase.listings} listings · ${v.supabase.available} currently available`:'Private catalogue connection unavailable'},
@@ -68,7 +68,7 @@ function openDraft(o,type){
 }
 function packingSlip(o){
  const content=`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Packing slip ${esc(o.id.slice(0,8))}</title><style>body{font:15px/1.6 system-ui;color:#111;max-width:770px;margin:35px auto;padding:20px}h1{font:normal 38px Georgia,serif;margin:0}h2{margin-top:28px;font-size:18px}small{color:#666}pre{font:inherit;white-space:pre-wrap}table{width:100%;border-collapse:collapse;margin:16px 0}th,td{border-bottom:1px solid #bbb;padding:10px;text-align:left}footer{margin-top:36px;border-top:1px solid #aaa;padding-top:12px}@media print{button{display:none}body{margin:0}}</style></head><body>
- <h1>Burton &amp; Found</h1><small>Books · Ephemera · Collectibles · History worth holding</small><p>356 Queen St. E. · Sault Ste. Marie, ON P6A 1Z1 · Canada</p>
+ <h1>Burton &amp; Found</h1><small>Books · Ephemera · Collectibles · History worth holding</small><p>2-356 Queen Street East · Sault Ste. Marie, ON P6A 1Z1 · Canada · 249-700-1871</p>
  <h2>Packing slip · Order ${esc(o.id.slice(0,8))}</h2><p>Order date: ${esc(new Date(o.created_at).toLocaleDateString('en-CA'))}</p><h2>Ship to</h2><pre>${esc(address(o))}</pre>
  <h2>Contents</h2><table><thead><tr><th>SKU</th><th>Item</th><th>Qty</th></tr></thead><tbody>${(o.item_lines||[]).map(p=>`<tr><td>${esc(p.sku)}</td><td>${esc(p.title)}</td><td>1</td></tr>`).join('')}</tbody></table>
  <p>Carrier: ${esc(o.carrier||'To be confirmed')} · Tracking: ${esc(o.tracking_number||'To be confirmed')}</p><footer>Thank you for collecting with us · Please protect original paper from moisture and bending</footer><button onclick="window.print()">Print packing slip</button></body></html>`;
