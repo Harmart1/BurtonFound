@@ -43,6 +43,13 @@ jobs:
           retention-days: 30
       - name: Assert all preview release safety gates
         run: node scripts/assert-preview-release.mjs
+      - name: Require isolated desktop and mobile browser tests before deployment
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/bf-browser" --ignore-scripts --no-fund --no-audit --save-exact playwright-core@1.56.1
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          test -n "$chrome" || { echo "Browser unavailable; refusing release"; exit 1; }
+          BF_BROWSER_MODULE="$RUNNER_TEMP/bf-browser/node_modules/playwright-core" BF_CHROME_PATH="$chrome" node scripts/browser-customer-qa.mjs
       - name: Resolve Cloudflare account without displaying credentials
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
