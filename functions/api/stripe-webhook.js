@@ -45,7 +45,7 @@ export async function onRequestPost({request,env}){
   if(!liveBinding&&(!env.STRIPE_WEBHOOK_SECRET||!await verifyStripe(payload,sig,env.STRIPE_WEBHOOK_SECRET)))return error(400,'Invalid Stripe webhook signature');
   // Separate live signature binding permits staging without disrupting sandbox delivery.
   // Signature determines mode, not untrusted request data.
-  if(liveBinding)env={...env,STRIPE_WEBHOOK_MODE:'live'};
+  if(env.STRIPE_LIVE_WEBHOOK_SECRET)env={...env,STRIPE_WEBHOOK_MODE:liveBinding?'live':'test'};
   let evt;try{evt=JSON.parse(payload)}catch{return error(400,'Malformed webhook')}
   const result=classifyStripeEvent(evt,env);
   if(result.error)return error(result.status,result.error);
