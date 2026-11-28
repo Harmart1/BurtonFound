@@ -134,6 +134,20 @@ try{
    });
    await test(size+' private owner exception report and mode isolation',viewport,async page=>{
      await page.goto(origin+'/admin/orders.html?owner_fixture=1');await visible(page,'#dashboard');
+     const wizard=page.locator('#launchWizard');
+     await wizard.locator('#wizardScope').waitFor({state:'visible'});
+     assert.match(await wizard.textContent(),/Step 1 of 7/);
+     await wizard.locator('.wizard-tick input').check();
+     assert.match(await wizard.textContent(),/1 owner-marked reviewed/);
+     await wizard.getByRole('button',{name:'Next',exact:true}).click();
+     assert.match(await wizard.locator('.wizard-step h3').textContent(),/Confirm physical originals/);
+     await wizard.locator('#wizardScope').selectOption('CA,US');
+     assert.match(await wizard.textContent(),/Step 1 of 8/);
+     assert.match(await wizard.textContent(),/0 owner-marked reviewed/);
+     for(let i=0;i<5;i++)await wizard.getByRole('button',{name:'Next',exact:true}).click();
+     assert.match(await wizard.locator('.wizard-step h3').textContent(),/Verify US customs/);
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Owner wizard horizontal overflow');
+
      await page.locator('#ledgerFrom').fill('2026-11-01');await page.locator('#ledgerTo').fill('2026-11-30');
      await page.locator('#ledgerLoad').click();await page.locator('#exceptionRows tr').first().waitFor({state:'visible'});
      assert.equal(await page.locator('#exceptionRows tr').count(),1);assert.match(await page.locator('#exceptionRows').textContent(),/Local refunded status/);
