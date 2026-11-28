@@ -26,17 +26,25 @@ const autoItems=items.filter(p=>p.collection==='automobiles');
 if(saleItems.length!==131||autoItems.length!==98||autoItems.some(p=>!enquiry(p)))throw Error('Review changed catalogue or unverified automobile availability before marketing');
 // Optionally use a fresh public stock snapshot in the weekly export.
 // No private credential is involved; the public stock endpoint contains SKU availability only.
+const requireLiveStock=process.env.BF_REQUIRE_LIVE_MARKETING_STOCK==='true';
 let liveStock=null;
 const snapshot=join(root,'marketing-stock-snapshot.json');
 if(existsSync(snapshot)){
  try{
   const raw=JSON.parse(readFileSync(snapshot,'utf8'));
   if(raw?.configured===true&&Array.isArray(raw.items)&&raw.items.length){
-   liveStock=new Map(raw.items.filter(x=>typeof x.sku==='string'&&typeof x.available==='boolean').map(x=>[x.sku,x.available]));
-   if(liveStock.size<saleItems.length*.8){console.warn('Incomplete stock snapshot; checking all draft links manually is recommended.');liveStock=null}
+   const records=new Map();
+   for(const x of raw.items){
+    if(typeof x?.sku!=='string'||typeof x.available!=='boolean'||!Number.isSafeInteger(x.price_cents)||x.price_cents<=0||records.has(x.sku))throw Error('Malformed or duplicate public SKU');
+    records.set(x.sku,x);
+   }
+   if(saleItems.every(p=>records.has(p.sku))){
+    liveStock=new Map(saleItems.map(p=>[p.sku,records.get(p.sku).available===true&&records.get(p.sku).price_cents===Math.round(p.price*100)]));
+   }else console.warn('Incomplete stock snapshot; do not use as verified availability.');
   }
  }catch{console.warn('Could not read public stock snapshot; generating drafts from catalogue state only.')}
 }
+if(requireLiveStock&&liveStock===null)throw Error('Weekly marketing requires a complete live stock snapshot; no draft kit produced from stale data.');
 const marketable=p=>!enquiry(p)&&p.stockState!=='unavailable'&&p.status!=='unavailable'&&(liveStock===null||liveStock.get(p.sku)===true);
 const clean=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 const text=s=>String(s??'').replace(/\s+/g,' ').trim();
@@ -221,7 +229,8 @@ mkdirSync(out,{recursive:true});
 const csv=x=>'"'+String(x??'').replace(/"/g,'""').replace(/[\r\n]+/g,' ')+'"';
 const pinCopy=p=>short((p.collection==='hollywood'?'Old Hollywood printed-paper collectible':p.type==='bundle'?'Curated vintage-paper collector set':'Vintage Coca-Cola advertising')+': '+p.title+'. '+text(p.shortDescription)+'. See the actual item photograph, condition notes and CAD asking price at Burton & Found.',410);
 const socialCopy=p=>short((p.collection==='hollywood'?'For classic-film collectors: ':p.type==='bundle'?'For lovers of themed paper collections: ':'For vintage advertising enthusiasts: ')+p.title+'. '+text(p.shortDescription)+'. Explore the item photos and condition details at Burton & Found; confirm current availability before purchasing.',330);
-const rows=saleItems.map(p=>[p.sku,p.title,p.collection,p.type,dollar(p.price),abs(urlOf(p)),abs(p.image),
+const eligible=saleItems.filter(marketable);
+const rows=eligible.map(p=>[p.sku,p.title,p.collection,p.type,dollar(p.price),abs(urlOf(p)),abs(p.image),
  pinCopy(p),
  'Burton & Found · '+p.title+' · Vintage '+(p.collection==='hollywood'?'cinema':'advertising')+' · Catalogue photograph'].map(csv).join(','));
 writeFileSync(join(out,'pinterest-and-social-catalog.csv'),['sku,title,collection,type,asking_cad,product_url,image_url,pin_description,image_alt',...rows].join('\n')+'\n');
@@ -247,21 +256,21 @@ for(let i=0;i<14;i++){
 }
 const tagUrl=(p,source,slot)=>abs(urlOf(p))+'?utm_source='+source+'&utm_medium=organic&utm_campaign=collector_weekly&utm_content='+encodeURIComponent(p.sku.toLowerCase()+'-'+slot);
 writeFileSync(join(out,'14-day-social-calendar.md'),
- '# Burton & Found · 14 post ideas (editorial drafts)\n\nThese drafts are not scheduled or published. Check condition and claims; follow each community\'s promotion rules.\n\n'+picks.map((p,i)=>'### Day '+(i+1)+' — '+p.title+'\n\n'+socialCopy(p)+'\n\nView item photographs and CAD asking price: '+tagUrl(p,'pinterest','day'+(i+1))+'\n\nSuggested tags: #VintageAdvertising #BurtonAndFound '+(p.collection==='hollywood'?'#OldHollywood':'#CocaColaCollectibles')+'\n').join('\n'));
+ '# Burton & Found · 14 post ideas (editorial drafts)\n\nThese drafts are not scheduled or published. Stock check: '+(liveStock?'live public availability and asking-price match at generation; recheck before posting.':'offline catalogue only; confirm all availability and prices before posting.')+' Check condition and claims; follow each community\'s promotion rules.\n\n'+picks.map((p,i)=>'### Day '+(i+1)+' — '+p.title+'\n\n'+socialCopy(p)+'\n\nView item photographs and CAD asking price: '+tagUrl(p,'pinterest','day'+(i+1))+'\n\nSuggested tags: #VintageAdvertising #BurtonAndFound '+(p.collection==='hollywood'?'#OldHollywood':'#CocaColaCollectibles')+'\n').join('\n'));
 writeFileSync(join(out,'weekly-social-queue.csv'),
  ['day,sku,collection,product_title,image_url,product_url,caption,pinterest_link',
  ...picks.map((p,i)=>[i+1,p.sku,p.collection,p.title,abs(p.image),abs(urlOf(p)),
  socialCopy(p),
  tagUrl(p,'pinterest','day'+(i+1))].map(csv).join(','))].join('\n')+'\n');
 writeFileSync(join(out,'marketing-utm-links.csv'),
- ['sku,pinterest_url,facebook_url,instagram_bio_url',...saleItems.map(p=>[p.sku,
+ ['sku,pinterest_url,facebook_url,instagram_bio_url',...eligible.map(p=>[p.sku,
  tagUrl(p,'pinterest','catalog'),tagUrl(p,'facebook','organic'),tagUrl(p,'instagram','bio')].map(csv).join(','))].join('\n')+'\n');
 writeFileSync(join(out,'collector-newsletter-draft.md'),
  '# Subject: Three paper finds worth a closer look\n\nHello collectors,\n\nThis edition of Burton & Found highlights three vintage-paper finds:\n\n'+picks.slice(0,3).map(p=>'- '+p.title+' — '+dollar(p.price)+' CAD\n  '+abs(urlOf(p))).join('\n')+
  '\n\nA paper-collecting tip: always ask about the back of a vintage ad, the dimensions and any trimming before deciding to buy.\n\nBrowse the collection: '+base+'/collections/coca-cola.html?utm_source=newsletter&utm_medium=email&utm_campaign=collector_weekly\n\nThis is a DRAFT, not a sent email. Send only to subscribers with valid consent and include merchant identification and a working unsubscribe mechanism.\n');
 writeFileSync(join(out,'automobile-enquiry-promotions.csv'),['sku,title,asking_cad,product_url,image_url,draft_caption',...autoItems.map(p=>[p.sku,p.title,p.price.toFixed(2),abs(urlOf(p)),abs(p.image),short('For classic motoring enthusiasts: '+p.title+'. Browse the pictured advertising design and CAD asking price. Enquiry only: physical stock and printing date require confirmation. No online purchase or delivery promised.',300)].map(csv).join(','))].join('\n')+'\n');
 writeFileSync(join(out,'marketing-readiness.json'),JSON.stringify({
- timestamp:new Date().toISOString(),base,productPages:items.length,enquiryOnlyPages:autoItems.length,ordinaryPromotionListings:saleItems.length,collectionPages:collection.length,guidePages:guides.length,giftLandingPages:1,indexable,weeklyRotation:weekNumber,weeklyDraftItems:picks.map(p=>p.sku),jsonFeedItems:feedItems.length,liveStockSnapshotUsed:liveStock!==null,
+ timestamp:new Date().toISOString(),base,productPages:items.length,enquiryOnlyPages:autoItems.length,ordinaryPromotionListings:saleItems.length,promotionEligibleListings:eligible.length,collectionPages:collection.length,guidePages:guides.length,giftLandingPages:1,indexable,weeklyRotation:weekNumber,weeklyDraftItems:picks.map(p=>p.sku),jsonFeedItems:feedItems.length,liveStockSnapshotUsed:liveStock!==null,
  checkoutApproved,merchantFeedCreated:false,productLinksCreated:true,socialPostsPublished:false,newsletterSent:false,
  nextSteps:['Approve search indexing after seller content review','Connect Google Search Console and submit sitemap','Connect Pinterest business account to import CSV or create Pins','Confirm live checkout and shipping before Merchant Center','Connect a consent-managed email platform before collecting newsletter subscribers']
 },null,2));
