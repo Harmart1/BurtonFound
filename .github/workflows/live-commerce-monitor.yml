@@ -1,0 +1,37 @@
+name: Monitor live Canadian commerce (no charges)
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/live-commerce-monitor-trigger.txt'
+permissions:
+  contents: read
+concurrency:
+  group: burtonfound-live-monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect public checkout, stock, Stripe merchant and destination
+        env:
+          BF_LIVE_KEY: ${{ secrets.BF_STRIPE_LIVE_SECRET_KEY }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -o pipefail
+          python3 scripts/monitor-live-commerce.py | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Verify production signing and actual runtime merchant
+        env:
+          BF_EXPECT_LIVE: 'true'
+          BF_LIVE_WEBHOOK: ${{ secrets.BF_STRIPE_LIVE_WEBHOOK_SECRET }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_HINT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -o pipefail
+          python3 scripts/verify-production-webhook.py | tee -a "$GITHUB_STEP_SUMMARY"
