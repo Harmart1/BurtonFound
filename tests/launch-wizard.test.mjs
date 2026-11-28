@@ -13,7 +13,7 @@ test('domestic first has seven steps; US scope adds explicit customs review',()=
 });
 test('unknown or incomplete configuration is never represented as verified',()=>{
  assert.ok(W.checks({},{}).every(x=>!x.ok));
- const v={checkout:'preview_only',approvals:{checkoutEnabled:false,livePaymentApproved:false},supabase:{connected:true},shipping:{flatRates:{approved:true,CA:{standard:1995,express:3495},US:{standard:2995,express:4995}},crossBorderCheckoutApproved:false,canadaPostUsDutiesApproved:false}};
+ const v={checkout:'preview_only',approvals:{checkoutEnabled:false,livePaymentApproved:false,physicalStockApproved:true,domesticPostageVerified:true,customerEmailDeliveryApproved:true,sellerTermsApproved:true,productionWebhookReady:true},supabase:{connected:true},shipping:{flatRates:{approved:true,CA:{standard:1995,express:3495},US:{standard:2995,express:4995}},crossBorderCheckoutApproved:false,canadaPostUsDutiesApproved:false}};
  assert.ok(W.checks(v,{sellerEmail:'support@example.invalid'}).every(x=>x.ok));
  assert.equal(W.checks({...v,checkout:'live_mode'},{}).find(x=>x.label==='Checkout locked').ok,false);
  assert.equal(W.checks({...v,shipping:{...v.shipping,crossBorderCheckoutApproved:true}},{}).find(x=>x.label==='US checkout remains blocked').ok,false);
