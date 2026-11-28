@@ -20,7 +20,7 @@
     "TAX_CONFIGURATION_APPROVED": "false",
     "CARRIER_QUOTES_ENABLED": "false",
     "SHIPPING_MODE": "flat_rate",
-    "SHIPPING_ALLOWED_COUNTRIES": "CA,US",
+    "SHIPPING_ALLOWED_COUNTRIES": "CA",
     "CANADA_POST_API_MODE": "json",
     "US_SHIPPING_APPROVED": "false",
     "CANADA_POST_US_DUTIES_APPROVED": "false",
@@ -42,7 +42,8 @@
     "DOMESTIC_POSTAGE_VERIFIED": "false",
     "CUSTOMER_EMAIL_DELIVERY_APPROVED": "false",
     "SELLER_TERMS_APPROVED": "false",
-    "PRODUCTION_WEBHOOK_READY": "false"
+    "PRODUCTION_WEBHOOK_READY": "false",
+    "LIVE_APPROVED_SKUS_JSON": "[]"
   },
   "ratelimits": [
     {
