@@ -1,7 +1,7 @@
 /* Owner-only fulfillment console. No customer data is sent to third-party services. */
 (()=>{
 'use strict';
-const A=window.BURTON_ACCOUNT, $=id=>document.getElementById(id);
+const A=window.BURTON_ACCOUNT,F=window.BURTON_FULFILLMENT, $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const dollars=c=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format((Number(c)||0)/100);
 let orders=[];
@@ -35,8 +35,8 @@ function render(){
  <label>Tracking number<input name="tracking" value="${esc(o.tracking_number||'')}" maxlength="100" autocomplete="off"></label>
  <button type="submit">Save status</button></form>
  ${o.shipping_review_reason&&!o.shipping_review_resolved_at?`<div class="shipping-review-alert"><strong>Shipping address/price mismatch · fulfillment blocked</strong><p>${esc(o.shipping_review_reason)}</p><p>Confirm the paid amount in Stripe, obtain the customer's correct address, recheck the carrier's actual postage, and obtain consent or refund if necessary. This control cannot override an inventory conflict.</p><label>Owner resolution note <textarea data-review-note rows="3" maxlength="1000" placeholder="Describe verified address, postage amount, customer consent and whether a refund is required"></textarea></label><button class="resolve-review" type="button" data-action="resolve-shipping">Record review and unblock shipment</button></div>`:''}
- <div class="order-actions">${o.record_mode!=='live'?'<strong>Non-live or unknown record — no real shipment or customer contact.</strong>':''}<button class="secondary" type="button" data-action="packing">Print packing slip</button>${o.record_mode==='live'?'<a class="secondary" href="https://www.canadapost-postescanada.ca/cpc/en/small-business/snap-ship.page" target="_blank" rel="noopener noreferrer">Canada Post Snap Ship ↗</a><a class="secondary" href="https://www.fedex.com/en-ca/shipping/ship-online.html" target="_blank" rel="noopener noreferrer">FedEx Ship Manager ↗</a>':''}<button class="secondary" type="button" data-action="address">Copy address</button><button class="secondary" type="button" data-action="email">Prepare update email</button><button class="secondary" type="button" data-action="history">View change history</button></div>
- <div class="history" hidden></div></article>`).join('')||'<div class="help">No orders match these filters</div>';
+ <div class="order-actions">${o.record_mode!=='live'?'<strong>Non-live or unknown record — no real shipment or customer contact.</strong>':''}<button class="secondary" type="button" data-action="packing">Print packing slip</button>${o.record_mode==='live'?'<a class="secondary" href="https://www.canadapost-postescanada.ca/cpc/en/small-business/snap-ship.page" target="_blank" rel="noopener noreferrer">Canada Post Snap Ship ↗</a><a class="secondary" href="https://www.fedex.com/en-ca/shipping/ship-online.html" target="_blank" rel="noopener noreferrer">FedEx Ship Manager ↗</a>':''}<button class="secondary" type="button" data-action="address">Copy address</button><button class="secondary" type="button" data-action="email">Prepare update email</button>${F?.ready(o)?`<button class="secondary" type="button" data-action="summary">Print paid order summary</button><button class="secondary" type="button" data-action="confirmation">Prepare order confirmation</button><button class="secondary" type="button" data-action="shipping-cost">Calculate shipping contribution</button>`:'' }<button class="secondary" type="button" data-action="history">View change history</button></div>
+ <div class="shipping-cost-panel" hidden></div><div class="history" hidden></div></article>`).join('')||'<div class="help">No orders match these filters</div>';
 }
 async function refresh(){status('Loading orders…');try{const d=await request('/api/admin/orders');orders=d.orders||[];status('Secure owner dashboard · Recent order records, including review and test records');$('dashboard').hidden=false;$('loginHelp').hidden=true;render();loadReadiness();loadHolds()}catch(e){status(e.message);$('loginHelp').hidden=false;$('dashboard').hidden=true}}
 async function loadReadiness(){
@@ -58,11 +58,12 @@ async function loadReadiness(){
  }catch(ex){el.textContent=ex.message||'Launch readiness temporarily unavailable';}
 }
 
-function customerEmail(o){
- const shipped=['shipped','delivered'].includes(o.fulfillment_status);
- const subject=`Burton & Found ${shipped?'shipping':'order'} update · ${o.id.slice(0,8)}`;
- const body=`Hello,\n\n${shipped?'Your Burton & Found order has been dispatched.':'We are preparing your Burton & Found order.'}\n\nOrder: ${o.id.slice(0,8)}\nStatus: ${o.fulfillment_status.replaceAll('_',' ')}\nCarrier: ${o.carrier||'To be confirmed'}\nTracking number: ${o.tracking_number||'To be confirmed'}\n\nCheck the carrier's official tracking page:\n${String(o.carrier||'').toLowerCase().includes('fedex')?'https://www.fedex.com/fedextrack/':'https://www.canadapost-postescanada.ca/cpc/en/tools/track.page'}\n\nPlease contact Burton & Found if you have any questions.\n\nBurton & Found\n356 Queen St. E.\nSault Ste. Marie, Ontario P6A 1Z1\nCanada`;
- location.href=`mailto:${encodeURIComponent(o.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+function openDraft(o,type){
+ const d=F?.draft(o,type,window.BURTON_CONFIG?.sellerEmail);
+ if(!d)return status('Paid live order, valid email and saved shipment details required; resolve any outstanding exceptions.');
+ const href='mailto:'+d.to+'?subject='+encodeURIComponent(d.subject)+'&body='+encodeURIComponent(d.body);
+ if(href.length>1800){navigator.clipboard.writeText(d.body).then(()=>status('Long email draft copied. Address: '+d.to+' · Subject: '+d.subject+' · Send it manually.')).catch(()=>status('Draft too long for email app. Copy order details manually.'));return;}
+ location.href=href;status('Email draft prepared in your mail app. Review and send manually; nothing has been sent by this website.');
 }
 function packingSlip(o){
  const content=`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Packing slip ${esc(o.id.slice(0,8))}</title><style>body{font:15px/1.6 system-ui;color:#111;max-width:770px;margin:35px auto;padding:20px}h1{font:normal 38px Georgia,serif;margin:0}h2{margin-top:28px;font-size:18px}small{color:#666}pre{font:inherit;white-space:pre-wrap}table{width:100%;border-collapse:collapse;margin:16px 0}th,td{border-bottom:1px solid #bbb;padding:10px;text-align:left}footer{margin-top:36px;border-top:1px solid #aaa;padding-top:12px}@media print{button{display:none}body{margin:0}}</style></head><body>
@@ -70,7 +71,7 @@ function packingSlip(o){
  <h2>Packing slip · Order ${esc(o.id.slice(0,8))}</h2><p>Order date: ${esc(new Date(o.created_at).toLocaleDateString('en-CA'))}</p><h2>Ship to</h2><pre>${esc(address(o))}</pre>
  <h2>Contents</h2><table><thead><tr><th>SKU</th><th>Item</th><th>Qty</th></tr></thead><tbody>${(o.item_lines||[]).map(p=>`<tr><td>${esc(p.sku)}</td><td>${esc(p.title)}</td><td>1</td></tr>`).join('')}</tbody></table>
  <p>Carrier: ${esc(o.carrier||'To be confirmed')} · Tracking: ${esc(o.tracking_number||'To be confirmed')}</p><footer>Thank you for collecting with us · Please protect original paper from moisture and bending</footer><button onclick="window.print()">Print packing slip</button></body></html>`;
- const w=window.open('','_blank');if(!w){status('Pop-up blocked. Allow pop-ups to print a packing slip.');return;}w.document.write(content);w.document.close();w.focus();
+ const w=window.open('','_blank');if(!w){status('Pop-up blocked. Allow pop-ups to print a packing slip.');return;}w.opener=null;w.document.write(content);w.document.close();w.focus();
 }
 function csvCell(v){let s=String(v??'').replaceAll('\r',' ').replaceAll('\n',' ');if(/^[\s]*[=+\-@\t]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"'}
 function exportCsv(){
@@ -103,9 +104,25 @@ $('orders').addEventListener('click',async e=>{
    catch(err){status(err.message);btn.disabled=false;}
    break;
   }
-  case 'packing':if(o.record_mode!=='live')return status('Do not print real packing slips for sandbox or unknown orders.');packingSlip(o);break;
+  case 'packing':if(o.record_mode!=='live')return status('Do not print real packing slips for sandbox or unknown orders.');if(!F?.shippingReady(o))return status('Verify paid status and resolve shipping/order exceptions before packing.');packingSlip(o);break;
   case 'address':if(o.record_mode!=='live')return status('Do not copy delivery addresses for sandbox or unknown orders.');try{await navigator.clipboard.writeText(address(o));status('Delivery address copied')}catch{status('Clipboard unavailable; select and copy the address manually')}break;
-  case 'email':if(o.record_mode!=='live')return status('No customer email from a sandbox or unknown record.');if(o.email)customerEmail(o);else status('No email address on this order');break;
+  case 'email':if(o.record_mode!=='live')return status('No customer email from a sandbox or unknown record.');if(!F?.ready(o))return status('Verify paid status and resolve exceptions before preparing customer emails.');
+   openDraft(o,['shipped','delivered'].includes(o.fulfillment_status)?'dispatch':'confirmation');break;
+  case 'confirmation':openDraft(o,'confirmation');break;
+  case 'summary':{
+   const html=F?.summary(o,window.BURTON_CONFIG?.sellerEmail);
+   if(!html)return status('Paid live order must be verified before printing a summary.');
+   const w=window.open('','_blank');if(!w)return status('Allow pop-ups to print or save the summary.');
+   w.opener=null;w.document.write(html);w.document.close();w.focus();break;
+  }
+  case 'shipping-cost':{
+   if(!F?.ready(o))return status('Verify paid live order first.');
+   const panel=btn.closest('.order').querySelector('.shipping-cost-panel');if(!panel)return;
+   if(!panel.hidden){panel.hidden=true;panel.replaceChildren();break;}
+   panel.hidden=false;panel.innerHTML='<h3>Shipping contribution (CAD)</h3><p>Customer shipping charge: '+esc(dollars(o.shipping_cents))+' · Enter actual or quoted expenses. No estimate is implied.</p><div class="operations-form">'+['Postage','Packaging','Duties and customs fees','Other shipping expenses'].map((label,i)=>'<label>'+label+'<input type="number" min="0" step="0.01" inputmode="decimal" data-expense="'+i+'" placeholder="0.00"></label>').join('')+'</div><p role="status">Enter all four costs, including zero where applicable.</p><small>Local calculation only. Excludes item margin, payment fees and taxes; not stored or posted to bookkeeping.</small>';
+   const result=panel.querySelector('[role="status"]'),inputs=[...panel.querySelectorAll('input')];
+   panel.addEventListener('input',()=>{const vals=inputs.map(x=>F.parseCAD(x.value));const v=F.contribution(o.shipping_cents,...vals);result.textContent=v?'Total shipping expense '+dollars(v.costs)+' · '+(v.contribution<0?'Shipping shortfall ':'Shipping contribution ')+dollars(Math.abs(v.contribution)):'Enter all four costs, including zero where applicable.';},{signal:undefined});break;
+  }
   case 'history':{
    const box=btn.closest('.order').querySelector('.history');if(!box.hidden){box.hidden=true;break;}
    box.textContent='Loading change history…';box.hidden=false;
