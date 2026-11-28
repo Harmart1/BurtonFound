@@ -5,6 +5,7 @@ import {onRequestGet as merchantFeed} from '../functions/api/merchant-feed.js';
 import {onRequestGet as catalog} from '../functions/api/catalog.js';
 import {onRequestGet as accountOrders} from '../functions/api/account-orders.js';
 import {onRequestGet as checkoutStatus} from '../functions/api/checkout-status.js';
+import {onRequestPost as checkoutCancel} from '../functions/api/checkout-cancel.js';
 import {onRequestPost as checkout} from '../functions/api/checkout.js';
 import {onRequestPost as shippingQuotes} from '../functions/api/shipping-quotes.js';
 import {onRequestPost as stripeWebhook} from '../functions/api/stripe-webhook.js';
@@ -38,6 +39,7 @@ const routes = {
   '/api/account-orders': {GET: accountOrders},
   '/api/checkout-status': {GET: checkoutStatus},
   '/api/checkout': {POST: checkout},
+  '/api/checkout-cancel': {POST: checkoutCancel},
   '/api/shipping-quotes': {POST: shippingQuotes},
   '/api/stripe-webhook': {POST: stripeWebhook},
   '/api/admin/me': {GET: adminMe},
